@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace Hi3Helper.Win32.ShellLinkCOM
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct PropVariant
+    public struct PropVariant
     {
         public short variantType;
         public short Reserved1, Reserved2, Reserved3;
