@@ -122,7 +122,7 @@ namespace Hi3Helper.Win32.Native
         
         [LibraryImport("user32.dll", EntryPoint = "EnumWindows", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+        public static partial bool EnumWindows(EnumWindowsProc lpEnumFunc, nint lParam);
         
         [LibraryImport("user32.dll", EntryPoint = "GetWindowThreadProcessId", SetLastError = true)]
         public static unsafe partial uint GetWindowThreadProcessId(nint hWnd, int* lpdwProcessId);

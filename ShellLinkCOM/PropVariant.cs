@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Hi3Helper.Win32.Native;
+using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hi3Helper.Win32.ShellLinkCOM
 {
@@ -39,20 +37,15 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         }
 
         /// <summary>
-        /// Called to properly clean up the memory referenced by a PropVariant instance.
-        /// </summary>
-        [DllImport("ole32.dll")]
-        private extern static int PropVariantClear(ref PropVariant pvar);
-
-        /// <summary>
         /// Called to clear the PropVariant's referenced and local memory.
         /// </summary>
         /// <remarks>
         /// You must call Clear to avoid memory leaks.
         /// </remarks>
-        public void Clear()
+        public unsafe void Clear()
         {
-            PropVariantClear(ref this);
+            PInvoke.PropVariantClear((PropVariant*)Unsafe.AsPointer(ref this))
+                .ThrowOnFailure();
         }
     }
 }

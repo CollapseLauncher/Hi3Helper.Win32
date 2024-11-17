@@ -5,7 +5,7 @@ namespace Hi3Helper.Win32.Native.Structs
 {
     public struct MainWindowFinder
     {
-        private IntPtr _bestHandle;
+        private nint _bestHandle;
         private int _processId;
 
         public static unsafe nint FindMainWindow(int processId)

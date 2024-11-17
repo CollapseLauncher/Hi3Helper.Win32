@@ -269,7 +269,7 @@ namespace Hi3Helper.Win32.Native
                     if (p == null) continue;
                     try
                     {
-                        if (p.MainWindowHandle == IntPtr.Zero)
+                        if (p.MainWindowHandle == nint.Zero)
                         {
                             logger?.LogTrace("Process does not have window, skipping...");
                             continue;
