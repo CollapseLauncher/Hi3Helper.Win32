@@ -1,9 +1,12 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Structs;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.Native
 {
+    public delegate bool EnumWindowsProc(nint hWnd, nint lParam);
+
     public static partial class PInvoke
     {
         [LibraryImport("user32.dll", EntryPoint = "ShowWindow")]
@@ -116,5 +119,15 @@ namespace Hi3Helper.Win32.Native
         [LibraryImport("user32.dll", EntryPoint = "SetWindowPos", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool SetWindowPos(nint hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, SWP_FLAGS wFlags);
+        
+        [LibraryImport("user32.dll", EntryPoint = "EnumWindows", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+        
+        [LibraryImport("user32.dll", EntryPoint = "GetWindowThreadProcessId", SetLastError = true)]
+        public static unsafe partial uint GetWindowThreadProcessId(nint hWnd, int* lpdwProcessId);
+
+        [LibraryImport("user32.dll", EntryPoint = "GetWindow", SetLastError = true)]
+        public static partial nint GetWindow(nint hWnd, GetWindowType uCmd);
     }
 }

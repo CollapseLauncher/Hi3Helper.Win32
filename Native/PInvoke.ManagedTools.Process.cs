@@ -16,12 +16,22 @@ namespace Hi3Helper.Win32.Native
         // https://github.com/dotnet/runtime/blob/main/src/libraries/Common/src/Interop/Windows/NtDll/Interop.NtQuerySystemInformation.cs#L11
 
         private const int SystemProcessInformation = 5;
+        private const int QueryLimitedInformation = 0x1000;
 
         private const int DefaultNtQueryChangedLen = 4 << 17;
         private static int DynamicNtQueryChangedBufferLen = DefaultNtQueryChangedLen;
 
-        public unsafe static bool IsProcessExist(ReadOnlySpan<char> processName, string checkForOriginPath = "", ILogger? logger = null)
+        public unsafe static bool IsProcessExist(int processId) => OpenProcess(QueryLimitedInformation, false, processId) != nint.Zero;
+
+        public unsafe static bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", ILogger? logger = null)
+            => IsProcessExist(processName, out processId, out windowHandle, checkForOriginPath, false, logger);
+
+        public unsafe static bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", bool useStartsWithMatch = false, ILogger? logger = null)
         {
+            // Set default process id number to 0
+            processId = 0;
+            windowHandle = nint.Zero;
+
             // If the buffer length is more than 2 MiB, then reset the length to default
             if (DynamicNtQueryChangedBufferLen > (2 << 20))
             {
@@ -90,7 +100,10 @@ namespace Hi3Helper.Win32.Native
                     // Use the struct buffer into the ReadOnlySpan<char> to be compared with
                     // the input from "processName" argument.
                     ReadOnlySpan<char> imageNameSpan = new ReadOnlySpan<char>(unicodeString->Buffer, unicodeString->Length / 2);
-                    bool isMatchedExecutable = imageNameSpan.Equals(processName, StringComparison.OrdinalIgnoreCase);
+                    bool isMatchedExecutable = !useStartsWithMatch ? 
+                        imageNameSpan.Equals(processName, StringComparison.OrdinalIgnoreCase) :
+                        imageNameSpan.StartsWith(processName, StringComparison.OrdinalIgnoreCase);
+
                     if (isMatchedExecutable)
                     {
                         // If the origin path argument is null, then return as true.
@@ -101,10 +114,12 @@ namespace Hi3Helper.Win32.Native
                         // START!!
 
                         // Move the offset of the current pointer and get the processId value
-                        uint processId = *(uint*)(curPosPtr + 56 + sizeOfUnicodeString + 8);
+                        processId = *(int*)(curPosPtr + 56 + sizeOfUnicodeString + 8);
+
+                        // Try find the window id and assign it to windowHandle
+                        windowHandle = MainWindowFinder.FindMainWindow(processId);
 
                         // Try open the process and get the handle
-                        const int QueryLimitedInformation = 0x1000;
                         nint processHandle = OpenProcess(QueryLimitedInformation, false, processId);
 
                         // If failed, then log the Win32 error and return false.
@@ -146,7 +161,10 @@ namespace Hi3Helper.Win32.Native
                                 ReadOnlySpan<char> checkForOriginPathDir = checkForOriginPath;
 
                                 // Compare and return if any of result is equal
-                                isCommandPathEqual = processCmdLineSpan.Equals(checkForOriginPathDir, StringComparison.OrdinalIgnoreCase);
+                                isCommandPathEqual = !useStartsWithMatch ? 
+                                    processCmdLineSpan.Equals(checkForOriginPathDir, StringComparison.OrdinalIgnoreCase) :
+                                    processCmdLineSpan.StartsWith(checkForOriginPathDir, StringComparison.OrdinalIgnoreCase);
+
                                 if (isCommandPathEqual)
                                     return true;
                             }
@@ -178,8 +196,7 @@ namespace Hi3Helper.Win32.Native
         public static unsafe string? GetProcessPathByProcessId(int processId, ILogger? logger = null)
         {
             // Try open the process and get the handle
-            const int QueryLimitedInformation = 0x1000;
-            nint processHandle = OpenProcess(QueryLimitedInformation, false, (uint)processId);
+            nint processHandle = OpenProcess(QueryLimitedInformation, false, processId);
 
             // If failed, then log the Win32 error and return null.
             if (processHandle == nint.Zero)
