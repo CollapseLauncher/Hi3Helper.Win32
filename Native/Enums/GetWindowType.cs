@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hi3Helper.Win32.Native.Enums
+﻿namespace Hi3Helper.Win32.Native.Enums
 {
     public enum GetWindowType : uint
     {
