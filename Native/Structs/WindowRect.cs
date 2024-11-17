@@ -17,9 +17,9 @@
             set => Bottom = Top + value;
         }
 
-        public unsafe bool Equals(WindowRect* compareTo) => Left == compareTo->Left &&
-                Top == compareTo->Top &&
-                Right == compareTo->Right &&
-                Bottom == compareTo->Bottom;
+        public unsafe bool Equals(ref WindowRect compareTo) => Left == compareTo.Left &&
+                Top == compareTo.Top &&
+                Right == compareTo.Right &&
+                Bottom == compareTo.Bottom;
     }
 }
