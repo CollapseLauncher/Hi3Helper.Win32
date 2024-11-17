@@ -102,5 +102,19 @@ namespace Hi3Helper.Win32.Native
         [LibraryImport("user32.dll", EntryPoint = "DestroyIcon", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool DestroyIcon(nint hIcon);
+
+        [LibraryImport("user32.dll", EntryPoint = "GetWindowLongW", SetLastError = true)]
+        public static partial WS_STYLE GetWindowLong(nint hWnd, GWL_INDEX nIndex);
+
+        [LibraryImport("user32.dll", EntryPoint = "SetWindowLongW", SetLastError = true)]
+        public static partial int SetWindowLong(nint hWnd, GWL_INDEX nIndex, WS_STYLE dwNewLong);
+
+        [LibraryImport("user32.dll", EntryPoint = "GetWindowRect", SetLastError = true)]
+        [return : MarshalAs(UnmanagedType.Bool)]
+        public static unsafe partial bool GetWindowRect(nint hwnd, WindowRect* rectangle);
+
+        [LibraryImport("user32.dll", EntryPoint = "SetWindowPos", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool SetWindowPos(nint hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, SWP_FLAGS wFlags);
     }
 }
