@@ -8,21 +8,24 @@ namespace Hi3Helper.Win32.Native
 {
     public static partial class PInvoke
     {
-        public static CancellationTokenSource? _preventSleepToken;
-        private static bool _preventSleepRunning;
+        public static  CancellationTokenSource? _preventSleepToken;
+        private static bool                     _preventSleepRunning;
+        private static ILogger?                 _logger;
 
         public static async void RestoreSleep()
         {
             // Return early if token is disposed/already cancelled
             if (_preventSleepToken == null || _preventSleepToken.IsCancellationRequested)
                 return;
-            await (_preventSleepToken?.CancelAsync() ?? Task.CompletedTask);
+            _logger?.LogInformation($"[InvokeProp::RestoreSleep()] Called by{new System.Diagnostics.StackTrace()}");
+            await _preventSleepToken.CancelAsync();
         }
 
         public static async void PreventSleep(ILogger? logger = null)
         {
             // Only run this loop once
             if (_preventSleepRunning) return;
+            _logger = logger;
 
             // Initialize instance if it's still null
             _preventSleepToken ??= new CancellationTokenSource();
@@ -35,7 +38,8 @@ namespace Hi3Helper.Win32.Native
 
             try
             {
-                logger?.LogWarning("[InvokeProp::PreventSleep()] Starting to prevent sleep!");
+                _logger?.LogWarning("[InvokeProp::PreventSleep()] Starting to prevent sleep!");
+                _logger?.LogInformation($"[InvokeProp::PreventSleep()] Called by{new System.Diagnostics.StackTrace()}");
                 while (!_preventSleepToken.IsCancellationRequested)
                 {
                     // Set ES to SystemRequired every 60s
@@ -60,6 +64,7 @@ namespace Hi3Helper.Win32.Native
 
                 // Null the token for the next time method is called
                 _preventSleepToken = null;
+                _logger            = null;
             }
         }
     }
