@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Runtime.InteropServices;
+// ReSharper disable RedundantUnsafeContext
 
 namespace Hi3Helper.Win32.Native
 {
@@ -21,12 +22,12 @@ namespace Hi3Helper.Win32.Native
         private const int DefaultNtQueryChangedLen = 4 << 17;
         private static int DynamicNtQueryChangedBufferLen = DefaultNtQueryChangedLen;
 
-        public unsafe static bool IsProcessExist(int processId) => OpenProcess(QueryLimitedInformation, false, processId) != nint.Zero;
+        public static unsafe bool IsProcessExist(int processId) => OpenProcess(QueryLimitedInformation, false, processId) != nint.Zero;
 
-        public unsafe static bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", ILogger? logger = null)
+        public static unsafe bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", ILogger? logger = null)
             => IsProcessExist(processName, out processId, out windowHandle, checkForOriginPath, false, logger);
 
-        public unsafe static bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", bool useStartsWithMatch = false, ILogger? logger = null)
+        public static unsafe bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", bool useStartsWithMatch = false, ILogger? logger = null)
         {
             // Set default process id number to 0
             processId = 0;
@@ -42,6 +43,7 @@ namespace Hi3Helper.Win32.Native
             ArrayPool<byte> arrayPool = ArrayPool<byte>.Shared;
             byte[] NtQueryCachedBuffer = arrayPool.Rent(DynamicNtQueryChangedBufferLen);
             bool isReallocate = false;
+            // ReSharper disable once RedundantAssignment
             uint length = 0;
 
             // Get size of UNICODE_STRING struct
@@ -86,7 +88,7 @@ namespace Hi3Helper.Win32.Native
 
                     // Start reading data from the buffer
                     int currentOffset = 0;
-                    bool isCommandPathEqual = false;
+                    bool isCommandPathEqual;
                 ReadQueryData:
                     // Get the current position of the pointer based on its offset
                     byte* curPosPtr = dataBufferPtr + currentOffset;
@@ -192,7 +194,6 @@ namespace Hi3Helper.Win32.Native
             return false;
         }
 
-#nullable enable
         public static unsafe string? GetProcessPathByProcessId(int processId, ILogger? logger = null)
         {
             // Try open the process and get the handle
@@ -240,7 +241,6 @@ namespace Hi3Helper.Win32.Native
                 ArrayPool<char>.Shared.Return(bufferProcessCmd);
             }
         }
-#nullable restore
 
         public static nint GetProcessWindowHandle(string ProcName) => Process.GetProcessesByName(Path.GetFileNameWithoutExtension(ProcName), ".")[0].MainWindowHandle;
 
@@ -266,6 +266,7 @@ namespace Hi3Helper.Win32.Native
                 logger?.LogTrace($"Enumerating instances...");
                 foreach (Process p in instanceProc)
                 {
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                     if (p == null) continue;
                     try
                     {

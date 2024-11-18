@@ -28,7 +28,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
     }
 
     [Flags]
-    public enum SHGetFileInfoConstants : int
+    public enum SHGetFileInfoConstants
     {
         SHGFI_ICON = 0x100, // get icon 
         SHGFI_DISPLAYNAME = 0x200, // get display name 

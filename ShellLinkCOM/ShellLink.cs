@@ -6,14 +6,16 @@ using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+// ReSharper disable ArrangeTypeMemberModifiers
+// ReSharper disable NotAccessedField.Local
 
-#nullable enable
 #pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 namespace Hi3Helper.Win32.ShellLinkCOM
 {
     unsafe delegate void ToDelegateInvoke(char* buffer, int length);
     unsafe delegate void ToDelegateWithW32FindDataInvoke(char* buffer, nint findDataPtr, int length);
 
+    [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
     public class ShellLink : IDisposable
     {
         // Use Unicode (W) under NT, otherwise use ANSI      
@@ -231,13 +233,13 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             try
             {
                 fixed (char* bufferPtr = &buffer[0])
-                fixed (void* findDataPtr = &win32FindDataBuffer[0])
-                {
-                    nint findDataSafe = (nint)findDataPtr;
-                    toInvokeDelegate(bufferPtr, findDataSafe, length);
+                    fixed (void* findDataPtr = &win32FindDataBuffer[0])
+                    {
+                        nint findDataSafe = (nint)findDataPtr;
+                        toInvokeDelegate(bufferPtr, findDataSafe, length);
 
-                    return GetStringFromNullTerminatedPtr(bufferPtr);
-                }
+                        return GetStringFromNullTerminatedPtr(bufferPtr);
+                    }
             }
             finally
             {

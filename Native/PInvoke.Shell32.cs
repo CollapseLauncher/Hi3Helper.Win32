@@ -1,8 +1,8 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.Native
 {
+    // ReSharper disable once RedundantUnsafeContext
     public static unsafe partial class PInvoke
     {
         [LibraryImport("shell32.dll", EntryPoint = "ExtractIconExW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]

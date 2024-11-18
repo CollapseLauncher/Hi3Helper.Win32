@@ -1,6 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Structs;
-using System;
 using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.Native

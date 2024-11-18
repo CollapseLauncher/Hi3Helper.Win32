@@ -13,7 +13,7 @@ namespace Hi3Helper.Win32.Native.Structs
         // CCHDEVICENAME = 32 = 0x50
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         public string dmDeviceName;
-        // In addition you can define the last character array
+        // In addition, you can define the last character array
         // as following:
         //[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         //public Char[] dmDeviceName;

@@ -1,5 +1,4 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
-using System;
 
 namespace Hi3Helper.Win32.Native.Structs
 {
@@ -16,7 +15,7 @@ namespace Hi3Helper.Win32.Native.Structs
             instance._processId = processId;
 
             EnumWindowsProc enumWindowCallback = EnumWindowsCallback;
-            PInvoke.EnumWindows(enumWindowCallback, (nint)(void*)&instance);
+            PInvoke.EnumWindows(enumWindowCallback, (nint)(&instance));
 
             return instance._bestHandle;
         }

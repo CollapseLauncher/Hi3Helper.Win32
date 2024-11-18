@@ -7,6 +7,7 @@ using System.Runtime.InteropServices.Marshalling;
 
 namespace Hi3Helper.Win32.Native
 {
+    // ReSharper disable once PartialTypeWithSinglePart
     public static partial class CoCreateInstance
     {
         public static unsafe HResult CreateInstance<T>(Guid rclsid, nint pUnkOuter, CLSCTX dwClsContext, out T? ppv)

@@ -44,7 +44,7 @@ namespace Hi3Helper.Win32.Native
                     logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Loading inputString into buffer has failed! Clipboard will not be set!");
 
                 // Always set the null byte at the end of the buffer
-                ((byte*)stringBufferPtr!)![bufferWritten] = 0x00; // Write the null (terminator) byte
+                ((byte*)stringBufferPtr)![bufferWritten] = 0x00; // Write the null (terminator) byte
 
                 // Unlock the buffer
                 GlobalUnlock(hMem);

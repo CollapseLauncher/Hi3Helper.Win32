@@ -1,5 +1,4 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
-using System;
 
 namespace Hi3Helper.Win32.Native
 {
