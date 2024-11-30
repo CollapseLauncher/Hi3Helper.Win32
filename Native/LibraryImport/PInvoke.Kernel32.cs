@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Runtime.InteropServices;
 
@@ -87,5 +88,33 @@ namespace Hi3Helper.Win32.Native
             string lpBuffer,
             uint nSize,
             nint argumentsLong);
+        
+        [LibraryImport("kernel32.dll", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+        public static partial IntPtr CreateFileW(
+            string lpFileName,
+            uint   dwDesiredAccess,
+            uint   dwShareMode,
+            IntPtr lpSecurityAttributes,
+            uint   dwCreationDisposition,
+            uint   dwFlagsAndAttributes,
+            IntPtr hTemplateFile);
+
+        [LibraryImport("kernel32.dll", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool DeviceIoControl(
+            IntPtr   hDevice,
+            uint     dwIoControlCode,
+            IntPtr   lpInBuffer,
+            uint     nInBufferSize,
+            IntPtr   lpOutBuffer,
+            uint     nOutBufferSize,
+            out uint lpBytesReturned,
+            IntPtr   lpOverlapped);
+
+        [LibraryImport("kernel32.dll", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool CloseHandle(IntPtr hObject);
     }
 }
