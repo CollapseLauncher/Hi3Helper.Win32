@@ -51,7 +51,7 @@ public static partial class PInvoke
         nint   hDevice    = CreateFile(devicePath, 0, 3, nint.Zero, 3, 0, nint.Zero);
         if (hDevice == nint.Zero || hDevice == new nint(-1))
         {
-            logger?.LogError(new IOException($"Unable to open drive: {pathRoot}. Error: {Marshal.GetLastWin32Error()}").ToString());
+            logger?.LogError(new IOException($"Unable to open drive: {pathRoot}. Error: {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}").ToString());
             return true; // Assume SSD
         }
 
@@ -109,7 +109,7 @@ public static partial class PInvoke
             }
             else
             {
-                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {Marshal.GetLastWin32Error()}").ToString());
+                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}").ToString());
                 return false; // Assume SSD
             }
         }
@@ -157,7 +157,7 @@ public static partial class PInvoke
             }
             else
             {
-                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {Marshal.GetLastWin32Error()}").ToString());
+                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}").ToString());
                 return true; // Assume SSD
             }
         }

@@ -82,7 +82,7 @@ namespace Hi3Helper.Win32.Native
                     // If other error has occurred, then return false as failed.
                     if (hNtQuerySystemInformationResult != 0)
                     {
-                        logger?.LogError($"Error happened while operating NtQuerySystemInformation(): {Marshal.GetLastWin32Error()}");
+                        logger?.LogError($"Error happened while operating NtQuerySystemInformation(): {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}");
                         return false;
                     }
 
@@ -127,7 +127,7 @@ namespace Hi3Helper.Win32.Native
                         // If failed, then log the Win32 error and return false.
                         if (processHandle == nint.Zero)
                         {
-                            logger?.LogError($"Error happened while operating OpenProcess(): {Marshal.GetLastWin32Error()}");
+                            logger?.LogError($"Error happened while operating OpenProcess(): {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}");
                             return false;
                         }
 
@@ -145,7 +145,7 @@ namespace Hi3Helper.Win32.Native
                                 // If the query is unsuccessful, then log the Win32 error and return false.
                                 if (!hQueryFullProcessImageNameResult)
                                 {
-                                    logger?.LogError($"Error happened while operating QueryFullProcessImageName(): {Marshal.GetLastWin32Error()}");
+                                    logger?.LogError($"Error happened while operating QueryFullProcessImageName(): {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}");
                                     return false;
                                 }
 
@@ -202,7 +202,7 @@ namespace Hi3Helper.Win32.Native
             // If failed, then log the Win32 error and return null.
             if (processHandle == nint.Zero)
             {
-                logger?.LogError($"Error happened while operating OpenProcess(): {Marshal.GetLastWin32Error()}");
+                logger?.LogError($"Error happened while operating OpenProcess(): {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}");
                 return null;
             }
 
@@ -221,7 +221,7 @@ namespace Hi3Helper.Win32.Native
                     // If the query is unsuccessful, then log the Win32 error and return false.
                     if (!hQueryFullProcessImageNameResult)
                     {
-                        logger?.LogError($"Error happened while operating QueryFullProcessImageName(): {Marshal.GetLastWin32Error()}");
+                        logger?.LogError($"Error happened while operating QueryFullProcessImageName(): {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}");
                         return null;
                     }
 

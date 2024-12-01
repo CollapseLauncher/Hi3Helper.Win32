@@ -467,14 +467,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
                 }
                 else
                 {
-                    int err = Marshal.GetLastWin32Error();
-                    Console.WriteLine("Error {0}", err);
-                    string txtS = new string('\0', 256);
-                    int len = PInvoke.FormatMessage(
-                        FORMAT_MESSAGE.FROM_SYSTEM | FORMAT_MESSAGE.IGNORE_INSERTS,
-                        nint.Zero, err, 0, txtS, 256, nint.Zero
-                        );
-                    Console.WriteLine("Len {0} text {1}", len, txtS);
+                    Console.WriteLine(Native.ManagedTools.PInvoke.GetLastWin32ErrorMessage());
                 }
 
                 Marshal.DestroyStructure<SHFILEINFOW>(shfiHandle);

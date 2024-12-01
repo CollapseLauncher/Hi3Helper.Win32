@@ -84,9 +84,8 @@ namespace Hi3Helper.Win32.Native
             nint lpSource,
             int dwMessageId,
             int dwLanguageId,
-            [MarshalAs(UnmanagedType.LPWStr)]
-            string lpBuffer,
-            uint nSize,
+            char[] lpBuffer,
+            int nSize,
             nint argumentsLong);
         
         [LibraryImport("kernel32.dll", EntryPoint = "CreateFileW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
