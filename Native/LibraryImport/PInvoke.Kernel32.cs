@@ -89,32 +89,32 @@ namespace Hi3Helper.Win32.Native
             uint nSize,
             nint argumentsLong);
         
-        [LibraryImport("kernel32.dll", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
-        public static partial IntPtr CreateFileW(
+        [LibraryImport("kernel32.dll", EntryPoint = "CreateFileW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+        public static partial nint CreateFile(
             string lpFileName,
             uint   dwDesiredAccess,
             uint   dwShareMode,
-            IntPtr lpSecurityAttributes,
+            nint lpSecurityAttributes,
             uint   dwCreationDisposition,
             uint   dwFlagsAndAttributes,
-            IntPtr hTemplateFile);
+            nint hTemplateFile);
 
-        [LibraryImport("kernel32.dll", SetLastError = true)]
+        [LibraryImport("kernel32.dll", EntryPoint = "DeviceIoControl", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool DeviceIoControl(
-            IntPtr   hDevice,
+            nint   hDevice,
             uint     dwIoControlCode,
-            IntPtr   lpInBuffer,
+            nint   lpInBuffer,
             uint     nInBufferSize,
-            IntPtr   lpOutBuffer,
+            nint   lpOutBuffer,
             uint     nOutBufferSize,
             out uint lpBytesReturned,
-            IntPtr   lpOverlapped);
+            nint   lpOverlapped);
 
-        [LibraryImport("kernel32.dll", SetLastError = true)]
+        [LibraryImport("kernel32.dll", EntryPoint = "CloseHandle", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool CloseHandle(IntPtr hObject);
+        public static partial bool CloseHandle(nint hObject);
     }
 }
