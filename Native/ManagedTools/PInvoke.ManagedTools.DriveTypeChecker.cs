@@ -139,19 +139,19 @@ public static partial class PInvoke
             query->QueryType                = 0;
 
             // Assign buffer for DEVICE_SEEK_PENALTY_DESCRIPTOR
-            ReadOnlySpan<byte>  trimDescBuffer  = buffer.AsSpan(querySize); // Set offset, move forward from query buffer
-            nint                trimDescPtr     = GetArrayReference(trimDescBuffer);
+            ReadOnlySpan<byte>  seekPenaltyDescBuffer  = buffer.AsSpan(querySize); // Set offset, move forward from query buffer
+            nint                seekPenaltyDescPtr     = GetArrayReference(seekPenaltyDescBuffer);
             if (DeviceIoControl(
                 hDevice,
                 IOCTL_STORAGE_QUERY_PROPERTY,
                 queryPtr,
                 (uint)querySize,
-                trimDescPtr,
+                seekPenaltyDescPtr,
                 (uint)seekPenaltyDescSize,
                 out _,
                 nint.Zero))
             {
-                DEVICE_SEEK_PENALTY_DESCRIPTOR* trimDescriptor      = (DEVICE_SEEK_PENALTY_DESCRIPTOR*)trimDescPtr;
+                DEVICE_SEEK_PENALTY_DESCRIPTOR* trimDescriptor      = (DEVICE_SEEK_PENALTY_DESCRIPTOR*)seekPenaltyDescPtr;
                 bool                            isHasSeekPenalty    = trimDescriptor->IncursSeekPenalty != 0; // Convert byte to bool
                 return isHasSeekPenalty;
             }
