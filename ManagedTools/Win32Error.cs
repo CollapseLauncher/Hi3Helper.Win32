@@ -1,11 +1,11 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
 using System.Buffers;
 using System.Runtime.InteropServices;
-using NativePInvoke = Hi3Helper.Win32.Native.PInvoke;
+using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 
 namespace Hi3Helper.Win32.Native.ManagedTools
 {
-    public static partial class PInvoke
+    public static class Win32Error
     {
         public static string GetLastWin32ErrorMessage()
         {
@@ -20,7 +20,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             try
             {
                 // Get the message
-                int messageSize = NativePInvoke.FormatMessage(
+                int messageSize = FormatMessage(
                     FormatMessageFlag,
                     nint.Zero,
                     lastError,

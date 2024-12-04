@@ -1,8 +1,9 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 
-namespace Hi3Helper.Win32.Native
+namespace Hi3Helper.Win32.Native.ManagedTools
 {
-    public static partial class PInvoke
+    public static class Windowing
     {
         public static void ShowWindow(nint windowPtr) => ShowWindowAsync(windowPtr, HandleEnum.SW_SHOWNORMAL);
         public static void ShowWindowMaximized(nint windowPtr) => ShowWindowAsync(windowPtr, HandleEnum.SW_SHOWMAXIMIZED);

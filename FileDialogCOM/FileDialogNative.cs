@@ -1,5 +1,5 @@
-using Hi3Helper.Win32.Native;
 using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.ManagedTools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -43,7 +43,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
         private static ValueTask<object> GetPickerOpenTask<T>(object defaultValue, Dictionary<string, string>? FileTypeFilter = null,
             string? title = null, bool isMultiple = false, bool isFolder = false)
         {
-            CoCreateInstance.CreateInstance(
+            ComMarshal.CreateInstance(
                 new Guid(CLSIDGuid.FileOpenDialog),
                 nint.Zero,
                 CLSCTX.CLSCTX_INPROC_SERVER,
@@ -82,13 +82,13 @@ namespace Hi3Helper.Win32.FileDialogCOM
             {
                 if (titlePtr != nint.Zero) Marshal.FreeCoTaskMem(titlePtr);
                 // Free the COM instance
-                CoCreateInstance.FreeInstance(dialog);
+                ComMarshal.FreeInstance(dialog);
             }
         }
 
         private static ValueTask<string> GetPickerSaveTask<T>(string defaultValue, Dictionary<string, string>? FileTypeFilter = null, string? title = null)
         {
-            CoCreateInstance.CreateInstance(
+            ComMarshal.CreateInstance(
                 new Guid(CLSIDGuid.FileSaveDialog),
                 nint.Zero,
                 CLSCTX.CLSCTX_INPROC_SERVER,
@@ -115,7 +115,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
             {
                 if (titlePtr != nint.Zero) Marshal.FreeCoTaskMem(titlePtr);
                 // Free the COM instance
-                CoCreateInstance.FreeInstance(dialog);
+                ComMarshal.FreeInstance(dialog);
             }
         }
 

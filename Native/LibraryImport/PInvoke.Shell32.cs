@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Hi3Helper.Win32.Native
+namespace Hi3Helper.Win32.Native.LibraryImport
 {
     // ReSharper disable once RedundantUnsafeContext
     public static unsafe partial class PInvoke

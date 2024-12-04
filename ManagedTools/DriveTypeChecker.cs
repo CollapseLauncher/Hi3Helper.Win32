@@ -5,11 +5,12 @@ using System.Buffers;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable UnusedMember.Local
 
-namespace Hi3Helper.Win32.Native;
+namespace Hi3Helper.Win32.Native.ManagedTools;
 
-public static partial class PInvoke
+public static class DriveTypeChecker
 {
     // For CreateFile to get handle to drive
     private const uint GENERIC_READ             = 0x80000000;
@@ -51,7 +52,7 @@ public static partial class PInvoke
         nint   hDevice    = CreateFile(devicePath, 0, 3, nint.Zero, 3, 0, nint.Zero);
         if (hDevice == nint.Zero || hDevice == new nint(-1))
         {
-            logger?.LogError(new IOException($"Unable to open drive: {pathRoot}. Error: {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}").ToString());
+            logger?.LogError(new IOException($"Unable to open drive: {pathRoot}. Error: {Win32Error.GetLastWin32ErrorMessage()}").ToString());
             return true; // Assume SSD
         }
 
@@ -109,7 +110,7 @@ public static partial class PInvoke
             }
             else
             {
-                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}").ToString());
+                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {Win32Error.GetLastWin32ErrorMessage()}").ToString());
                 return false; // Assume SSD
             }
         }
@@ -157,7 +158,7 @@ public static partial class PInvoke
             }
             else
             {
-                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}").ToString());
+                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {Win32Error.GetLastWin32ErrorMessage()}").ToString());
                 return true; // Assume SSD
             }
         }

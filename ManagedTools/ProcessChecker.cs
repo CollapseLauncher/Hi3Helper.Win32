@@ -6,11 +6,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable RedundantUnsafeContext
 
-namespace Hi3Helper.Win32.Native
+namespace Hi3Helper.Win32.Native.ManagedTools
 {
-    public static partial class PInvoke
+    public static class ProcessChecker
     {
         // https://github.com/dotnet/runtime/blob/f4d39134b8daefb5ab0db6750a203f980eecb4f0/src/libraries/System.Diagnostics.Process/src/System/Diagnostics/ProcessManager.Win32.cs#L299
         // https://github.com/dotnet/runtime/blob/f4d39134b8daefb5ab0db6750a203f980eecb4f0/src/libraries/System.Diagnostics.Process/src/System/Diagnostics/ProcessManager.Win32.cs#L346
@@ -82,7 +83,7 @@ namespace Hi3Helper.Win32.Native
                     // If other error has occurred, then return false as failed.
                     if (hNtQuerySystemInformationResult != 0)
                     {
-                        logger?.LogError($"Error happened while operating NtQuerySystemInformation(): {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}");
+                        logger?.LogError($"Error happened while operating NtQuerySystemInformation(): {Win32Error.GetLastWin32ErrorMessage()}");
                         return false;
                     }
 
@@ -127,7 +128,7 @@ namespace Hi3Helper.Win32.Native
                         // If failed, then log the Win32 error and return false.
                         if (processHandle == nint.Zero)
                         {
-                            logger?.LogError($"Error happened while operating OpenProcess(): {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}");
+                            logger?.LogError($"Error happened while operating OpenProcess(): {Win32Error.GetLastWin32ErrorMessage()}");
                             return false;
                         }
 
@@ -145,7 +146,7 @@ namespace Hi3Helper.Win32.Native
                                 // If the query is unsuccessful, then log the Win32 error and return false.
                                 if (!hQueryFullProcessImageNameResult)
                                 {
-                                    logger?.LogError($"Error happened while operating QueryFullProcessImageName(): {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}");
+                                    logger?.LogError($"Error happened while operating QueryFullProcessImageName(): {Win32Error.GetLastWin32ErrorMessage()}");
                                     return false;
                                 }
 
@@ -202,7 +203,7 @@ namespace Hi3Helper.Win32.Native
             // If failed, then log the Win32 error and return null.
             if (processHandle == nint.Zero)
             {
-                logger?.LogError($"Error happened while operating OpenProcess(): {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}");
+                logger?.LogError($"Error happened while operating OpenProcess(): {Win32Error.GetLastWin32ErrorMessage()}");
                 return null;
             }
 
@@ -221,7 +222,7 @@ namespace Hi3Helper.Win32.Native
                     // If the query is unsuccessful, then log the Win32 error and return false.
                     if (!hQueryFullProcessImageNameResult)
                     {
-                        logger?.LogError($"Error happened while operating QueryFullProcessImageName(): {ManagedTools.PInvoke.GetLastWin32ErrorMessage()}");
+                        logger?.LogError($"Error happened while operating QueryFullProcessImageName(): {Win32Error.GetLastWin32ErrorMessage()}");
                         return null;
                     }
 

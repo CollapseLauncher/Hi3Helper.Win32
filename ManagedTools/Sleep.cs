@@ -3,10 +3,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 
-namespace Hi3Helper.Win32.Native
+namespace Hi3Helper.Win32.Native.ManagedTools
 {
-    public static partial class PInvoke
+    public static class Sleep
     {
         public static  CancellationTokenSource? _preventSleepToken;
         private static bool                     _preventSleepRunning;

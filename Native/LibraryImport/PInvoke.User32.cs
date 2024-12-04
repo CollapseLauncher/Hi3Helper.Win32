@@ -2,7 +2,7 @@
 using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
 
-namespace Hi3Helper.Win32.Native
+namespace Hi3Helper.Win32.Native.LibraryImport
 {
     public delegate bool EnumWindowsProc(nint hWnd, nint lParam);
 

@@ -4,7 +4,7 @@ using Hi3Helper.Win32.ShellLinkCOM;
 using System;
 using System.Runtime.InteropServices;
 
-namespace Hi3Helper.Win32.Native
+namespace Hi3Helper.Win32.Native.LibraryImport
 {
     public static partial class PInvoke
     {

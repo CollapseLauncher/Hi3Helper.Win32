@@ -1,5 +1,6 @@
-﻿using Hi3Helper.Win32.Native;
-using Hi3Helper.Win32.Native.Enums;
+﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.LibraryImport;
+using Hi3Helper.Win32.Native.ManagedTools;
 using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Buffers;
@@ -30,7 +31,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         public ShellLink()
         {
-            CoCreateInstance.CreateInstance(
+            ComMarshal.CreateInstance(
                 CLSIDGuid.ClsId_ShellLink,
                 nint.Zero,
                 CLSCTX.CLSCTX_INPROC_SERVER,
@@ -58,7 +59,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// <summary>
         /// Dispose the object, releasing the COM ShellLink object
         /// </summary>
-        public void Dispose() => CoCreateInstance.FreeInstance(linkW);
+        public void Dispose() => ComMarshal.FreeInstance(linkW);
 
         public string ShortCutFile
         {
@@ -233,13 +234,13 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             try
             {
                 fixed (char* bufferPtr = &buffer[0])
-                    fixed (void* findDataPtr = &win32FindDataBuffer[0])
-                    {
-                        nint findDataSafe = (nint)findDataPtr;
-                        toInvokeDelegate(bufferPtr, findDataSafe, length);
+                fixed (void* findDataPtr = &win32FindDataBuffer[0])
+                {
+                    nint findDataSafe = (nint)findDataPtr;
+                    toInvokeDelegate(bufferPtr, findDataSafe, length);
 
-                        return GetStringFromNullTerminatedPtr(bufferPtr);
-                    }
+                    return GetStringFromNullTerminatedPtr(bufferPtr);
+                }
             }
             finally
             {
@@ -467,7 +468,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
                 }
                 else
                 {
-                    Console.WriteLine(Native.ManagedTools.PInvoke.GetLastWin32ErrorMessage());
+                    Console.WriteLine(Win32Error.GetLastWin32ErrorMessage());
                 }
 
                 Marshal.DestroyStructure<SHFILEINFOW>(shfiHandle);

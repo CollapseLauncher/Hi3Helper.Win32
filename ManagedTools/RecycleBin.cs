@@ -1,10 +1,11 @@
 ﻿using Hi3Helper.Win32.Native.Structs;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 
-namespace Hi3Helper.Win32.Native
+namespace Hi3Helper.Win32.Native.ManagedTools
 {
-    public static partial class PInvoke
+    public static class RecycleBin
     {
         public static void MoveFileToRecycleBin(IList<string> filePaths)
         {

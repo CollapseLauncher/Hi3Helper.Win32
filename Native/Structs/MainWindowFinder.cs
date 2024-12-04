@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.LibraryImport;
 
 namespace Hi3Helper.Win32.Native.Structs
 {

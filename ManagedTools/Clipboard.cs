@@ -3,10 +3,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 
-namespace Hi3Helper.Win32.Native
+namespace Hi3Helper.Win32.Native.ManagedTools
 {
-    public static partial class PInvoke
+    public static class Clipboard
     {
         public static unsafe void CopyStringToClipboard(string inputString, ILogger? logger = null)
         {

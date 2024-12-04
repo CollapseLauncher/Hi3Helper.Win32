@@ -1,4 +1,4 @@
-﻿using Hi3Helper.Win32.Native;
+﻿using Hi3Helper.Win32.Native.LibraryImport;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;

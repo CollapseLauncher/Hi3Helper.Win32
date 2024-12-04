@@ -1,5 +1,5 @@
-﻿using Hi3Helper.Win32.Native;
-using Hi3Helper.Win32.Native.Enums;
+﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using System.Collections.Generic;
 using System.Drawing;

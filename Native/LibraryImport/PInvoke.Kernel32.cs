@@ -1,9 +1,7 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.Structs;
-using System;
 using System.Runtime.InteropServices;
 
-namespace Hi3Helper.Win32.Native
+namespace Hi3Helper.Win32.Native.LibraryImport
 {
     public delegate bool ConsoleControlHandler(uint handle);
     public static partial class PInvoke
@@ -87,29 +85,29 @@ namespace Hi3Helper.Win32.Native
             char[] lpBuffer,
             int nSize,
             nint argumentsLong);
-        
+
         [LibraryImport("kernel32.dll", EntryPoint = "CreateFileW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
         public static partial nint CreateFile(
             string lpFileName,
-            uint   dwDesiredAccess,
-            uint   dwShareMode,
+            uint dwDesiredAccess,
+            uint dwShareMode,
             nint lpSecurityAttributes,
-            uint   dwCreationDisposition,
-            uint   dwFlagsAndAttributes,
+            uint dwCreationDisposition,
+            uint dwFlagsAndAttributes,
             nint hTemplateFile);
 
         [LibraryImport("kernel32.dll", EntryPoint = "DeviceIoControl", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool DeviceIoControl(
-            nint   hDevice,
-            uint     dwIoControlCode,
-            nint   lpInBuffer,
-            uint     nInBufferSize,
-            nint   lpOutBuffer,
-            uint     nOutBufferSize,
+            nint hDevice,
+            uint dwIoControlCode,
+            nint lpInBuffer,
+            uint nInBufferSize,
+            nint lpOutBuffer,
+            uint nOutBufferSize,
             out uint lpBytesReturned,
-            nint   lpOverlapped);
+            nint lpOverlapped);
 
         [LibraryImport("kernel32.dll", EntryPoint = "CloseHandle", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
