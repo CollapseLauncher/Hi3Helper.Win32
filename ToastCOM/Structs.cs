@@ -1,4 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿using Hi3Helper.Win32.ToastCOM.Notification;
+using System;
+using System.Runtime.InteropServices;
+using System.Xml;
 
 namespace Hi3Helper.Win32.ToastCOM
 {
@@ -12,20 +15,84 @@ namespace Hi3Helper.Win32.ToastCOM
         public string Value;
     }
 
-    public struct ToastCommands
+    /// <summary>
+    /// To see details for all included properties, see this URL:<br/>
+    /// <seealso href="https://learn.microsoft.com/en-us/uwp/schemas/tiles/toastschema/element-action#attributes-and-elements"/>
+    /// </summary>
+    public class ToastCommand
     {
-        #region Properties
-        public string Argument;
+        public string? Argument { get; set; }
+        public string? Content { get; set; }
+        public Uri? ImageUri { get; set; }
+        public ToastActivationType? ActivationType { get; set; }
+        public ToastAfterActivationBehavior? AfterActivationBehaviour { get; set; }
+        public string? HintInputId { get; set; }
+        public ToastButtonStyle? HintButtonStyle { get; set; }
+        public string? HintTooltip { get; set; }
 
-        public string Content;
-        #endregion
-
-        #region Constructors
-        public ToastCommands(string arg, string content)
+        internal XmlNode GetXmlNode()
         {
-            Argument = arg;
-            Content = content;
+            XmlDocument xmlDocument = new XmlDocument();
+            XmlNode xmlNodeRootElement = xmlDocument.CreateElement("action");
+
+            if (!string.IsNullOrEmpty(Argument))
+                xmlNodeRootElement.AddAttribute(xmlDocument, "argument", Argument);
+
+            if (!string.IsNullOrEmpty(Content))
+                xmlNodeRootElement.AddAttribute(xmlDocument, "content", Content);
+
+            if (ImageUri != null)
+                xmlNodeRootElement.AddAttribute(xmlDocument, "imageUri", ImageUri.ToString());
+
+            if (ActivationType != null)
+                xmlNodeRootElement.AddAttribute(xmlDocument, "activationType", ActivationType.Value.ToCamelCaseString());
+
+            if (AfterActivationBehaviour != null)
+                xmlNodeRootElement.AddAttribute(xmlDocument, "afterActivationBehavior", AfterActivationBehaviour.Value.ToCamelCaseString());
+
+            if (!string.IsNullOrEmpty(HintInputId))
+                xmlNodeRootElement.AddAttribute(xmlDocument, "hint-inputId", HintInputId);
+
+            if (HintButtonStyle != null)
+                xmlNodeRootElement.AddAttribute(xmlDocument, "hint-buttonStyle", HintButtonStyle.Value.ToCamelCaseString());
+
+            if (!string.IsNullOrEmpty(HintTooltip))
+                xmlNodeRootElement.AddAttribute(xmlDocument, "hint-toolTip", HintTooltip);
+
+            return xmlDocument;
         }
-        #endregion
+    }
+
+    public enum ToastActivationType
+    {
+        Foreground,
+        Background,
+        Protocol
+    }
+
+    public enum ToastAfterActivationBehavior
+    {
+        Default,
+        PendingUpdate
+    }
+
+    public enum ToastButtonStyle
+    {
+        Success,
+        Critical
+    }
+
+    public enum ToastDuration
+    {
+        Long,
+        Short
+    }
+
+    public enum ToastScenario
+    {
+        Reminder,
+        Alarm,
+        IncomingCall,
+        Urgent
     }
 }
