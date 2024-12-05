@@ -3,7 +3,7 @@ using Windows.UI.Notifications;
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {
-    public class DesktopNotificationHistoryCompat
+    internal class DesktopNotificationHistoryCompat
     {
         #region Properties
         private string _aumid;

@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
@@ -30,7 +31,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                     nint.Zero);
 
                 // Store as managed string
-                string message = new string(buffer, 0, messageSize) + $" (Err: {lastError:x8} | HRESULT: {hresult:x8})";
+                string message = new string(buffer.AsSpan(0, messageSize).TrimEnd("\r\n")) + $" (Err: {lastError:x8} | HRESULT: {hresult:x8})";
                 return message;
             }
             finally

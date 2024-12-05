@@ -1,14 +1,25 @@
-﻿namespace Hi3Helper.Win32.ToastCOM.Notification
+﻿using Microsoft.Extensions.Logging;
+
+namespace Hi3Helper.Win32.ToastCOM.Notification
 {
-    public abstract partial class NotificationActivator : INotificationActivationCallback
+    public unsafe abstract partial class NotificationActivator : INotificationActivationCallback
     {
+        #region Properties
+        internal ILogger? _logger;
+        #endregion
+
         #region Methods
-        public void Activate(string appUserModelId, string invokedArgs, nint[] data, uint dataCount)
+        protected NotificationActivator(ILogger? logger = null)
         {
-            OnActivated(invokedArgs, new NotificationUserInput(data), appUserModelId);
+            _logger = logger;
         }
 
-        public abstract void OnActivated(string arguments, NotificationUserInput userInput, string appUserModelId);
+        public void Activate(string appUserModelId, string invokedArgs, byte* data, uint dataCount)
+        {
+            OnActivated(invokedArgs, new NotificationUserInput(data, dataCount, _logger), appUserModelId);
+        }
+
+        protected abstract void OnActivated(string arguments, NotificationUserInput userInput, string appUserModelId);
 
         #endregion
     }

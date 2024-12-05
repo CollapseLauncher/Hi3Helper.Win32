@@ -16,7 +16,7 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         /// <summary>
         /// Called to properly clean up the memory referenced by a PropVariant instance.
         /// </summary>
-        [LibraryImport("ole32.dll")]
+        [LibraryImport("ole32.dll", EntryPoint = "PropVariantClear")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static unsafe partial HResult PropVariantClear(PropVariant* pvar);
 

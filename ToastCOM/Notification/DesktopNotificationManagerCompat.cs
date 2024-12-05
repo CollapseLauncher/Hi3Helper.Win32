@@ -2,6 +2,7 @@
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.ManagedTools;
 using Hi3Helper.Win32.ShellLinkCOM;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -11,7 +12,7 @@ using Windows.UI.Notifications;
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {
-    public class DesktopNotificationManagerCompat
+    internal class DesktopNotificationManagerCompat
     {
         #region Properties
         public const string TOAST_ACTIVATED_LAUNCH_ARG = "-ToastActivated";
@@ -23,7 +24,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         #endregion
 
         #region Methods
-        public static void RegisterAumidAndComServer<T>(string aumid, string executablePath, string shortcutPath)
+        internal static void RegisterAumidAndComServer<T>(T currentInstance, string aumid, string executablePath, string shortcutPath, Guid applicationId, bool asElevatedUser)
             where T : NotificationActivator
         {
             if (string.IsNullOrWhiteSpace(aumid))
@@ -41,15 +42,33 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
             _aumid = aumid;
 
-            CreateAumidTemporaryShortcut<T>(aumid, executablePath, shortcutPath);
-            RegisterComServer<T>(executablePath);
+            CreateAumidShortcut(currentInstance, aumid, executablePath, shortcutPath, applicationId, asElevatedUser);
+            RegisterComServer(currentInstance, executablePath, applicationId, asElevatedUser);
 
             _registeredAumidAndComServer = true;
         }
 
-        private static void CreateAumidTemporaryShortcut<T>(string aumid, string executablePath, string shortcutPath)
+        private static void CreateAumidShortcut<T>(T currentInstance, string aumid, string executablePath, string shortcutPath, Guid applicationId, bool asElevatedUser)
             where T : NotificationActivator
         {
+            bool isFullPath = Path.IsPathFullyQualified(shortcutPath);
+
+            currentInstance._logger?.LogInformation($"[DesktopNotificationManagerCompat::CreateAumidShortcut] Registering AumId for application name: {aumid} with application id: {applicationId} (Is as elevated user?: {asElevatedUser})");
+            currentInstance._logger?.LogInformation($"[DesktopNotificationManagerCompat::CreateAumidShortcut] Using executable path: {executablePath}");
+
+            // If the shortcut path is not fully qualified, then assign based on elevate state
+            if (!isFullPath)
+            {
+                currentInstance._logger?.LogWarning($"[DesktopNotificationManagerCompat::CreateAumidShortcut] Shortcut path is not fully qualified: {shortcutPath}");
+                string applicationDirPath = Environment.GetFolderPath(asElevatedUser ?
+                    Environment.SpecialFolder.CommonApplicationData :
+                    Environment.SpecialFolder.ApplicationData);
+
+                string startMenuProgramPath = Path.Combine(applicationDirPath, @"Microsoft\Windows\Start Menu\Programs");
+                shortcutPath = Path.Combine(startMenuProgramPath, shortcutPath);
+            }
+
+            currentInstance._logger?.LogInformation($"[DesktopNotificationManagerCompat::CreateAumidShortcut] Shortcut will be written to: {shortcutPath}");
             string executableDirPath = Path.GetDirectoryName(executablePath) ?? "";
             string? temporaryDirectoryPath = Path.GetDirectoryName(shortcutPath);
 
@@ -66,7 +85,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                 fmtid = TOAST_G,
                 pid = 5
             };
-            PropVariant toastId = PropVariant.FromGuid(typeof(T).GUID);
+            PropVariant toastId = PropVariant.FromGuid(applicationId);
             PropertyKey toastIdPropkey = new PropertyKey
             {
                 fmtid = TOAST_G,
@@ -81,8 +100,15 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                 IPersist? persistW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersist>(in ShellLinkCOM.CLSIDGuid.IGuid_IPersist);
                 IPropertyStore? propertyStoreW = shellLink?.CastComInterfaceAs<IShellLinkW, IPropertyStore>(in ShellLinkCOM.CLSIDGuid.IGuid_IPropertyStore);
 
-                if (isShortcutExist)
-                    persistFileW?.Load(executablePath, 0);
+                try
+                {
+                    if (isShortcutExist)
+                        persistFileW?.Load(shortcutPath, 0);
+                }
+                catch (Exception ex)
+                {
+                    currentInstance._logger?.LogError($"[DesktopNotificationManagerCompat::CreateAumidShortcut] An error has occured while loading existing shortcut: {shortcutPath}\r\n{ex}");
+                }
 
                 shellLink?.SetPath(executablePath);
                 shellLink?.SetWorkingDirectory(executableDirPath);
@@ -90,6 +116,9 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                 propertyStoreW?.SetValue(ref aumIdPropkey, ref aumId);
                 propertyStoreW?.SetValue(ref toastIdPropkey, ref toastId);
                 propertyStoreW?.Commit();
+
+                if (!string.IsNullOrEmpty(temporaryDirectoryPath) && !Directory.Exists(temporaryDirectoryPath))
+                    Directory.CreateDirectory(temporaryDirectoryPath);
 
                 persistFileW?.Save(shortcutPath, true);
             }
@@ -100,41 +129,40 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             }
         }
 
-        /// <summary>
-        /// 使应用程序可以从toast启动
-        /// </summary>
-        private static void RegisterComServer<T>(string exePath)
+        private static void RegisterComServer<T>(T currentInstance, string exePath, Guid applicationId, bool asElevatedUser)
+            where T : NotificationActivator
         {
             // We register the EXE to start up when the notification is activated
-            string regString = $"SOFTWARE\\Classes\\CLSID\\{{{typeof(T).GUID}}}\\LocalServer32";
-            RegistryKey localKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
+            string regString = $"SOFTWARE\\Classes\\CLSID\\{{{applicationId}}}\\LocalServer32";
+            RegistryKey localKey = RegistryKey.OpenBaseKey(asElevatedUser ? RegistryHive.LocalMachine : RegistryHive.CurrentUser, RegistryView.Registry64);
 
             var key = localKey.CreateSubKey(regString);
 
             key.SetValue(null, '"' + exePath + '"');
+            currentInstance._logger?.LogInformation($"[DesktopNotificationManagerCompat::RegisterComServer] Registered ComServer for toast registration: {(asElevatedUser ? "HKEY_LOCAL_MACHINE" : "HKEY_CURRENT_USER")}\\{regString}");
         }
 
-        public static unsafe void RegisterActivator<T>(T instance)
-            where T : NotificationService
+        internal static unsafe void RegisterActivator<T>(T currentInstance, Guid applicationId)
+            where T : NotificationActivator
         {
-            Guid guid = typeof(T).GUID;
+            Guid guid = applicationId;
 
-            NotificationServiceClassFactory classFactory = new NotificationServiceClassFactory();
-            classFactory.UseExistingInstance(instance);
+            NotificationActivatorClassFactory classFactory = new NotificationActivatorClassFactory();
+            classFactory.UseExistingInstance(currentInstance);
 
+            CLSCTX classContext = CLSCTX.CLSCTX_LOCAL_SERVER;
             PInvoke.CoRegisterClassObject(
                 in guid,
                 classFactory,
-                (int)CLSCTX.CLSCTX_LOCAL_SERVER,
+                (uint)classContext,
                 0,
                 out uint id).ThrowOnFailure();
             _registeredActivator = true;
+
+            currentInstance._logger?.LogInformation($"[DesktopNotificationManagerCompat::RegisterActivator] Registered Toast Activator for application id: {guid} with CLSCTX: {classContext}");
         }
 
-        /// <summary>
-        /// 创建通知
-        /// </summary>
-        public static ToastNotifier CreateToastNotifier()
+        internal static ToastNotifier CreateToastNotifier()
         {
             EnsureRegistered();
 

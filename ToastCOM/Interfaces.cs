@@ -9,10 +9,10 @@ namespace Hi3Helper.Win32.ToastCOM
     [GeneratedComInterface]
     public partial interface INotificationActivationCallback
     {
-        void Activate(
+        unsafe void Activate(
             [MarshalAs(UnmanagedType.LPWStr)] string appUserModelId,
             [MarshalAs(UnmanagedType.LPWStr)] string invokedArgs,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] nint[] data,
+            byte* data,
             [MarshalAs(UnmanagedType.U4)] uint dataCount
             );
     }
