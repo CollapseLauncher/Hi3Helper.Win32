@@ -16,4 +16,20 @@ namespace Hi3Helper.Win32.ToastCOM
             [MarshalAs(UnmanagedType.U4)] uint dataCount
             );
     }
+
+    [GeneratedComInterface]
+    [Guid(IIDGuid.IClassFactory)]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public partial interface IClassFactory
+    {
+        // For HRESULTs use
+        [PreserveSig]
+        int CreateInstance(nint pUnkOuter,
+                           in Guid riid,
+                           out nint ppvObject);
+
+        [PreserveSig]
+        int LockServer([MarshalAs(UnmanagedType.VariantBool)] in bool fLock);
+    }
+
 }

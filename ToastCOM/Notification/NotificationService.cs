@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
@@ -197,7 +198,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                     // Enumerate and create command action
                     foreach (ToastCommand toastCommand in ToastCommands)
                     {
-                        xmlActionsElement.AppendChild(toastCommand.GetXmlNode());
+                        xmlActionsElement.AppendChild(toastCommand.GetXmlNode(xmlDocument));
                     }
                 }
             }
@@ -229,19 +230,29 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     }
 
     [Guid(CLSIDGuid.Member_NotificationService)]
+    [ClassInterface(ClassInterfaceType.None)]
+    [ComSourceInterfaces(typeof(INotificationActivationCallback)), ComVisible(true)]
     [GeneratedComClass]
-    public partial class NotificationService : NotificationActivator
+    public partial class NotificationService : NotificationServiceSub
+    {
+        public override void OnActivated(string arguments, NotificationUserInput userInput, string appUserModelId)
+        {
+            base.OnActivated(arguments, userInput, appUserModelId);
+        }
+    }
+
+    public class NotificationServiceSub : NotificationActivator
     {
         #region Properties
-        private ToastNotifier? _toastNotifier;
         private DesktopNotificationHistoryCompat? _desktopNotificationHistoryCompat;
         #endregion
 
         #region Methods
-        public void Init(string appid)
+        public void Init<T>(string appName, string executablePath, string shortcutPath)
+            where T : NotificationActivator
         {
-            DesktopNotificationManagerCompat.RegisterAumidAndComServer(appid);
-            DesktopNotificationManagerCompat.RegisterActivator();
+            DesktopNotificationManagerCompat.RegisterAumidAndComServer<T>(appName, executablePath, shortcutPath);
+            DesktopNotificationManagerCompat.RegisterActivator((NotificationService)this);
         }
 
         public event ToastAction? ToastCallback;
@@ -271,8 +282,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             domXmlDocument.LoadXml(xmlDocumentString);
 
             ToastNotification toast = new ToastNotification(domXmlDocument);
-            _toastNotifier ??= DesktopNotificationManagerCompat.CreateToastNotifier();
-            _toastNotifier?.Show(toast);
+            DesktopNotificationManagerCompat.CreateToastNotifier().Show(toast);
         }
 
         protected void AddInput(DomXmlDocument xml, params ToastCommand[] paras)
@@ -315,7 +325,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         public static void TestMethod()
         {
             NotificationService manager = new NotificationService();
-            manager.Init("Collapse Launcher");
+            manager.Init<NotificationService>("Collapse Launcher");
 
             NotificationContent content = NotificationContent.Create()
                 .SetTitle("Welcome to Collapse Launcher!")

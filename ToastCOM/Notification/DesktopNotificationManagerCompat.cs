@@ -1,6 +1,10 @@
-﻿using Microsoft.Win32;
+﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.LibraryImport;
+using Hi3Helper.Win32.Native.ManagedTools;
+using Hi3Helper.Win32.ShellLinkCOM;
+using Microsoft.Win32;
 using System;
-using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using Windows.UI.Notifications;
@@ -11,6 +15,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     {
         #region Properties
         public const string TOAST_ACTIVATED_LAUNCH_ARG = "-ToastActivated";
+        private static readonly Guid TOAST_G = new Guid("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3");
 
         private static bool _registeredAumidAndComServer;
         private static string? _aumid;
@@ -18,7 +23,8 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         #endregion
 
         #region Methods
-        public static void RegisterAumidAndComServer(string aumid)
+        public static void RegisterAumidAndComServer<T>(string aumid, string executablePath, string shortcutPath)
+            where T : NotificationActivator
         {
             if (string.IsNullOrWhiteSpace(aumid))
             {
@@ -35,19 +41,72 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
             _aumid = aumid;
 
-            string exename = Process.GetCurrentProcess().MainModule?.FileName ?? "";
-            RegisterComServer(exename);
+            CreateAumidTemporaryShortcut<T>(aumid, executablePath, shortcutPath);
+            RegisterComServer<T>(executablePath);
 
             _registeredAumidAndComServer = true;
+        }
+
+        private static void CreateAumidTemporaryShortcut<T>(string aumid, string executablePath, string shortcutPath)
+            where T : NotificationActivator
+        {
+            string executableDirPath = Path.GetDirectoryName(executablePath) ?? "";
+            string? temporaryDirectoryPath = Path.GetDirectoryName(shortcutPath);
+
+            ComMarshal.CreateInstance(
+                ShellLinkCOM.CLSIDGuid.ClsId_ShellLink,
+                nint.Zero,
+                CLSCTX.CLSCTX_INPROC_SERVER,
+            out IShellLinkW? shellLink
+            ).ThrowOnFailure();
+
+            PropVariant aumId = PropVariant.FromString(aumid);
+            PropertyKey aumIdPropkey = new PropertyKey
+            {
+                fmtid = TOAST_G,
+                pid = 5
+            };
+            PropVariant toastId = PropVariant.FromGuid(typeof(T).GUID);
+            PropertyKey toastIdPropkey = new PropertyKey
+            {
+                fmtid = TOAST_G,
+                pid = 26
+            };
+
+            bool isShortcutExist = File.Exists(shortcutPath);
+
+            try
+            {
+                IPersistFile? persistFileW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersistFile>(in ShellLinkCOM.CLSIDGuid.IGuid_IPersistFile);
+                IPersist? persistW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersist>(in ShellLinkCOM.CLSIDGuid.IGuid_IPersist);
+                IPropertyStore? propertyStoreW = shellLink?.CastComInterfaceAs<IShellLinkW, IPropertyStore>(in ShellLinkCOM.CLSIDGuid.IGuid_IPropertyStore);
+
+                if (isShortcutExist)
+                    persistFileW?.Load(executablePath, 0);
+
+                shellLink?.SetPath(executablePath);
+                shellLink?.SetWorkingDirectory(executableDirPath);
+
+                propertyStoreW?.SetValue(ref aumIdPropkey, ref aumId);
+                propertyStoreW?.SetValue(ref toastIdPropkey, ref toastId);
+                propertyStoreW?.Commit();
+
+                persistFileW?.Save(shortcutPath, true);
+            }
+            finally
+            {
+                aumId.Clear();
+                toastId.Clear();
+            }
         }
 
         /// <summary>
         /// 使应用程序可以从toast启动
         /// </summary>
-        private static void RegisterComServer(string exePath)
+        private static void RegisterComServer<T>(string exePath)
         {
             // We register the EXE to start up when the notification is activated
-            string regString = $"SOFTWARE\\Classes\\CLSID\\{{{CLSIDGuid.Member_NotificationServiceGuid}}}\\LocalServer32";
+            string regString = $"SOFTWARE\\Classes\\CLSID\\{{{typeof(T).GUID}}}\\LocalServer32";
             RegistryKey localKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
 
             var key = localKey.CreateSubKey(regString);
@@ -55,23 +114,20 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             key.SetValue(null, '"' + exePath + '"');
         }
 
-        [DllImport("Ole32.dll")]
-        static extern int CoRegisterClassObject(
-            [MarshalAs(UnmanagedType.LPStruct)] Guid rclsid,
-            nint pUnk,
-            uint dwClsContext,
-            uint flags,
-            out uint lpdwRegister);
-
-        public static void RegisterActivator()
+        public static unsafe void RegisterActivator<T>(T instance)
+            where T : NotificationService
         {
-            nint iunknow = nint.Zero;
-            CoRegisterClassObject(
-                CLSIDGuid.Member_NotificationServiceGuid,
-                iunknow,
-                4,
+            Guid guid = typeof(T).GUID;
+
+            NotificationServiceClassFactory classFactory = new NotificationServiceClassFactory();
+            classFactory.UseExistingInstance(instance);
+
+            PInvoke.CoRegisterClassObject(
+                in guid,
+                classFactory,
+                (int)CLSCTX.CLSCTX_LOCAL_SERVER,
                 0,
-                out uint id);
+                out uint id).ThrowOnFailure();
             _registeredActivator = true;
         }
 

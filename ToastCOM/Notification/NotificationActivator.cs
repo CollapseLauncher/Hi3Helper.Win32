@@ -1,10 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
-
-namespace Hi3Helper.Win32.ToastCOM.Notification
+﻿namespace Hi3Helper.Win32.ToastCOM.Notification
 {
-    [Guid(IIDGuid.INotificationActivationCallback)]
-    [GeneratedComClass]
     public abstract partial class NotificationActivator : INotificationActivationCallback
     {
         #region Methods

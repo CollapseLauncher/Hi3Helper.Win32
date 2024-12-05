@@ -15,6 +15,13 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         internal NotificationUserInput(nint[] data)
         {
+            if (data == null)
+            {
+                _dataPtrs = Array.Empty<nint>();
+                _data = Array.Empty<NOTIFICATION_USER_INPUT_DATA>();
+                return;
+            }
+
             _dataPtrs = data;
             _data = new NOTIFICATION_USER_INPUT_DATA[data.Length];
             for (int i = 0; i < data.Length; i++)
