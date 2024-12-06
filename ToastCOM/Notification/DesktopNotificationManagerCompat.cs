@@ -72,6 +72,11 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             string executableDirPath = Path.GetDirectoryName(executablePath) ?? "";
             string? temporaryDirectoryPath = Path.GetDirectoryName(shortcutPath);
 
+            if (!shortcutPath.EndsWith(".lnk"))
+            {
+                shortcutPath = shortcutPath + ".lnk";
+            }
+
             ComMarshal.CreateInstance(
                 ShellLinkCOM.CLSIDGuid.ClsId_ShellLink,
                 nint.Zero,
