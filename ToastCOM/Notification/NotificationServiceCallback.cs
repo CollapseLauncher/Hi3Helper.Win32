@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Xml;
 using Windows.UI.Notifications;
 using DomXmlDocument = Windows.Data.Xml.Dom.XmlDocument;
@@ -8,18 +10,20 @@ using DomXmlElement = Windows.Data.Xml.Dom.XmlElement;
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {
-    public class NotificationServiceCallback : NotificationActivator
+    /// <summary>
+    /// An abstract class inherited by <seealso cref="NotificationService"/>.
+    /// Do not use this class to initialize a new instance. Instead, use <seealso cref="NotificationService"/>
+    /// </summary>
+    /// <param name="logger">Logger of the instance to use</param>
+    public abstract class NotificationServiceCallback(ILogger? logger) : NotificationActivator(logger)
     {
         #region Properties
         private DesktopNotificationHistoryCompat? _desktopNotificationHistoryCompat;
+
         #endregion
-
         #region Methods
-        protected NotificationServiceCallback(ILogger? logger = null)
-            : base(logger) { }
 
-        public void Init<T>(string appName, string executablePath, string shortcutPath, Guid? applicationId = null, bool asElevatedUser = false)
-            where T : NotificationActivator
+        public void Initialize(string appName, string executablePath, string shortcutPath, Guid? applicationId = null, bool asElevatedUser = false)
         {
             applicationId ??= CLSIDGuid.GetGuidFromString(appName);
 
@@ -107,11 +111,14 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     {
         public static void TestMethod()
         {
+            string processPath = Process.GetCurrentProcess().MainModule?.FileName ?? "";
             NotificationService manager = new NotificationService();
-            manager.Init<NotificationService>(
-                "Collapse Launcher",
-                @"E:\myGit\Collapse\Hi3Helper.EncTool.Test\bin\x64\Debug\net9.0-windows10.0.22621.0\Hi3Helper.EncTool.Test.exe",
-                @"C:\Users\neon-nyan\AppData\Roaming\Microsoft\Windows\Start Menu\AHi3Helper.EncTool.Test\Hi3Helper EncTool Test.lnk");
+
+            string appName = "Hi3Helper.Win32 ToastCOM Test";
+            manager.Initialize(
+                appName,
+                processPath,
+                Path.Combine("Collapse Launcher Team", appName));
 
             NotificationContent content = NotificationContent.Create()
                 .SetTitle("Welcome to Collapse Launcher!")
