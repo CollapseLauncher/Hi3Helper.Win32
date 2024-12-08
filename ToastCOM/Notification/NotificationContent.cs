@@ -6,10 +6,12 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 {
     public class NotificationContent
     {
+        public record AppHeroImageRecord(Uri? imageUri, bool isHero);
+
         public string? Title { get; internal set; }
         public string? Content { get; internal set; }
         public Uri? AppLogo { get; internal set; }
-        public Uri? AppHeroImage { get; internal set; }
+        public List<AppHeroImageRecord> AppHeroImages { get; internal set; } = new List<AppHeroImageRecord>();
         public bool UseCircleCroppedAppLogo { get; internal set; }
         public List<ToastCommand> ToastCommands { get; internal set; } = new List<ToastCommand>();
         public string? Launch { get; set; }
@@ -73,11 +75,16 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                 }
 
                 // Append Hero Image if any
-                if (AppHeroImage != null)
+                foreach (AppHeroImageRecord heroImageRecord in AppHeroImages)
                 {
+                    if (heroImageRecord.imageUri == null)
+                        continue;
+
                     XmlNode? xmlAppLogoElement = xmlBindingElement.AppendChild(_xml.CreateElement("image"));
-                    xmlAppLogoElement.AddAttribute(_xml, "src", AppHeroImage.ToString());
-                    xmlAppLogoElement.AddAttribute(_xml, "placement", "hero");
+                    xmlAppLogoElement.AddAttribute(_xml, "src", heroImageRecord.imageUri.ToString());
+
+                    if (heroImageRecord.isHero)
+                        xmlAppLogoElement.AddAttribute(_xml, "placement", "hero");
                 }
             }
 

@@ -2,6 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using static Hi3Helper.Win32.ToastCOM.Notification.DesktopNotificationManagerCompat;
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {
@@ -10,10 +11,12 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     public partial class NotificationActivatorClassFactory : IClassFactory
     {
         private NotificationActivator? Instance;
+        private bool AsElevatedUser;
 
-        public void UseExistingInstance(NotificationActivator instance)
+        public void UseExistingInstance(NotificationActivator instance, bool asElevatedUser)
         {
             Instance = instance;
+            AsElevatedUser = asElevatedUser;
         }
 
         public unsafe int CreateInstance(nint pUnkOuter, in Guid riid, out nint ppvObject)
@@ -50,6 +53,42 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             {
                 ComInterfaceMarshaller<NotificationService>.Free((void*)ppvObject);
             }
+        }
+
+
+        [DllImport("ole32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern int CoGetObject(
+            string pszName,
+            [In] ref BIND_OPTS3 pBindOptions,
+            ref Guid riid,
+            [MarshalAs(UnmanagedType.Interface)] out object ppv);
+
+        // Constants
+        private const uint CLSCTX_LOCAL_SERVER = 0x4;
+        private const int S_OK = 0;
+        private const int E_FAIL = unchecked((int)0x80004005);
+
+        private static int CoCreateInstanceAsAdmin(IntPtr hwnd, Guid rclsid, Guid riid, out nint ppvObject)
+        {
+            ppvObject = nint.Zero;
+
+            // Prepare moniker name
+            char[] wszMonikerName = new char[300];
+            string format = "Elevation:Administrator!new:{0}";
+            string clsidString = rclsid.ToString();
+            string monikerFormatted = string.Format(format, clsidString);
+
+            // Initialize BIND_OPTS3 structure
+            var bindOpts = new BIND_OPTS3
+            {
+                cbStruct = (uint)Marshal.SizeOf<BIND_OPTS3>(),
+                hwnd = hwnd,
+                dwClassContext = CLSCTX_LOCAL_SERVER
+            };
+
+            // Call CoGetObject
+            int hr = CoGetObject(monikerFormatted, ref bindOpts, ref riid, out object ppv);
+            return hr;
         }
 
         public int LockServer([MarshalAs(UnmanagedType.VariantBool)] in bool fLock)

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml;
 using Windows.UI.Notifications;
 using DomXmlDocument = Windows.Data.Xml.Dom.XmlDocument;
@@ -19,8 +20,8 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     {
         #region Properties
         private DesktopNotificationHistoryCompat? _desktopNotificationHistoryCompat;
-
         #endregion
+
         #region Methods
 
         public void Initialize(string appName, string executablePath, string shortcutPath, Guid? applicationId = null, bool asElevatedUser = false)
@@ -28,7 +29,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             applicationId ??= CLSIDGuid.GetGuidFromString(appName);
 
             DesktopNotificationManagerCompat.RegisterAumidAndComServer(this, appName, executablePath, shortcutPath, applicationId.Value, asElevatedUser);
-            DesktopNotificationManagerCompat.RegisterActivator(this, applicationId.Value);
+            DesktopNotificationManagerCompat.RegisterActivator(this, applicationId.Value, asElevatedUser);
         }
 
         public event ToastCallback? ToastCallback;
@@ -56,7 +57,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         protected virtual void OnSetNotifyXML(string xml) { }
 
-        public void ShowNotificationToast(NotificationContent notificationContent)
+        public ToastNotification CreateToastNotification(NotificationContent notificationContent)
         {
             XmlDocument? xmlDocument = notificationContent.Xml;
             string xmlDocumentString = xmlDocument?.OuterXml ?? "";
@@ -69,8 +70,12 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             domXmlDocument.LoadXml(xmlDocumentString);
 
             ToastNotification toast = new ToastNotification(domXmlDocument);
-            DesktopNotificationManagerCompat.CreateToastNotifier().Show(toast);
+            toast.Tag = Guid.CreateVersion7().ToString();
+            return toast;
         }
+
+        public ToastNotifier CreateToastNotifier()
+            => DesktopNotificationManagerCompat.CreateToastNotifier();
 
         protected void AddInput(DomXmlDocument xml, params ToastAction[] paras)
         {
@@ -124,11 +129,13 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                 .SetTitle("Welcome to Collapse Launcher!")
                 .SetContent("You are currently selecting Honkai: Star Rail - Global as your game. There are more games awaits you, find out more!")
                 .SetAppLogoPath(@"Assets\Images/GameLogo\starrail-logo.png", true)
-                .SetAppHeroImagePath(@"Assets\Images\GamePoster/poster_starrail.png");
+                .AddAppHeroImagePath(@"Assets\Images\GamePoster/poster_starrail.png");
 
             content.Duration = ToastDuration.Short;
 
-            manager.ShowNotificationToast(content);
+            ToastNotification toastNotification = manager.CreateToastNotification(content);
+            ToastNotifier toastNotifier = manager.CreateToastNotifier();
+            toastNotifier.Show(toastNotification);
         }
     }
 }

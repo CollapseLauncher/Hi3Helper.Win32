@@ -29,12 +29,12 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             return content;
         }
 
-        public static NotificationContent SetAppHeroImagePath(this NotificationContent content, string? heroImageUriOrPath)
-            => content.SetAppHeroImagePath(CreateUrlFromString(heroImageUriOrPath));
+        public static NotificationContent AddAppHeroImagePath(this NotificationContent content, string? heroImageUriOrPath, bool isHeroPosition = true)
+            => content.AddAppHeroImagePath(CreateUrlFromString(heroImageUriOrPath), isHeroPosition);
 
-        public static NotificationContent SetAppHeroImagePath(this NotificationContent content, Uri? heroImageUri)
+        public static NotificationContent AddAppHeroImagePath(this NotificationContent content, Uri? heroImageUri, bool isHeroPosition = true)
         {
-            content.AppHeroImage = heroImageUri;
+            content.AppHeroImages.Add(new NotificationContent.AppHeroImageRecord(heroImageUri, isHeroPosition));
             return content;
         }
 
