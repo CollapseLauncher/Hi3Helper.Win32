@@ -20,5 +20,8 @@ namespace Hi3Helper.Win32.Native.LibraryImport
             nint psfi,
             uint cbFileInfo,
             uint uFlags);
+        
+        [LibraryImport("shell32.dll", SetLastError = true, EntryPoint = "SetCurrentProcessExplicitAppUserModelID", StringMarshalling = StringMarshalling.Utf16)]
+        public static partial void SetProcessAumid(string appUserModelId);
     }
 }
