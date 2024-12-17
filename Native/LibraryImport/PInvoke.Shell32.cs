@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.Native.LibraryImport
 {
@@ -22,6 +23,9 @@ namespace Hi3Helper.Win32.Native.LibraryImport
             uint uFlags);
         
         [LibraryImport("shell32.dll", SetLastError = true, EntryPoint = "SetCurrentProcessExplicitAppUserModelID", StringMarshalling = StringMarshalling.Utf16)]
-        public static partial void SetProcessAumid(string appUserModelId);
+        public static partial HResult SetProcessAumid(string appUserModelId);
+
+        [LibraryImport("shell32.dll", SetLastError = true, EntryPoint = "GetCurrentProcessExplicitAppUserModelID", StringMarshalling = StringMarshalling.Utf16)]
+        public static partial HResult GetProcessAumid(out string? appUserModelId);
     }
 }
