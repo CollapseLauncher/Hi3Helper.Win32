@@ -1,6 +1,7 @@
-﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Enums;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
@@ -13,15 +14,20 @@ namespace Hi3Helper.Win32.Native.ManagedTools
         private static bool                     _preventSleepRunning;
         private static ILogger?                 _logger;
 
+        [RequiresUnreferencedCode("GetFrame().GetMethod() is being used to get the function name that calls the RestoreSleep sleep function")]
         public static async void RestoreSleep()
         {
             // Return early if token is disposed/already cancelled
             if (_preventSleepToken == null || _preventSleepToken.IsCancellationRequested)
                 return;
-            _logger?.LogInformation($"[InvokeProp::RestoreSleep()] Called by{new System.Diagnostics.StackTrace()}");
+            _logger?.LogInformation($"[InvokeProp::RestoreSleep()] Called by {(new System.Diagnostics.StackTrace().GetFrame(2)?.GetMethod()!)}");
+#if DEBUG
+            _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new System.Diagnostics.StackTrace()}");   
+#endif
             await _preventSleepToken.CancelAsync();
         }
 
+        [RequiresUnreferencedCode("GetFrame().GetMethod() is being used to get the function name that calls the PreventSleep functions")]
         public static async void PreventSleep(ILogger? logger = null)
         {
             // Only run this loop once
@@ -39,8 +45,11 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
             try
             {
-                _logger?.LogWarning("[InvokeProp::PreventSleep()] Starting to prevent sleep!");
-                _logger?.LogInformation($"[InvokeProp::PreventSleep()] Called by{new System.Diagnostics.StackTrace()}");
+                _logger?.LogInformation("[InvokeProp::PreventSleep()] Starting to prevent sleep!");
+                _logger?.LogInformation($"[InvokeProp::PreventSleep()] Called by {new System.Diagnostics.StackTrace().GetFrame(2)?.GetMethod()!}");
+#if DEBUG
+                _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new System.Diagnostics.StackTrace()}");   
+#endif
                 while (!_preventSleepToken.IsCancellationRequested)
                 {
                     // Set ES to SystemRequired every 60s
@@ -61,7 +70,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                 // Reset flag and ES 
                 _preventSleepRunning = false;
                 SetThreadExecutionState(ExecutionState.EsContinuous);
-                logger?.LogWarning("[InvokeProp::PreventSleep()] Stopped preventing sleep!");
+                logger?.LogInformation("[InvokeProp::PreventSleep()] Stopped preventing sleep!");
 
                 // Null the token for the next time method is called
                 _preventSleepToken = null;
