@@ -20,7 +20,9 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             // Return early if token is disposed/already cancelled
             if (_preventSleepToken == null || _preventSleepToken.IsCancellationRequested)
                 return;
-            _logger?.LogInformation($"[InvokeProp::RestoreSleep()] Called by {(new System.Diagnostics.StackTrace().GetFrame(2)?.GetMethod()!)}");
+            // Uncomment once issue is resolved
+            // _logger?.LogInformation($"[InvokeProp::RestoreSleep()] Called by {(new System.Diagnostics.StackTrace().GetFrame(2)?.GetMethod()!)}");
+            _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new System.Diagnostics.StackTrace()}");
 #if DEBUG
             _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new System.Diagnostics.StackTrace()}");   
 #endif
@@ -46,7 +48,9 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             try
             {
                 _logger?.LogInformation("[InvokeProp::PreventSleep()] Starting to prevent sleep!");
-                _logger?.LogInformation($"[InvokeProp::PreventSleep()] Called by {new System.Diagnostics.StackTrace().GetFrame(2)?.GetMethod()!}");
+                // Uncomment once issue is resolved
+                // _logger?.LogInformation($"[InvokeProp::PreventSleep()] Called by {new System.Diagnostics.StackTrace().GetFrame(2)?.GetMethod()!}");
+                _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new System.Diagnostics.StackTrace()}");
 #if DEBUG
                 _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new System.Diagnostics.StackTrace()}");   
 #endif
