@@ -234,13 +234,13 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             try
             {
                 fixed (char* bufferPtr = &buffer[0])
-                fixed (void* findDataPtr = &win32FindDataBuffer[0])
-                {
-                    nint findDataSafe = (nint)findDataPtr;
-                    toInvokeDelegate(bufferPtr, findDataSafe, length);
+                    fixed (void* findDataPtr = &win32FindDataBuffer[0])
+                    {
+                        nint findDataSafe = (nint)findDataPtr;
+                        toInvokeDelegate(bufferPtr, findDataSafe, length);
 
-                    return GetStringFromNullTerminatedPtr(bufferPtr);
-                }
+                        return GetStringFromNullTerminatedPtr(bufferPtr);
+                    }
             }
             finally
             {
