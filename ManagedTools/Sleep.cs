@@ -1,6 +1,7 @@
 using Hi3Helper.Win32.Native.Enums;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,23 +14,25 @@ namespace Hi3Helper.Win32.Native.ManagedTools
         public static  CancellationTokenSource? _preventSleepToken;
         private static bool                     _preventSleepRunning;
         private static ILogger?                 _logger;
-
-        [RequiresUnreferencedCode("GetFrame().GetMethod() is being used to get the function name that calls the RestoreSleep sleep function")]
+        
         public static async void RestoreSleep()
         {
-            // Return early if token is disposed/already cancelled
-            if (_preventSleepToken == null || _preventSleepToken.IsCancellationRequested)
-                return;
-            // Uncomment once issue is resolved
-            // _logger?.LogInformation($"[InvokeProp::RestoreSleep()] Called by {(new System.Diagnostics.StackTrace().GetFrame(2)?.GetMethod()!)}");
-            _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new System.Diagnostics.StackTrace()}");
-#if DEBUG
+            try
+            {
+                // Return early if token is disposed/already cancelled
+                if (_preventSleepToken == null || _preventSleepToken.IsCancellationRequested) return;
+                _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new StackTrace()}");
+            #if DEBUG
             _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new System.Diagnostics.StackTrace()}");   
-#endif
-            await _preventSleepToken.CancelAsync();
+            #endif
+                await _preventSleepToken.CancelAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[InvokeProp::RestoreSleep()] Errors while preventing sleep!\r\n{ex}");
+            }
         }
-
-        [RequiresUnreferencedCode("GetFrame().GetMethod() is being used to get the function name that calls the PreventSleep functions")]
+        
         public static async void PreventSleep(ILogger? logger = null)
         {
             // Only run this loop once
