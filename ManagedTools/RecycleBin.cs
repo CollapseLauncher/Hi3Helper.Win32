@@ -18,19 +18,25 @@ namespace Hi3Helper.Win32.Native.ManagedTools
         /// Moves a list of files to the Recycle Bin.
         /// </summary>
         /// <param name="filePaths">The list of file paths to be moved to the Recycle Bin.</param>
-        public static void MoveFileToRecycleBin(List<string> filePaths) =>
-            MoveFileToRecycleBin(CollectionsMarshal.AsSpan(filePaths));
+        /// <param name="needConfirmIfCannotRecycleBin">Whether to show a confirmation dialog if the Recycle Bin is not available.</param>
+        public static void MoveFileToRecycleBin(List<string> filePaths, bool needConfirmIfCannotRecycleBin = false) =>
+            MoveFileToRecycleBin(CollectionsMarshal.AsSpan(filePaths), needConfirmIfCannotRecycleBin);
 
         /// <summary>
         /// Moves a span of file paths to the Recycle Bin.
         /// </summary>
         /// <param name="filePathSpan">The span of file paths to be moved to the Recycle Bin.</param>
-        public static unsafe void MoveFileToRecycleBin(ReadOnlySpan<string> filePathSpan)
+        /// <param name="needConfirmIfCannotRecycleBin">Whether to show a confirmation dialog if the Recycle Bin is not available.</param>
+        public static unsafe void MoveFileToRecycleBin(ReadOnlySpan<string> filePathSpan, bool needConfirmIfCannotRecycleBin = false)
         {
             // Define the type of file operation to be performed (delete in this case)
             // and flags for the file operation (allow undo and no confirmation)
             FileFuncFlags funcType = FileFuncFlags.FO_DELETE;
             FILEOP_FLAGS  flags    = FILEOP_FLAGS.FOF_ALLOWUNDO | FILEOP_FLAGS.FOF_NOCONFIRMATION;
+
+            // If the operation requires confirmation when the Recycle Bin is not available
+            if (needConfirmIfCannotRecycleBin)
+                flags |= FILEOP_FLAGS.FOF_WANTNUKEWARNING;
 
             // Calculate the length of the buffer needed to store the concatenated file paths
             // and SHFILEOPSTRUCTW_UNSAFE structure
@@ -56,6 +62,12 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
                 // Perform the file operation
                 int result = SHFileOperation((nint)fileOpUnsafe);
+
+                // If the operation was cancelled, throw cancellation exception
+                if (result == 0x75)
+                    throw new OperationCanceledException("Operation was cancelled by the user");
+
+                // Otherwise, throw other Win32 exception
                 if (result != 0)
                     throw new Win32Exception(result);
             }
