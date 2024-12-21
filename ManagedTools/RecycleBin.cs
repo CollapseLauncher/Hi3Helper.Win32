@@ -64,7 +64,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                 int result = SHFileOperation((nint)fileOpUnsafe);
 
                 // If the operation was cancelled, throw cancellation exception
-                if (result == 0x75)
+                if (result == 0x75 || result == 0x4c7)
                     throw new OperationCanceledException("Operation was cancelled by the user");
 
                 // Otherwise, throw other Win32 exception
