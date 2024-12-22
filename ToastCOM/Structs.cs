@@ -1,7 +1,4 @@
-﻿using Hi3Helper.Win32.ToastCOM.Notification;
-using System;
-using System.Runtime.InteropServices;
-using System.Xml;
+﻿using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.ToastCOM
 {

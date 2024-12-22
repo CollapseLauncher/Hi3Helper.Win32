@@ -113,5 +113,11 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool CloseHandle(nint hObject);
+
+        [LibraryImport("kernel32.dll",
+                       SetLastError = true,
+                       StringMarshalling = StringMarshalling.Utf16)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial int GetCurrentPackageFullName(ref int packageFullNameLength, out string? packageFullName);
     }
 }

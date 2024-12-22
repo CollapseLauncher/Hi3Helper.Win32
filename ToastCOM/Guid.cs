@@ -9,14 +9,11 @@ namespace Hi3Helper.Win32.ToastCOM
     {
         internal const  string  INotificationActivationCallback = "53e31837-6600-4a81-9395-75cffe746f94";
         internal const  string  IClassFactory                   = "00000001-0000-0000-c000-000000000046";
-        internal static Guid    Guid_IClassFactory              = new Guid(IClassFactory);
+        internal static Guid    Guid_IClassFactory              = new(IClassFactory);
     }
 
     internal class CLSIDGuid
     {
-        internal const string NotificationActivatorClassFactory = "77841234-6600-4a81-9395-75cffe746f94";
-        internal static Guid Guid_NotificationActivatorClassFactory = new Guid(NotificationActivatorClassFactory);
-
         internal static Guid GetGuidFromString(string fromString)
         {
             int bufferLen = fromString.Length + 16;

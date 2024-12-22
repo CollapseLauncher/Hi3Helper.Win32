@@ -6,8 +6,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
 using Windows.UI.Notifications;
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
@@ -16,7 +14,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     {
         #region Properties
         public const string TOAST_ACTIVATED_LAUNCH_ARG = "-ToastActivated";
-        private static readonly Guid TOAST_G = new Guid("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3");
+        private static readonly Guid TOAST_G = new("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3");
 
         private static bool _registeredAumidAndComServer;
         private static string? _aumid;
@@ -182,7 +180,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             Guid guid = applicationId;
 
             CLSCTX    classContext = CLSCTX.CLSCTX_LOCAL_SERVER;
-            TagREGCLS registerFlag = TagREGCLS.REGCLS_SINGLEUSE;
+            TagREGCLS registerFlag = TagREGCLS.REGCLS_MULTIPLEUSE;
 
             NotificationActivatorClassFactory classFactory = new NotificationActivatorClassFactory();
             classFactory.UseExistingInstance(currentInstance, asElevatedUser);
@@ -212,7 +210,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         }
 
         /// <summary>
-        /// Gets the <see cref="DesktopNotificationHistoryCompat"/> object. You must have called <see cref="RegisterActivator"/> first (and also <see cref="RegisterAumidAndComServer(string)"/> if you're a classic Win32 app), or this will throw an exception.
+        /// Gets the <see cref="DesktopNotificationHistoryCompat"/> object. You must have called <see cref="RegisterActivator"/> first (and also <see cref="RegisterAumidAndComServer"/> if you're a classic Win32 app), or this will throw an exception.
         /// </summary>
         public static DesktopNotificationHistoryCompat History
         {
@@ -254,53 +252,6 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         /// Gets a boolean representing whether http images can be used within toasts. This is true if running under Desktop Bridge.
         /// </summary>
         public static bool CanUseHttpImages { get { return DesktopBridgeHelpers.IsRunningAsUwp(); } }
-
-        /// <summary>
-        /// Code from https://github.com/qmatteoq/DesktopBridgeHelpers/edit/master/DesktopBridge.Helpers/Helpers.cs
-        /// </summary>
-        private class DesktopBridgeHelpers
-        {
-            const long APPMODEL_ERROR_NO_PACKAGE = 15700L;
-
-            [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-            static extern int GetCurrentPackageFullName(ref int packageFullNameLength, StringBuilder packageFullName);
-
-            private static bool? _isRunningAsUwp;
-            public static bool IsRunningAsUwp()
-            {
-                if (_isRunningAsUwp == null)
-                {
-                    if (IsWindows7OrLower)
-                    {
-                        _isRunningAsUwp = false;
-                    }
-                    else
-                    {
-                        int length = 0;
-                        StringBuilder sb = new StringBuilder(0);
-                        int result = GetCurrentPackageFullName(ref length, sb);
-
-                        sb = new StringBuilder(length);
-                        result = GetCurrentPackageFullName(ref length, sb);
-
-                        _isRunningAsUwp = result != APPMODEL_ERROR_NO_PACKAGE;
-                    }
-                }
-
-                return _isRunningAsUwp.Value;
-            }
-
-            private static bool IsWindows7OrLower
-            {
-                get
-                {
-                    int versionMajor = Environment.OSVersion.Version.Major;
-                    int versionMinor = Environment.OSVersion.Version.Minor;
-                    double version = versionMajor + (double)versionMinor / 10;
-                    return version <= 6.1;
-                }
-            }
-        }
         #endregion
     }
 }

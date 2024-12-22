@@ -18,9 +18,9 @@ namespace Hi3Helper.Win32.ToastCOM
             );
     }
 
-    [GeneratedComInterface]
     [Guid(IIDGuid.IClassFactory)]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [GeneratedComInterface(Options = ComInterfaceOptions.ManagedObjectWrapper | ComInterfaceOptions.ComObjectWrapper)]
     public partial interface IClassFactory
     {
         // For HRESULTs use
