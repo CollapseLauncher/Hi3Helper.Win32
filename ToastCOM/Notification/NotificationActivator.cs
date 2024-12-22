@@ -1,11 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Hi3Helper.Win32.Native.LibraryImport;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {
-    public unsafe abstract partial class NotificationActivator : INotificationActivationCallback
+    public abstract unsafe class NotificationActivator : INotificationActivationCallback, IDisposable
     {
         #region Properties
         internal ILogger? _logger;
+        internal uint     _currentRegisteredClass = 0;
         #endregion
 
         #region Methods
@@ -21,6 +24,13 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         protected abstract void OnActivated(string arguments, NotificationUserInput userInput, string appUserModelId);
 
+        public void Dispose()
+        {
+            if (_currentRegisteredClass != 0)
+            {
+                PInvoke.CoRevokeClassObject(_currentRegisteredClass).ThrowOnFailure();
+            }
+        }
         #endregion
     }
 }

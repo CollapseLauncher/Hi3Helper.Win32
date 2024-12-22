@@ -6,14 +6,15 @@ namespace Hi3Helper.Win32.ToastCOM
 {
     [Guid(IIDGuid.INotificationActivationCallback)]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    [GeneratedComInterface]
+    [GeneratedComInterface(Options = ComInterfaceOptions.ManagedObjectWrapper | ComInterfaceOptions.ComObjectWrapper, StringMarshalling = StringMarshalling.Utf16)]
+    [ComVisible(true)]
     public partial interface INotificationActivationCallback
     {
         unsafe void Activate(
-            [MarshalAs(UnmanagedType.LPWStr)] string appUserModelId,
-            [MarshalAs(UnmanagedType.LPWStr)] string invokedArgs,
+            string appUserModelId,
+            string invokedArgs,
             byte* data,
-            [MarshalAs(UnmanagedType.U4)] uint dataCount
+            uint dataCount
             );
     }
 

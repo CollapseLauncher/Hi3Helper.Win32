@@ -8,9 +8,9 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     /// </summary>
     public class ToastTextBox : ToastCommand
     {
-        public string? Id { get; set; }
-        public string? PlaceHolderContent { get; set; }
-        public string? Title { get; set; }
+        public required string  Id                 { get; set; }
+        public          string? PlaceHolderContent { get; set; }
+        public          string? Title              { get; set; }
 
         internal override XmlNode GetXmlNode(XmlDocument rootDocument)
         {

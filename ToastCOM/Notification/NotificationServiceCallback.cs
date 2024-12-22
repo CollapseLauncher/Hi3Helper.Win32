@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using System.Xml;
 using Windows.UI.Notifications;
 using DomXmlDocument = Windows.Data.Xml.Dom.XmlDocument;
@@ -59,8 +58,8 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         public ToastNotification CreateToastNotification(NotificationContent notificationContent)
         {
-            XmlDocument? xmlDocument = notificationContent.Xml;
-            string xmlDocumentString = xmlDocument?.OuterXml ?? "";
+            XmlDocument xmlDocument = notificationContent.Xml;
+            string xmlDocumentString = xmlDocument.OuterXml;
 
 #if DEBUG
             _logger?.LogDebug($"[NotificationServiceSub::ShowNotificationToast] Showing toast using this XML:\r\n{xmlDocumentString}");

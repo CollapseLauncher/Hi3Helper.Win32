@@ -11,10 +11,10 @@ namespace Hi3Helper.Win32.Native.ManagedTools
     // ReSharper disable once PartialTypeWithSinglePart
     public static class ComMarshal
     {
-        public static unsafe HResult CreateInstance<T>(Guid rclsid, nint pUnkOuter, CLSCTX dwClsContext, out T? ppv)
+        public static unsafe HResult CreateInstance<T>(Guid rClsId, nint pUnkOuter, CLSCTX dwClsContext, out T? ppv)
         {
-            Guid refTGuid = typeof(T).GUID;
-            HResult hr = CoCreateInstance(in rclsid, pUnkOuter, dwClsContext, in refTGuid, out void* o);
+            Guid    refTGuid = typeof(T).GUID;
+            HResult hr       = CoCreateInstance(in rClsId, pUnkOuter, dwClsContext, in refTGuid, out void* o);
             ppv = ComInterfaceMarshaller<T>.ConvertToManaged(o);
             return hr;
         }
@@ -25,11 +25,9 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             where TInterfaceTo : class
         {
             void* interfaceFromPtr = ComInterfaceMarshaller<TInterfaceFrom>.ConvertToUnmanaged(interfaceFrom);
+            ((HResult)Marshal.QueryInterface((nint)interfaceFromPtr, in interfaceToGuid, out nint interfaceToPtr)).ThrowOnFailure();
 
-            Marshal.QueryInterface((nint)interfaceFromPtr, in interfaceToGuid, out nint ppv);
-            void* interfaceToPtr = (void*)ppv;
-
-            TInterfaceTo? interfaceTo = ComInterfaceMarshaller<TInterfaceTo>.ConvertToManaged(interfaceToPtr);
+            TInterfaceTo? interfaceTo = ComInterfaceMarshaller<TInterfaceTo>.ConvertToManaged((void*)interfaceToPtr);
             return interfaceTo;
         }
 

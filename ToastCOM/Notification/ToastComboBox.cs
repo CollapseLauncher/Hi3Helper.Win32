@@ -10,11 +10,11 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     /// </summary>
     public class ToastComboBox : ToastCommand
     {
-        public string? Id { get; set; }
-        public string? PlaceHolderContent { get; set; }
-        public string? Title { get; set; }
-        public string? DefaultSelectionKey { get; set; }
-        public Dictionary<string, string> Selection { get; set; } = new Dictionary<string, string>();
+        public required string                     Id                  { get; set; }
+        public          string?                    PlaceHolderContent  { get; set; }
+        public          string?                    Title               { get; set; }
+        public          string?                    DefaultSelectionKey { get; set; }
+        public          Dictionary<string, string> Selection           { get; set; } = new();
 
         internal override XmlNode GetXmlNode(XmlDocument rootDocument)
         {

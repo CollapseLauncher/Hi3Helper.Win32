@@ -9,14 +9,14 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     /// </summary>
     public class ToastAction : ToastCommand
     {
-        public string? Argument { get; set; }
-        public string? Content { get; set; }
-        public Uri? ImageUri { get; set; }
-        public ToastActivationType? ActivationType { get; set; }
-        public ToastAfterActivationBehavior? AfterActivationBehaviour { get; set; }
-        public string? HintInputId { get; set; }
-        public ToastButtonStyle? HintButtonStyle { get; set; }
-        public string? HintTooltip { get; set; }
+        public required string                        Argument                 { get; set; }
+        public required string                        Content                  { get; set; }
+        public          Uri?                          ImageUri                 { get; set; }
+        public          ToastActivationType?          ActivationType           { get; set; }
+        public          ToastAfterActivationBehavior? AfterActivationBehaviour { get; set; }
+        public          string?                       HintInputId              { get; set; }
+        public          ToastButtonStyle?             HintButtonStyle          { get; set; }
+        public          string?                       HintTooltip              { get; set; }
 
         internal override XmlNode GetXmlNode(XmlDocument rootDocument)
         {

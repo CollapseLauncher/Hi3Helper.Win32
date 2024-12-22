@@ -23,10 +23,23 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("ole32.dll", EntryPoint = "CoRegisterClassObject")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial HResult CoRegisterClassObject(
-            in Guid rclsid,
+            in                                   Guid          rclsid,
             [MarshalAs(UnmanagedType.Interface)] IClassFactory pUnk,
-            uint dwClsContext,
-            uint flags,
-            out uint lpdwRegister);
+            CLSCTX                                             dwClsContext,
+            TagREGCLS                                          flags,
+            out uint                                           dwRegister);
+
+
+        [LibraryImport("ole32.dll", EntryPoint = "CoRevokeClassObject")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial HResult CoRevokeClassObject(uint dwRegister);
+
+        [LibraryImport("ole32.dll", EntryPoint = "CoGetObject", StringMarshalling = StringMarshalling.Utf16)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static unsafe partial HResult CoGetObject(
+            string      pszName,
+            BIND_OPTS3* pBindOptions,
+            in  Guid    riid,
+            out nint    ppv);
     }
 }

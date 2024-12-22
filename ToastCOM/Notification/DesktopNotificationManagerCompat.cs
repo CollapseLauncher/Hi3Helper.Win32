@@ -1,16 +1,12 @@
-﻿using Hi3Helper.Win32.FileDialogCOM;
-using Hi3Helper.Win32.Native.Enums;
+﻿using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.ManagedTools;
-using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.ShellLinkCOM;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using Windows.UI.Notifications;
 
@@ -78,7 +74,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
             if (!shortcutPath.EndsWith(".lnk"))
             {
-                shortcutPath = shortcutPath + ".lnk";
+                shortcutPath += ".lnk";
             }
 
             ComMarshal.CreateInstance(
@@ -106,7 +102,6 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             try
             {
                 IPersistFile? persistFileW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersistFile>(in ShellLinkCOM.CLSIDGuid.IGuid_IPersistFile);
-                IPersist? persistW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersist>(in ShellLinkCOM.CLSIDGuid.IGuid_IPersist);
                 IPropertyStore? propertyStoreW = shellLink?.CastComInterfaceAs<IShellLinkW, IPropertyStore>(in ShellLinkCOM.CLSIDGuid.IGuid_IPropertyStore);
 
                 try
@@ -141,6 +136,12 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         private static void RegisterComServer<T>(T currentInstance, string exePath, Guid applicationId, bool asElevatedUser)
             where T : NotificationActivator
         {
+            // Throw if the _aumid is blank
+            if (string.IsNullOrEmpty(_aumid))
+            {
+                throw new InvalidOperationException("Please set the ApplicationId!");
+            }
+
             // We register the EXE to start up when the notification is activated
             string monikerPath = @$"SOFTWARE\Classes\CLSID\{{{applicationId}}}";
             string regLocalServerString = Path.Combine(monikerPath, "LocalServer32");
@@ -148,18 +149,25 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
             // Add LOCAL_SERVER registration path
             RegistryKey regLocalServerKey = localKey.CreateSubKey(regLocalServerString);
-            regLocalServerKey.SetValue(null, '"' + exePath + '"');
+            regLocalServerKey.SetValue(null,             '"' + exePath + '"' + $" {TOAST_ACTIVATED_LAUNCH_ARG}", RegistryValueKind.ExpandString);
+            regLocalServerKey.SetValue("ServerExecutable", exePath, RegistryValueKind.ExpandString);
             currentInstance._logger?.LogInformation($"[DesktopNotificationManagerCompat::RegisterComServer] Registered ComServer for toast registration: {(asElevatedUser ? "HKEY_LOCAL_MACHINE" : "HKEY_CURRENT_USER")}\\{regLocalServerString}");
 
             // If asElevatedUser is enabled, then add "Elevation" key on COM Activator moniker
             if (asElevatedUser)
             {
-                bool found = FindResourceNumberOfAumid(exePath, _aumid ?? "", out int resourceNumber);
+                // Remove one if the duplicated key from non-elevated user exist
+                RegistryKey  localKeyNonElevated = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
+                RegistryKey? regLocalServerKeyNonElevated = localKeyNonElevated.OpenSubKey(regLocalServerString);
+                if (regLocalServerKeyNonElevated != null)
+                {
+                    localKey.DeleteSubKeyTree(regLocalServerString);
+                }
 
                 RegistryKey monikerKey = localKey.CreateSubKey(monikerPath);
-                monikerKey.SetValue(null, _aumid ?? "", RegistryValueKind.String);
+                monikerKey.SetValue(null, _aumid, RegistryValueKind.String);
                 monikerKey.SetValue("AppID", $"{{{applicationId}}}");
-                monikerKey.SetValue("LocalizedString", "@C:\\Windows\\system32\\vsjitdebugger.exe,-201");
+                monikerKey.SetValue("LocalizedString", _aumid);
 
                 string regElevateString = Path.Combine(monikerPath, "Elevation");
                 RegistryKey regElevateKey = localKey.CreateSubKey(regElevateString);
@@ -168,99 +176,13 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             }
         }
 
-        // Constants
-        private const uint LOAD_LIBRARY_AS_DATAFILE = 0x00000002;
-        private const int RT_STRING = 6; // Resource type for string tables
-
-        // P/Invoke declarations
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern IntPtr LoadLibraryEx(string lpFileName, IntPtr hFile, uint dwFlags);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool FreeLibrary(IntPtr hModule);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr FindResourceEx(IntPtr hModule, IntPtr lpType, IntPtr lpName, ushort wLanguage);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr LoadResource(IntPtr hModule, IntPtr hResource);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr LockResource(IntPtr hGlobal);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern uint SizeofResource(IntPtr hModule, IntPtr hResource);
-
-        private static IntPtr MAKEINTRESOURCE(int id) => (IntPtr)id;
-
-        private static bool FindResourceNumberOfAumid(string executablePath, string aumidToSearch, out int resourceNumber)
-        {
-            const ushort languageId = 0;
-            IntPtr hModule = LoadLibraryEx(executablePath, IntPtr.Zero, LOAD_LIBRARY_AS_DATAFILE);
-
-            bool resourceFound = false;
-            resourceNumber = -1;
-            try
-            {
-                for (int resourceId = 0; resourceId < 2000; resourceId++)
-                {
-                    IntPtr hResource = FindResourceEx(nint.Zero, MAKEINTRESOURCE(RT_STRING), MAKEINTRESOURCE(resourceId), languageId);
-                    if (hResource != IntPtr.Zero)
-                    {
-                        Console.WriteLine($"Found LocalizedString resource with ID: {resourceId}");
-                        resourceFound = true;
-
-                        // Load and view resource data
-                        IntPtr hResourceData = LoadResource(hModule, hResource);
-                        if (hResourceData != IntPtr.Zero)
-                        {
-                            IntPtr pResource = LockResource(hResourceData);
-                            uint size = SizeofResource(hModule, hResource);
-
-                            if (pResource != IntPtr.Zero && size > 0)
-                            {
-                                Console.WriteLine($"Resource data found with size: {size} bytes.");
-                                // Additional logic to interpret string data can be added here
-                            }
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                FreeLibrary(hModule);
-            }
-
-            return resourceFound;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct BIND_OPTS3
-        {
-            public uint cbStruct;          // DWORD
-            public uint grfFlags;          // DWORD
-            public uint grfMode;           // DWORD
-            public uint dwTickCountDeadline; // DWORD
-            public uint dwTrackFlags;      // DWORD
-            public uint dwClassContext;    // DWORD
-            public uint locale;            // LCID (equivalent to uint in .NET)
-            public IntPtr pServerInfo;     // COSERVERINFO*, use IntPtr for pointer to unmanaged struct
-            public IntPtr hwnd;            // HWND, use IntPtr to represent window handles
-        }
-
-        [DllImport("ole32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern int CoGetObject(
-            string pszName,
-            ref BIND_OPTS3 pBindOptions,
-            in Guid riid,
-            out nint ppv);
-
-        internal static unsafe void RegisterActivator<T>(T currentInstance, Guid applicationId, bool asElevatedUser)
+        internal static void RegisterActivator<T>(T currentInstance, Guid applicationId, bool asElevatedUser)
             where T : NotificationActivator
         {
             Guid guid = applicationId;
 
-            CLSCTX classContext = CLSCTX.CLSCTX_LOCAL_SERVER;
+            CLSCTX    classContext = CLSCTX.CLSCTX_LOCAL_SERVER;
+            TagREGCLS registerFlag = TagREGCLS.REGCLS_SINGLEUSE;
 
             NotificationActivatorClassFactory classFactory = new NotificationActivatorClassFactory();
             classFactory.UseExistingInstance(currentInstance, asElevatedUser);
@@ -268,9 +190,10 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             PInvoke.CoRegisterClassObject(
                 in guid,
                 classFactory,
-                (uint)classContext,
-                0,
-                out uint id).ThrowOnFailure();
+                classContext,
+                registerFlag,
+                out currentInstance._currentRegisteredClass).ThrowOnFailure();
+
             _registeredActivator = true;
 
             currentInstance._logger?.LogInformation($"[DesktopNotificationManagerCompat::RegisterActivator] Registered Toast Activator for application id: {guid} with CLSCTX: {classContext}");
@@ -281,16 +204,11 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         {
             EnsureRegistered();
 
-            if (_aumid != null)
-            {
+            return _aumid != null ?
                 // Non-Desktop Bridge
-                return ToastNotificationManager.CreateToastNotifier(_aumid);
-            }
-            else
-            {
+                ToastNotificationManager.CreateToastNotifier(_aumid) :
                 // Desktop Bridge
-                return ToastNotificationManager.CreateToastNotifier();
-            }
+                ToastNotificationManager.CreateToastNotifier();
         }
 
         /// <summary>
@@ -384,6 +302,5 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             }
         }
         #endregion
-
     }
 }

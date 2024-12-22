@@ -21,14 +21,15 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         public bool? UseButtonStyle { get; set; }
 
         private XmlDocument? _xml;
-        public XmlDocument? Xml
+        public XmlDocument Xml
         {
-            get => GenerateXmlDocument();
+            get => _xml ??= GenerateXmlDocument();
         }
 
         public static NotificationContent Create() => new NotificationContent();
 
-        public void UpdateXml(XmlDocument xml) => _xml = xml;
+        public void UpdateXml()                    => _xml = GenerateXmlDocument();
+        public void UpdateXmlWith(XmlDocument xml) => _xml = xml;
 
         private XmlDocument GenerateXmlDocument()
         {
@@ -37,7 +38,10 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                 return _xml;
 
             // Create root visual element
-            _xml = new XmlDocument();
+            _xml = new XmlDocument
+            {
+                PreserveWhitespace = true
+            };
             XmlNode? xmlToastRootElement = _xml.AppendChild(CreateToastElement(_xml));
             XmlNode? xmlVisualElement = xmlToastRootElement?.AppendChild(_xml.CreateElement("visual"));
 

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.Native.Structs
 {
-    public readonly partial struct HResult
+    public readonly struct HResult
             : IEquatable<HResult>
     {
         internal readonly int Value;
