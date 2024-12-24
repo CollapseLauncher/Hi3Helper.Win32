@@ -1,6 +1,7 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -10,46 +11,56 @@ namespace Hi3Helper.Win32.Screen
 {
     public class ScreenProp
     {
-        public List<Size>? ScreenResolutions { get; private set; }
-        public Size CurrentResolution { get => GetScreenSize(); }
+        public static Size CurrentResolution { get => GetScreenSize(); }
 
-        public ScreenProp()
+        public static IEnumerable<Size> EnumerateScreenSizes()
         {
+            int index = 0;
+            int found = 0;
             int sizeOfDevMode = Marshal.SizeOf<DEVMODEW>();
-            nint devModeHandle = Marshal.AllocCoTaskMem(sizeOfDevMode);
 
+            byte[] buffer = ArrayPool<byte>.Shared.Rent(sizeOfDevMode);
+            nint bufferPtr = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
             try
             {
-                ScreenResolutions = new List<Size>();
-                for (int i = 0; PInvoke.EnumDisplaySettings(null, i, devModeHandle); i++)
+                int lastWidth = 0;
+                int lastHeight = 0;
+                while (PInvoke.EnumDisplaySettings(null, index, bufferPtr))
                 {
-                    DEVMODEW localDevMode = Marshal.PtrToStructure<DEVMODEW>(devModeHandle);
-                    if (ScreenResolutions.Count == 0)
-                        ScreenResolutions.Add(new Size { Width = (int)localDevMode.dmPelsWidth, Height = (int)localDevMode.dmPelsHeight });
-                    else if (!(ScreenResolutions[^1].Width == localDevMode.dmPelsWidth && ScreenResolutions[^1].Height == localDevMode.dmPelsHeight))
-                        ScreenResolutions.Add(new Size { Width = (int)localDevMode.dmPelsWidth, Height = (int)localDevMode.dmPelsHeight });
-
-                    Marshal.DestroyStructure<DEVMODEW>(devModeHandle);
+                    ++index;
+                    Size currentSize = GetSizeFromPtr(bufferPtr);
+                    if (lastWidth != currentSize.Width || lastHeight != currentSize.Height)
+                    {
+                        ++found;
+                        lastWidth = currentSize.Width;
+                        lastHeight = currentSize.Height;
+                        yield return currentSize;
+                    }
                 }
             }
             finally
             {
-                Marshal.FreeCoTaskMem(devModeHandle);
+                ArrayPool<byte>.Shared.Return(buffer);
             }
 
-            // Some corner case
-            if (ScreenResolutions.Count == 0)
+            if (found == 0)
             {
-                ScreenResolutions.Add(GetScreenSize());
+                yield return GetScreenSize();
             }
         }
 
-        public Size GetScreenSize() => new Size
+        public static int GetMaxHeight() => EnumerateScreenSizes().Max(x => x.Height);
+
+        private static unsafe Size GetSizeFromPtr(nint ptr)
+        {
+            DEVMODEW* localDevMode = (DEVMODEW*)ptr;
+            return new Size { Width = (int)localDevMode->dmPelsWidth, Height = (int)localDevMode->dmPelsHeight };
+        }
+
+        private static Size GetScreenSize() => new Size
         {
             Width = PInvoke.GetSystemMetrics(SystemMetric.SM_CXSCREEN),
             Height = PInvoke.GetSystemMetrics(SystemMetric.SM_CYSCREEN)
         };
-
-        public int GetMaxHeight() => ScreenResolutions?.Max(x => x.Height) ?? 0;
     }
 }
