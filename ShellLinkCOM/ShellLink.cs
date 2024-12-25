@@ -17,7 +17,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
     unsafe delegate void ToDelegateWithW32FindDataInvoke(char* buffer, nint findDataPtr, int length);
 
     [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
-    public class ShellLink : IDisposable
+    public partial class ShellLink : IDisposable
     {
         // Use Unicode (W) under NT, otherwise use ANSI      
         IShellLinkW? linkW;

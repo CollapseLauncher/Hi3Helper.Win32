@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {
-    public unsafe class NotificationUserInput : IReadOnlyDictionary<string, string?>
+    public unsafe partial class NotificationUserInput : IReadOnlyDictionary<string, string?>
     {
         #region Properties
         private NOTIFICATION_USER_INPUT_DATA[] _data;
