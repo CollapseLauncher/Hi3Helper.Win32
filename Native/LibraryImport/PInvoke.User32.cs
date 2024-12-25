@@ -130,6 +130,6 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         public static partial nint GetWindow(nint hWnd, GetWindowType uCmd);
 
         [LibraryImport("user32.dll", EntryPoint = "MessageBoxW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-        public static partial int MessageBox(nint hWnd, string lpText, string lpCaption, uint uType);
+        public static partial MessageBoxResult MessageBox(nint hWnd, string lpContent, string? lpTitle, MessageBoxFlags uType);
     }
 }
