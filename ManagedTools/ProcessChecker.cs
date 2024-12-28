@@ -1,4 +1,5 @@
-﻿using Hi3Helper.Win32.Native.Structs;
+﻿using Hi3Helper.Win32.Native.LibraryImport;
+using Hi3Helper.Win32.Native.Structs;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Buffers;
@@ -6,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable RedundantUnsafeContext
 
 namespace Hi3Helper.Win32.Native.ManagedTools
@@ -23,7 +23,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
         private const int DefaultNtQueryChangedLen = 4 << 17;
         private static int DynamicNtQueryChangedBufferLen = DefaultNtQueryChangedLen;
 
-        public static unsafe bool IsProcessExist(int processId) => OpenProcess(QueryLimitedInformation, false, processId) != nint.Zero;
+        public static unsafe bool IsProcessExist(int processId) => PInvoke.OpenProcess(QueryLimitedInformation, false, processId) != nint.Zero;
 
         public static unsafe bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", ILogger? logger = null)
             => IsProcessExist(processName, out processId, out windowHandle, checkForOriginPath, false, logger);
@@ -42,7 +42,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
             // Initialize the first buffer to 512 KiB
             ArrayPool<byte> arrayPool = ArrayPool<byte>.Shared;
-            byte[] NtQueryCachedBuffer = arrayPool.Rent(DynamicNtQueryChangedBufferLen);
+            byte[] ntQueryCachedBuffer = arrayPool.Rent(DynamicNtQueryChangedBufferLen);
             bool isReallocate = false;
             // ReSharper disable once RedundantAssignment
             uint length = 0;
@@ -60,22 +60,22 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                 // If buffer reallocation is requested, then re-rent the buffer
                 // from ArrayPool<T>.Shared
                 if (isReallocate)
-                    NtQueryCachedBuffer = arrayPool.Rent(DynamicNtQueryChangedBufferLen);
+                    ntQueryCachedBuffer = arrayPool.Rent(DynamicNtQueryChangedBufferLen);
 
                 // Get the pointer of the buffer
-                fixed (byte* dataBufferPtr = &NtQueryCachedBuffer[0])
+                byte* dataBufferPtr = (byte*)Marshal.UnsafeAddrOfPinnedArrayElement(ntQueryCachedBuffer, 0);
                 {
                     // Get the query of the current running process and store it to the buffer
-                    uint hNtQuerySystemInformationResult = NtQuerySystemInformation(SystemProcessInformation, dataBufferPtr, (uint)NtQueryCachedBuffer.Length, out length);
+                    uint hNtQuerySystemInformationResult = PInvoke.NtQuerySystemInformation(SystemProcessInformation, dataBufferPtr, (uint)ntQueryCachedBuffer.Length, out length);
 
                     // If the required length of the data is exceeded than the current buffer,
                     // then try to reallocate and start over to the top.
                     const uint STATUS_INFO_LENGTH_MISMATCH = 0xC0000004;
-                    if (hNtQuerySystemInformationResult == STATUS_INFO_LENGTH_MISMATCH || length > NtQueryCachedBuffer.Length)
+                    if (hNtQuerySystemInformationResult == STATUS_INFO_LENGTH_MISMATCH || length > ntQueryCachedBuffer.Length)
                     {
                         // Round up length
                         DynamicNtQueryChangedBufferLen = (int)BitOperations.RoundUpToPowerOf2(length);
-                        logger?.LogWarning($"Buffer requested is insufficient! Requested: {length} > Capacity: {NtQueryCachedBuffer.Length}, Resizing the buffer...");
+                        logger?.LogWarning($"Buffer requested is insufficient! Requested: {length} > Capacity: {ntQueryCachedBuffer.Length}, Resizing the buffer...");
                         isReallocate = true;
                         goto StartOver;
                     }
@@ -123,7 +123,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                         windowHandle = MainWindowFinder.FindMainWindow(processId);
 
                         // Try open the process and get the handle
-                        nint processHandle = OpenProcess(QueryLimitedInformation, false, processId);
+                        nint processHandle = PInvoke.OpenProcess(QueryLimitedInformation, false, processId);
 
                         // If failed, then log the Win32 error and return false.
                         if (processHandle == nint.Zero)
@@ -139,10 +139,10 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                         try
                         {
                             // Cast processCmd buffer as pointer
-                            fixed (char* bufferProcessCmdPtr = &bufferProcessCmd[0])
+                            char* bufferProcessCmdPtr = (char*)Marshal.UnsafeAddrOfPinnedArrayElement(bufferProcessCmd, 0);
                             {
                                 // Get the command line query of the process
-                                bool hQueryFullProcessImageNameResult = QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, ref bufferProcessCmdLenReturn);
+                                bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, ref bufferProcessCmdLenReturn);
                                 // If the query is unsuccessful, then log the Win32 error and return false.
                                 if (!hQueryFullProcessImageNameResult)
                                 {
@@ -189,7 +189,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             finally
             {
                 // Return the buffer to the ArrayPool<T>.Shared
-                arrayPool.Return(NtQueryCachedBuffer);
+                arrayPool.Return(ntQueryCachedBuffer);
             }
 
             return false;
@@ -198,7 +198,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
         public static unsafe string? GetProcessPathByProcessId(int processId, ILogger? logger = null)
         {
             // Try open the process and get the handle
-            nint processHandle = OpenProcess(QueryLimitedInformation, false, processId);
+            nint processHandle = PInvoke.OpenProcess(QueryLimitedInformation, false, processId);
 
             // If failed, then log the Win32 error and return null.
             if (processHandle == nint.Zero)
@@ -215,10 +215,10 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             try
             {
                 // Cast processCmd buffer as pointer
-                fixed (char* bufferProcessCmdPtr = &bufferProcessCmd[0])
+                char* bufferProcessCmdPtr = (char*)Marshal.UnsafeAddrOfPinnedArrayElement(bufferProcessCmd, 0);
                 {
                     // Get the command line query of the process
-                    bool hQueryFullProcessImageNameResult = QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, ref bufferProcessCmdLenReturn);
+                    bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, ref bufferProcessCmdLenReturn);
                     // If the query is unsuccessful, then log the Win32 error and return false.
                     if (!hQueryFullProcessImageNameResult)
                     {
