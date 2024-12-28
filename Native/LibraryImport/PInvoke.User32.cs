@@ -43,7 +43,7 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("user32.dll", EntryPoint = "SetClipboardData", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static partial nint SetClipboardData(uint uFormat, nint data);
+        public static partial nint SetClipboardData(StandardClipboardFormats uFormat, nint data);
 
         [LibraryImport("user32.dll", EntryPoint = "EmptyClipboard", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]

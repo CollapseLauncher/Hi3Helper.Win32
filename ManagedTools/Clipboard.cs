@@ -1,60 +1,78 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.LibraryImport;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 
 namespace Hi3Helper.Win32.Native.ManagedTools
 {
     public static class Clipboard
     {
-        public static unsafe void CopyStringToClipboard(string inputString, ILogger? logger = null)
+        public static unsafe void CopyStringToClipboard(string? inputString, ILogger? logger = null)
         {
+            // Flag constants
+            const GLOBAL_ALLOC_FLAGS AllocFlags = GLOBAL_ALLOC_FLAGS.GMEM_MOVEABLE | GLOBAL_ALLOC_FLAGS.GMEM_ZEROINIT;
+            const StandardClipboardFormats ClipboardFlags = StandardClipboardFormats.CF_UNICODETEXT;
+
             // Initialize the memory pointer
-            // ReSharper disable RedundantAssignment
-            nint stringBufferPtr = nint.Zero;
-            // ReSharper restore RedundantAssignment
-            nint hMem = nint.Zero;
+            nint hGlobalAllocPtrPinned = nint.Zero;
+            nint hGlobalAllocPtr = nint.Zero;
+            nint mStrToHGlobalPtr = nint.Zero;
 
-            // Set the Clipboard bool status
-            bool isOpenClipboardSuccess = false;
-
+            // Get the inputString length and allocate the buffer size
+            uint inputLen = string.IsNullOrEmpty(inputString) ? 0 : (uint)inputString.Length;
+            uint bufferSize = (inputLen + 1) * 2;
             try
             {
-                // If inputString is null or empty, then return
-                if (string.IsNullOrEmpty(inputString))
+                // Try open the Clipboard
+                if (!PInvoke.OpenClipboard(nint.Zero))
                 {
-                    logger?.LogWarning($"[InvokeProp::CopyStringToClipboard()] inputString cannot be empty! Clipboard will not be set!");
+                    logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Cannot open the clipboard! Error: {Win32Error.GetLastWin32ErrorMessage()}");
                     return;
                 }
 
-                // Try open the Clipboard
-                if (!(isOpenClipboardSuccess = OpenClipboard(nint.Zero)))
-                    logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Error has occurred while opening clipboard buffer! Error: {Marshal.GetLastPInvokeErrorMessage()}");
-
-                // Set the bufferSize + 1, the additional 1 byte will be used to interpret the null byte
-                int bufferSize = inputString.Length + 1;
-
-                // Allocate the Global-Movable buffer to the kernel with given size and lock the buffer
-                hMem = GlobalAlloc(GLOBAL_ALLOC_FLAGS.GMEM_MOVEABLE, (nuint)bufferSize);
-                stringBufferPtr = GlobalLock(hMem);
-
-                // Write the inputString as a UTF-8 bytes into the string buffer
-                if (!Encoding.UTF8.TryGetBytes(inputString, new Span<byte>((byte*)stringBufferPtr, inputString.Length), out int bufferWritten))
-                    logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Loading inputString into buffer has failed! Clipboard will not be set!");
-
-                // Always set the null byte at the end of the buffer
-                ((byte*)stringBufferPtr)![bufferWritten] = 0x00; // Write the null (terminator) byte
-
-                // Unlock the buffer
-                GlobalUnlock(hMem);
-
-                // Empty the previous Clipboard and set to the new one from this buffer. If
-                // the clearance is failed, then clear the buffer at "finally" block
-                if (EmptyClipboard() || SetClipboardData(1, hMem) == nint.Zero)
+                // Make sure to empty the clipboard before setting and allocate the content
+                if (!PInvoke.EmptyClipboard())
                 {
-                    logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Error has occurred while clearing and set clipboard buffer! Error: {Marshal.GetLastPInvokeErrorMessage()}");
+                    logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Cannot clear the previous clipboard! Error: {Win32Error.GetLastWin32ErrorMessage()}");
+                    return;
+                }
+
+                // Allocate string to HGlobal since the pointer of the managed string will always be movable
+                // by the GC when it tries to compact the memory.
+                mStrToHGlobalPtr = Marshal.StringToHGlobalUni(inputString);
+                if (mStrToHGlobalPtr == nint.Zero)
+                {
+                    logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Cannot allocate string to HGlobal");
+                    return;
+                }
+
+                // Allocate the Global-Movable buffer to the kernel with given size
+                hGlobalAllocPtr = PInvoke.GlobalAlloc(AllocFlags, bufferSize);
+                if (hGlobalAllocPtr == nint.Zero)
+                {
+                    logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Cannot allocate global buffer using GlobalAlloc! Error: {Win32Error.GetLastWin32ErrorMessage()}");
+                    return;
+                }
+
+                // Lock the Global for writing
+                hGlobalAllocPtrPinned = PInvoke.GlobalLock(hGlobalAllocPtr);
+                if (hGlobalAllocPtrPinned == nint.Zero)
+                {
+                    logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Cannot lock global buffer for writing! Error: {Win32Error.GetLastWin32ErrorMessage()}");
+                    return;
+                }
+
+                // Write the mStrToHGlobalPtr into the hGlobalAlloc pointer
+                PInvoke.RtlCopyMemory(hGlobalAllocPtrPinned, mStrToHGlobalPtr, bufferSize);
+
+                // Unlock the buffer pinned pointer. Ignoring the return value
+                // as it will always returns for NO_ERROR.
+                _ = PInvoke.GlobalUnlock(hGlobalAllocPtr);
+
+                // Set the clipboard data to the new GlobalAlloc pointer
+                if (PInvoke.SetClipboardData(ClipboardFlags, hGlobalAllocPtr) == nint.Zero)
+                {
+                    logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Cannot set the clipboard data from hGlobalAllocPtr! Error: {Win32Error.GetLastWin32ErrorMessage()}");
                     return;
                 }
 
@@ -62,11 +80,20 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             }
             finally
             {
-                // If the buffer is allocated (not zero), then free it.
-                if (hMem != nint.Zero) GlobalFree(hMem);
+                // Free Global memory
+                if (hGlobalAllocPtr != nint.Zero)
+                {
+                    PInvoke.GlobalFree(hGlobalAllocPtr);
+                }
 
-                // Close the buffer if the clipboard is successfully opened.
-                if (isOpenClipboardSuccess) CloseClipboard();
+                // Free the HGlobal memory
+                if (mStrToHGlobalPtr != nint.Zero)
+                {
+                    Marshal.FreeHGlobal(mStrToHGlobalPtr);
+                }
+
+                // Close the clipboard
+                PInvoke.CloseClipboard();
             }
         }
     }

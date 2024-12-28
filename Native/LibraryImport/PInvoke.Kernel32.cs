@@ -36,7 +36,7 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("kernel32.dll", EntryPoint = "GlobalAlloc", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static partial nint GlobalAlloc(GLOBAL_ALLOC_FLAGS uFlags, nuint uBytes);
+        public static partial nint GlobalAlloc(GLOBAL_ALLOC_FLAGS uFlags, uint uBytes);
 
         [LibraryImport("kernel32.dll", EntryPoint = "GlobalFree", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -119,5 +119,9 @@ namespace Hi3Helper.Win32.Native.LibraryImport
                        StringMarshalling = StringMarshalling.Utf16)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial int GetCurrentPackageFullName(ref int packageFullNameLength, out string? packageFullName);
+        
+        [LibraryImport("kernel32.dll", EntryPoint = "RtlCopyMemory", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial void RtlCopyMemory(nint dest, nint src, uint count);
     }
 }
