@@ -23,12 +23,14 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         #region Methods
 
-        public void Initialize(string appName, string executablePath, string shortcutPath, Guid? applicationId = null, bool asElevatedUser = false)
+        public Guid Initialize(string appName, string executablePath, string shortcutPath, Guid? applicationId = null, bool asElevatedUser = false)
         {
             applicationId ??= CLSIDGuid.GetGuidFromString(appName);
 
             DesktopNotificationManagerCompat.RegisterAumidAndComServer(this, appName, executablePath, shortcutPath, applicationId.Value, asElevatedUser);
             DesktopNotificationManagerCompat.RegisterActivator(this, applicationId.Value, asElevatedUser);
+
+            return applicationId.Value;
         }
 
         public event ToastCallback? ToastCallback;
