@@ -6,16 +6,16 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     internal class DesktopNotificationHistoryCompat
     {
         #region Properties
-        private string _aumid;
-        private ToastNotificationHistory _history;
+        private readonly string                   _aumId;
+        private readonly ToastNotificationHistory _history;
 
         /// <summary>
         /// Do not call this. Instead, call <see cref="DesktopNotificationManagerCompat.History"/> to obtain an instance.
         /// </summary>
-        /// <param name="aumid"></param>
-        public DesktopNotificationHistoryCompat(string aumid)
+        /// <param name="aumId"></param>
+        public DesktopNotificationHistoryCompat(string aumId)
         {
-            _aumid = aumid;
+            _aumId = aumId;
             _history = ToastNotificationManager.History;
         }
         #endregion
@@ -26,9 +26,9 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         /// </summary>
         public void Clear()
         {
-            if (_aumid != null)
+            if (_aumId != null)
             {
-                _history.Clear(_aumid);
+                _history.Clear(_aumId);
             }
             else
             {
@@ -42,7 +42,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         /// <returns>A collection of toasts.</returns>
         public IReadOnlyList<ToastNotification> GetHistory()
         {
-            return _aumid != null ? _history.GetHistory(_aumid) : _history.GetHistory();
+            return _aumId != null ? _history.GetHistory(_aumId) : _history.GetHistory();
         }
 
         /// <summary>
@@ -51,9 +51,9 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         /// <param name="tag">The tag label of the toast notification to be removed.</param>
         public void Remove(string tag)
         {
-            if (_aumid != null)
+            if (_aumId != null)
             {
-                _history.Remove(tag, string.Empty, _aumid);
+                _history.Remove(tag, string.Empty, _aumId);
             }
             else
             {
@@ -68,9 +68,9 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         /// <param name="group">The group label of the toast notification to be removed.</param>
         public void Remove(string tag, string group)
         {
-            if (_aumid != null)
+            if (_aumId != null)
             {
-                _history.Remove(tag, group, _aumid);
+                _history.Remove(tag, group, _aumId);
             }
             else
             {
@@ -84,9 +84,9 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         /// <param name="group">The group label of the toast notifications to be removed.</param>
         public void RemoveGroup(string group)
         {
-            if (_aumid != null)
+            if (_aumId != null)
             {
-                _history.RemoveGroup(group, _aumid);
+                _history.RemoveGroup(group, _aumId);
             }
             else
             {

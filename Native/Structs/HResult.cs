@@ -34,7 +34,7 @@ namespace Hi3Helper.Win32.Native.Structs
         /// <c>new nint(-1)</c> to ignore the current IErrorInfo interface and construct the exception
         /// just from the error code.
         /// </param>
-        /// <returns><see langword="this"/><see cref="HRESULT"/>, if it does not reflect an error.</returns>
+        /// <returns><see langword="this"/><see cref="HResult"/>, if it does not reflect an error.</returns>
         /// <seealso cref="Marshal.ThrowExceptionForHR(int, nint)"/>
         public HResult ThrowOnFailure(nint errorInfo = default)
         {

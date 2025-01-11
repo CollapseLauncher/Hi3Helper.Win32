@@ -1,21 +1,22 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+// ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable UnusedParameter.Local
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {
     public unsafe partial class NotificationUserInput : IReadOnlyDictionary<string, string?>
     {
         #region Properties
-        private NOTIFICATION_USER_INPUT_DATA[] _data;
+        private readonly NOTIFICATION_USER_INPUT_DATA[] _data;
 
         internal NotificationUserInput(byte* dataPtr, uint dataCount, ILogger? logger = null)
         {
             if (dataPtr == null)
             {
-                _data = Array.Empty<NOTIFICATION_USER_INPUT_DATA>();
+                _data = [];
                 return;
             }
 
@@ -41,7 +42,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         public IEnumerable<string> Values => _data.Select(i => i.Value);
 
-        public int Count => _data is null ? 0 : _data.Length;
+        public int Count => _data.Length;
         #endregion
 
         #region Methods

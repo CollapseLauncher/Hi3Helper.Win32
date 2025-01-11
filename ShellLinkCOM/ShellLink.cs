@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 // ReSharper disable ArrangeTypeMemberModifiers
 // ReSharper disable NotAccessedField.Local
+// ReSharper disable PartialTypeWithSinglePart
 
 #pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 namespace Hi3Helper.Win32.ShellLinkCOM
@@ -94,25 +95,24 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             else
             {
                 // Use ExtractIconEx to get the icon:
-                nint[] hIconEx = new nint[1] { nint.Zero };
-                uint iconCount = 0;
+                nint[] hIconEx   = [nint.Zero];
                 if (large)
                 {
-                    iconCount = PInvoke.ExtractIconEx(
-                        iconFile,
-                        iconIndex,
-                        hIconEx,
-                        null,
-                        1);
+                    PInvoke.ExtractIconEx(
+                                          iconFile,
+                                          iconIndex,
+                                          hIconEx,
+                                          null,
+                                          1);
                 }
                 else
                 {
-                    iconCount = PInvoke.ExtractIconEx(
-                        iconFile,
-                        iconIndex,
-                        null,
-                        hIconEx,
-                        1);
+                    PInvoke.ExtractIconEx(
+                                          iconFile,
+                                          iconIndex,
+                                          null,
+                                          hIconEx,
+                                          1);
                 }
 
                 return hIconEx[0];
@@ -154,7 +154,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         public unsafe string Target
         {
-            get => _target ??= GetStringAndW32FindDataFromIMethod(260, out _, (ptr, fd, len) => linkW?.GetPath(ptr, len, fd, (uint)EShellLinkGP.SLGP_UNCPRIORITY));
+            get => _target ??= GetStringAndW32FindDataFromIMethod(260, (ptr, fd, len) => linkW?.GetPath(ptr, len, fd, (uint)EShellLinkGP.SLGP_UNCPRIORITY));
             set => linkW?.SetPath(_target = value);
         }
 
@@ -217,20 +217,12 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             set => linkW?.SetHotkey(value);
         }
 
-        private unsafe Win32FindDataW* GetWin32FindDataFromBuffer(byte[] buffer)
+        private unsafe string GetStringAndW32FindDataFromIMethod(int length, ToDelegateWithW32FindDataInvoke toInvokeDelegate)
         {
-            fixed (void* refPtr = &buffer[0])
-            {
-                return (Win32FindDataW*)refPtr;
-            }
-        }
+            int    sizeOfFindData = Marshal.SizeOf<Win32FindDataW>();
 
-        private unsafe string GetStringAndW32FindDataFromIMethod(int length, out byte[] win32FindDataBuffer, ToDelegateWithW32FindDataInvoke toInvokeDelegate)
-        {
-            int sizeOfFindData = Marshal.SizeOf<Win32FindDataW>();
-
-            win32FindDataBuffer = new byte[sizeOfFindData];
-            char[] buffer = ArrayPool<char>.Shared.Rent(length);
+            var    win32FindDataBuffer = new byte[sizeOfFindData];
+            char[] buffer              = ArrayPool<char>.Shared.Rent(length);
             try
             {
                 fixed (char* bufferPtr = &buffer[0])
@@ -270,26 +262,6 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             ReadOnlySpan<char> returnString = MemoryMarshal.CreateReadOnlySpanFromNullTerminated(bufferPtr);
             string outString = returnString.ToString();
             return outString;
-        }
-
-        private unsafe string GetFileNameFromDataPtr(Win32FindDataW* win32FindData)
-        {
-            byte* fdPtr = (byte*)win32FindData;
-            void* offset = fdPtr + 44; // Fixed pos of cFileName field
-            char* offsetField = (char*)offset;
-
-            ReadOnlySpan<char> spanNullTerminated = MemoryMarshal.CreateReadOnlySpanFromNullTerminated(offsetField);
-            return spanNullTerminated.ToString();
-        }
-
-        private unsafe string GetAlternativeFileNameFromDataPtr(Win32FindDataW* win32FindData)
-        {
-            byte* fdPtr = (byte*)win32FindData;
-            void* offset = fdPtr + 44 + 520; // Fixed pos of cFileName + sizeof(cFileName) field
-            char* offsetField = (char*)offset;
-
-            ReadOnlySpan<char> spanNullTerminated = MemoryMarshal.CreateReadOnlySpanFromNullTerminated(offsetField);
-            return spanNullTerminated.ToString();
         }
 
         /// <summary>
@@ -372,18 +344,6 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// <param name="timeOut">Timeout if SLR_NO_UI is specified, in ms.</param>
         public void Open(string linkFile, nint hWnd, EShellLinkResolveFlags resolveFlags, ushort timeOut)
         {
-            uint flags;
-
-            if ((resolveFlags & EShellLinkResolveFlags.SLR_NO_UI)
-                == EShellLinkResolveFlags.SLR_NO_UI)
-            {
-                flags = (uint)((int)resolveFlags | (timeOut << 16));
-            }
-            else
-            {
-                flags = (uint)resolveFlags;
-            }
-
             persistFileW?.Load(linkFile, 0);
             this.shortcutFile = linkFile;
         }

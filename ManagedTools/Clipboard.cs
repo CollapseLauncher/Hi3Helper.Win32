@@ -7,15 +7,14 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 {
     public static class Clipboard
     {
-        public static unsafe void CopyStringToClipboard(string? inputString, ILogger? logger = null)
+        public static void CopyStringToClipboard(string? inputString, ILogger? logger = null)
         {
             // Flag constants
             const GLOBAL_ALLOC_FLAGS AllocFlags = GLOBAL_ALLOC_FLAGS.GMEM_MOVEABLE | GLOBAL_ALLOC_FLAGS.GMEM_ZEROINIT;
             const StandardClipboardFormats ClipboardFlags = StandardClipboardFormats.CF_UNICODETEXT;
 
             // Initialize the memory pointer
-            nint hGlobalAllocPtrPinned = nint.Zero;
-            nint hGlobalAllocPtr = nint.Zero;
+            nint hGlobalAllocPtr  = nint.Zero;
             nint mStrToHGlobalPtr = nint.Zero;
 
             // Get the inputString length and allocate the buffer size
@@ -55,7 +54,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                 }
 
                 // Lock the Global for writing
-                hGlobalAllocPtrPinned = PInvoke.GlobalLock(hGlobalAllocPtr);
+                var hGlobalAllocPtrPinned = PInvoke.GlobalLock(hGlobalAllocPtr);
                 if (hGlobalAllocPtrPinned == nint.Zero)
                 {
                     logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Cannot lock global buffer for writing! Error: {Win32Error.GetLastWin32ErrorMessage()}");

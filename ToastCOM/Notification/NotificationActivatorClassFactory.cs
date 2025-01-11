@@ -1,7 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿#if DEBUG
+using Microsoft.Extensions.Logging;
+#endif
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+// ReSharper disable CommentTypo
+// ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable NotAccessedField.Local
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {
@@ -10,13 +15,12 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     [ClassInterface(ClassInterfaceType.None)]
     public partial class NotificationActivatorClassFactory : IClassFactory
     {
-        private NotificationActivator? Instance;
-        // ReSharper disable once NotAccessedField.Local
+        private NotificationActivator? _instance;
         private bool _asElevatedUser;
 
         public void UseExistingInstance(NotificationActivator instance, bool asElevatedUser)
         {
-            Instance = instance;
+            _instance = instance;
             _asElevatedUser = asElevatedUser;
         }
 
@@ -31,13 +35,13 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                     return unchecked((int)0x80004002); // Return CLASS_E_NOAGGREGATION
                 }
 
-                if (riid == IIDGuid.Guid_IClassFactory)
+                if (riid == IidGuid.GuidIClassFactory)
                 {
-                    ppvObject = (nint)ComInterfaceMarshaller<NotificationActivator>.ConvertToUnmanaged(Instance);
+                    ppvObject = (nint)ComInterfaceMarshaller<NotificationActivator>.ConvertToUnmanaged(_instance);
                 }
                 else
                 {
-                    ppvObject = (nint)ComInterfaceMarshaller<NotificationActivator>.ConvertToUnmanaged(Instance);
+                    ppvObject = (nint)ComInterfaceMarshaller<NotificationActivator>.ConvertToUnmanaged(_instance);
                     return Marshal.QueryInterface(ppvObject, in riid, out ppvObject);
                 }
                 return 0;
@@ -46,7 +50,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             {
                 ComInterfaceMarshaller<NotificationService>.Free((void*)ppvObject);
             #if DEBUG
-                Instance?._logger?.LogDebug($"[NotificationActivatorClassFactory::CreateInstance] NotificationActivator has been created successfully! (pUnkOuter: 0x{pUnkOuter:x8} riid: {riid} ppvObject: 0x{ppvObject:x8})");
+                _instance?.Logger?.LogDebug($"[NotificationActivatorClassFactory::CreateInstance] NotificationActivator has been created successfully! (pUnkOuter: 0x{pUnkOuter:x8} riid: {riid} ppvObject: 0x{ppvObject:x8})");
             #endif
             }
         }

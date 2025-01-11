@@ -74,7 +74,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
                 {
                     IShellItem resShell;
                     dialog.GetResult(out resShell);
-                    resShell!.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
+                    resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
                     return new ValueTask<object>(COMPtrToUnicodeString(resultPtr) ?? "");
                 }
             }
@@ -108,7 +108,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
 
                 IShellItem resShell;
                 dialog.GetResult(out resShell);
-                resShell!.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
+                resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
                 return new ValueTask<string>(COMPtrToUnicodeString(resultPtr) ?? "");
             }
             finally
@@ -155,7 +155,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
         {
             int sizeOf = Marshal.SizeOf<T>();
 
-            nint structPtr = Marshal.AllocHGlobal(sizeOf * array!.Length);
+            nint structPtr = Marshal.AllocHGlobal(sizeOf * array.Length);
             long partPtrLong = structPtr.ToInt64();
             for (int i = 0; i < array.Length; i++)
             {

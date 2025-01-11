@@ -1,6 +1,6 @@
 ﻿namespace Hi3Helper.Win32.Native.Enums
 {
-    public enum GWL_INDEX : int
+    public enum GWL_INDEX
     {
         GWLP_WNDPROC = -4,
         GWLP_HINSTANCE = -6,

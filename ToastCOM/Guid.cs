@@ -2,17 +2,18 @@
 using System.Buffers;
 using System.Security.Cryptography;
 using System.Text;
+// ReSharper disable InconsistentNaming
 
 namespace Hi3Helper.Win32.ToastCOM
 {
-    internal class IIDGuid
+    internal class IidGuid
     {
-        internal const  string  INotificationActivationCallback = "53e31837-6600-4a81-9395-75cffe746f94";
-        internal const  string  IClassFactory                   = "00000001-0000-0000-c000-000000000046";
-        internal static Guid    Guid_IClassFactory              = new(IClassFactory);
+        internal const  string NotificationActivationCallback = "53e31837-6600-4a81-9395-75cffe746f94";
+        internal const  string IClassFactory                  = "00000001-0000-0000-c000-000000000046";
+        internal static Guid   GuidIClassFactory              = new(IClassFactory);
     }
 
-    internal class CLSIDGuid
+    internal class ClsidGuid
     {
         internal static Guid GetGuidFromString(string fromString)
         {

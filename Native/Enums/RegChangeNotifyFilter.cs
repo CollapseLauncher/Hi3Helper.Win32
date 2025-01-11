@@ -2,9 +2,6 @@
 
 namespace Hi3Helper.Win32.Native.Enums
 {
-    /// <summary>
-    /// Filter for notifications reported by <see cref="RegistryMonitor"/>.
-    /// </summary>
     [Flags]
     public enum RegChangeNotifyFilter
     {

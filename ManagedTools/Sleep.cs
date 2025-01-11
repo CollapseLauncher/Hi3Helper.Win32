@@ -2,7 +2,6 @@ using Hi3Helper.Win32.Native.Enums;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
@@ -53,9 +52,9 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                 _logger?.LogInformation("[InvokeProp::PreventSleep()] Starting to prevent sleep!");
                 // Uncomment once issue is resolved
                 // _logger?.LogInformation($"[InvokeProp::PreventSleep()] Called by {new System.Diagnostics.StackTrace().GetFrame(2)?.GetMethod()!}");
-                _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new System.Diagnostics.StackTrace()}");
+                _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new StackTrace()}");
 #if DEBUG
-                _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new System.Diagnostics.StackTrace()}");   
+                _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new StackTrace()}");   
 #endif
                 while (!_preventSleepToken.IsCancellationRequested)
                 {

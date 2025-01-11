@@ -8,7 +8,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     /// </summary>
     internal class DesktopBridgeHelpers
     {
-        const long APPMODEL_ERROR_NO_PACKAGE = 15700L;
+        private const long AppModelErrorNoPackage = 15700L;
 
         private static bool? _isRunningAsUwp;
         public static bool IsRunningAsUwp()
@@ -26,7 +26,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             {
                 int len    = 0;
                 int result = PInvoke.GetCurrentPackageFullName(ref len, out _);
-                _isRunningAsUwp = result != APPMODEL_ERROR_NO_PACKAGE;
+                _isRunningAsUwp = result != AppModelErrorNoPackage;
             }
 
             return _isRunningAsUwp.Value;

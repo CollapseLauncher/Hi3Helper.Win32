@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable UnusedMember.Local
+// ReSharper disable ShiftExpressionZeroLeftOperand
 
 namespace Hi3Helper.Win32.Native.ManagedTools;
 

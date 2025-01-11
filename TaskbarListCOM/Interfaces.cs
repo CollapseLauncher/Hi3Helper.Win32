@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace Hi3Helper.Win32.TaskbarListCOM
 {

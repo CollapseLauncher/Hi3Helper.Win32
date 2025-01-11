@@ -4,31 +4,28 @@ using System;
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {
-    public abstract unsafe class NotificationActivator : INotificationActivationCallback, IDisposable
+    public abstract unsafe class NotificationActivator(ILogger? logger = null)
+        : INotificationActivationCallback, IDisposable
     {
         #region Properties
-        internal ILogger? _logger;
-        internal uint     _currentRegisteredClass = 0;
+        internal ILogger? Logger                 = logger;
+        internal uint     CurrentRegisteredClass = 0;
         #endregion
 
         #region Methods
-        protected NotificationActivator(ILogger? logger = null)
-        {
-            _logger = logger;
-        }
 
         public void Activate(string appUserModelId, string invokedArgs, byte* data, uint dataCount)
         {
-            OnActivated(invokedArgs, new NotificationUserInput(data, dataCount, _logger), appUserModelId);
+            OnActivated(invokedArgs, new NotificationUserInput(data, dataCount, Logger), appUserModelId);
         }
 
         protected abstract void OnActivated(string arguments, NotificationUserInput userInput, string appUserModelId);
 
         public void Dispose()
         {
-            if (_currentRegisteredClass != 0)
+            if (CurrentRegisteredClass != 0)
             {
-                PInvoke.CoRevokeClassObject(_currentRegisteredClass).ThrowOnFailure();
+                PInvoke.CoRevokeClassObject(CurrentRegisteredClass).ThrowOnFailure();
             }
         }
         #endregion

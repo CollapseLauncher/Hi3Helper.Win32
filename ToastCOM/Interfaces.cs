@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace Hi3Helper.Win32.ToastCOM
 {
-    [Guid(IIDGuid.INotificationActivationCallback)]
+    [Guid(IidGuid.NotificationActivationCallback)]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [GeneratedComInterface(Options = ComInterfaceOptions.ManagedObjectWrapper | ComInterfaceOptions.ComObjectWrapper, StringMarshalling = StringMarshalling.Utf16)]
     [ComVisible(true)]
@@ -18,7 +21,7 @@ namespace Hi3Helper.Win32.ToastCOM
             );
     }
 
-    [Guid(IIDGuid.IClassFactory)]
+    [Guid(IidGuid.IClassFactory)]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [GeneratedComInterface(Options = ComInterfaceOptions.ManagedObjectWrapper | ComInterfaceOptions.ComObjectWrapper)]
     public partial interface IClassFactory

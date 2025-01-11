@@ -25,7 +25,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         public Guid Initialize(string appName, string executablePath, string shortcutPath, Guid? applicationId = null, bool asElevatedUser = false)
         {
-            applicationId ??= CLSIDGuid.GetGuidFromString(appName);
+            applicationId ??= ClsidGuid.GetGuidFromString(appName);
 
             DesktopNotificationManagerCompat.RegisterAumidAndComServer(this, appName, executablePath, shortcutPath, applicationId.Value, asElevatedUser);
             DesktopNotificationManagerCompat.RegisterActivator(this, applicationId.Value, asElevatedUser);
@@ -38,7 +38,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         protected override void OnActivated(string arguments, NotificationUserInput userInput, string appUserModelId)
         {
 #if DEBUG
-            _logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking ToastCallback for application name: {appUserModelId} with argument: {arguments}");
+            logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking ToastCallback for application name: {appUserModelId} with argument: {arguments}");
 #endif
             Dictionary<string, string?>? inputDataDictionary = null;
             if (userInput != null && userInput.Count > 0)
@@ -47,7 +47,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                 foreach (KeyValuePair<string, string?> data in userInput)
                 {
 #if DEBUG
-                    _logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking additional data to ToastCallback with key: {data.Key} and data: {data.Value}");
+                    logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking additional data to ToastCallback with key: {data.Key} and data: {data.Value}");
 #endif
                     inputDataDictionary.Add(data.Key, data.Value);
                 }
@@ -64,7 +64,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             string xmlDocumentString = xmlDocument.OuterXml;
 
 #if DEBUG
-            _logger?.LogDebug($"[NotificationServiceSub::ShowNotificationToast] Showing toast using this XML:\r\n{xmlDocumentString}");
+            logger?.LogDebug($"[NotificationServiceSub::ShowNotificationToast] Showing toast using this XML:\r\n{xmlDocumentString}");
 #endif
 
             DomXmlDocument domXmlDocument = new DomXmlDocument();
@@ -94,7 +94,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         private DomXmlElement GetAction(DomXmlDocument xml)
         {
-            DomXmlElement? actions = null;
+            DomXmlElement? actions;
             if (xml.GetElementsByTagName("actions").Count != 0)
                 actions = (DomXmlElement)xml.GetElementsByTagName("actions")[0];
             else
