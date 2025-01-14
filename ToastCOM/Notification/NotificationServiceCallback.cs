@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices.Marshalling;
 using System.Xml;
 using Windows.UI.Notifications;
 using DomXmlDocument = Windows.Data.Xml.Dom.XmlDocument;
 using DomXmlElement = Windows.Data.Xml.Dom.XmlElement;
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {
@@ -15,7 +17,8 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     /// Do not use this class to initialize a new instance. Instead, use <seealso cref="NotificationService"/>
     /// </summary>
     /// <param name="logger">Logger of the instance to use</param>
-    public abstract class NotificationServiceCallback(ILogger? logger) : NotificationActivator(logger)
+    [GeneratedComClass]
+    public abstract partial class NotificationServiceCallback(ILogger? logger) : NotificationActivator(logger)
     {
         #region Properties
         private DesktopNotificationHistoryCompat? _desktopNotificationHistoryCompat;
@@ -38,7 +41,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         protected override void OnActivated(string arguments, NotificationUserInput userInput, string appUserModelId)
         {
 #if DEBUG
-            logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking ToastCallback for application name: {appUserModelId} with argument: {arguments}");
+            Logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking ToastCallback for application name: {appUserModelId} with argument: {arguments}");
 #endif
             Dictionary<string, string?>? inputDataDictionary = null;
             if (userInput != null && userInput.Count > 0)
@@ -47,7 +50,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                 foreach (KeyValuePair<string, string?> data in userInput)
                 {
 #if DEBUG
-                    logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking additional data to ToastCallback with key: {data.Key} and data: {data.Value}");
+                    Logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking additional data to ToastCallback with key: {data.Key} and data: {data.Value}");
 #endif
                     inputDataDictionary.Add(data.Key, data.Value);
                 }
@@ -64,7 +67,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             string xmlDocumentString = xmlDocument.OuterXml;
 
 #if DEBUG
-            logger?.LogDebug($"[NotificationServiceSub::ShowNotificationToast] Showing toast using this XML:\r\n{xmlDocumentString}");
+            Logger?.LogDebug($"[NotificationServiceSub::ShowNotificationToast] Showing toast using this XML:\r\n{xmlDocumentString}");
 #endif
 
             DomXmlDocument domXmlDocument = new DomXmlDocument();
