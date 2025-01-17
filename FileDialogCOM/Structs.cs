@@ -14,11 +14,9 @@ namespace Hi3Helper.Win32.FileDialogCOM
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
     
-    internal partial struct COMDLG_FILTERSPEC
+    internal struct COMDLG_FILTERSPEC
     {
-        [MarshalAs(UnmanagedType.LPWStr)]
-        internal string pszName;
-        [MarshalAs(UnmanagedType.LPWStr)]
-        internal string pszSpec;
+        internal nint pszName;
+        internal nint pszSpec;
     }
 }

@@ -76,16 +76,16 @@ public static class DriveTypeChecker
     private static unsafe bool IsDriveHasTrimEnabled(ILogger? logger, nint hDevice)
     {
         // Get query and descriptor size
-        int querySize       = Marshal.SizeOf<STORAGE_PROPERTY_QUERY>();
-        int trimDescSize    = Marshal.SizeOf<DEVICE_TRIM_DESCRIPTOR>();
-        int bufferSize      = querySize + trimDescSize;
+        int querySize    = sizeof(STORAGE_PROPERTY_QUERY);
+        int trimDescSize = sizeof(DEVICE_TRIM_DESCRIPTOR);
+        int bufferSize   = querySize + trimDescSize;
 
         // Allocate buffer
         byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
 
         // Assign buffer for STORAGE_PROPERTY_QUERY
         ReadOnlySpan<byte>  queryBuffer = buffer.AsSpan(0);
-        nint                queryPtr    = GetArrayReference(queryBuffer);
+        nint                queryPtr    = MemoryMarshal.GetReference(queryBuffer);
         try
         {
             STORAGE_PROPERTY_QUERY* query   = (STORAGE_PROPERTY_QUERY*)queryPtr;
@@ -94,7 +94,7 @@ public static class DriveTypeChecker
 
             // Assign buffer for DEVICE_TRIM_DESCRIPTOR
             ReadOnlySpan<byte>  trimDescBuffer  = buffer.AsSpan(querySize); // Set offset, move forward from query buffer
-            nint                trimDescPtr     = GetArrayReference(trimDescBuffer);
+            nint                trimDescPtr     = MemoryMarshal.GetReference(trimDescBuffer);
             if (DeviceIoControl(
                 hDevice,
                 IOCTL_STORAGE_QUERY_PROPERTY,
@@ -124,8 +124,8 @@ public static class DriveTypeChecker
     private static unsafe bool IsDriveHasSeekPenalty(ILogger? logger, nint hDevice)
     {
         // Get query and descriptor size
-        int querySize           = Marshal.SizeOf<STORAGE_PROPERTY_QUERY>();
-        int seekPenaltyDescSize = Marshal.SizeOf<DEVICE_SEEK_PENALTY_DESCRIPTOR>();
+        int querySize           = sizeof(STORAGE_PROPERTY_QUERY);
+        int seekPenaltyDescSize = sizeof(DEVICE_SEEK_PENALTY_DESCRIPTOR);
         int bufferSize          = querySize + seekPenaltyDescSize;
 
         // Allocate buffer
@@ -133,16 +133,16 @@ public static class DriveTypeChecker
 
         // Assign buffer for STORAGE_PROPERTY_QUERY
         ReadOnlySpan<byte> queryBuffer = buffer.AsSpan(0);
-        nint queryPtr = GetArrayReference(queryBuffer);
+        nint queryPtr = MemoryMarshal.GetReference(queryBuffer);
         try
         {
-            STORAGE_PROPERTY_QUERY* query   = (STORAGE_PROPERTY_QUERY*)queryPtr;
-            query->PropertyId               = 7; // StorageDeviceSeekPenaltyProperty
-            query->QueryType                = 0;
+            STORAGE_PROPERTY_QUERY* query = (STORAGE_PROPERTY_QUERY*)queryPtr;
+            query->PropertyId = 7; // StorageDeviceSeekPenaltyProperty
+            query->QueryType  = 0;
 
             // Assign buffer for DEVICE_SEEK_PENALTY_DESCRIPTOR
-            ReadOnlySpan<byte>  seekPenaltyDescBuffer  = buffer.AsSpan(querySize); // Set offset, move forward from query buffer
-            nint                seekPenaltyDescPtr     = GetArrayReference(seekPenaltyDescBuffer);
+            ReadOnlySpan<byte> seekPenaltyDescBuffer = buffer.AsSpan(querySize); // Set offset, move forward from query buffer
+            nint seekPenaltyDescPtr = MemoryMarshal.GetReference(seekPenaltyDescBuffer);
             if (DeviceIoControl(
                 hDevice,
                 IOCTL_STORAGE_QUERY_PROPERTY,
@@ -168,15 +168,4 @@ public static class DriveTypeChecker
             ArrayPool<byte>.Shared.Return(buffer);
         }
     }
-
-#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe nint GetArrayReference<T>(ReadOnlySpan<T> buffer)
-    {
-        fixed (T* bufferPtr = &buffer[0])
-        {
-            return (nint)bufferPtr;
-        }
-    }
-#pragma warning restore CS8500
 }

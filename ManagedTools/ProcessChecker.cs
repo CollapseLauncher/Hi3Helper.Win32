@@ -21,7 +21,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
         private const int QueryLimitedInformation = 0x1000;
 
         private const int DefaultNtQueryChangedLen = 4 << 17;
-        private static int DynamicNtQueryChangedBufferLen = DefaultNtQueryChangedLen;
+        private static int _dynamicNtQueryChangedBufferLen = DefaultNtQueryChangedLen;
 
         public static unsafe bool IsProcessExist(int processId) => PInvoke.OpenProcess(QueryLimitedInformation, false, processId) != nint.Zero;
 
@@ -35,46 +35,45 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             windowHandle = nint.Zero;
 
             // If the buffer length is more than 2 MiB, then reset the length to default
-            if (DynamicNtQueryChangedBufferLen > (2 << 20))
+            if (_dynamicNtQueryChangedBufferLen > 2 << 20)
             {
-                DynamicNtQueryChangedBufferLen = DefaultNtQueryChangedLen;
+                _dynamicNtQueryChangedBufferLen = DefaultNtQueryChangedLen;
             }
 
             // Initialize the first buffer to 512 KiB
             ArrayPool<byte> arrayPool = ArrayPool<byte>.Shared;
-            byte[] ntQueryCachedBuffer = arrayPool.Rent(DynamicNtQueryChangedBufferLen);
+            byte[] ntQueryCachedBuffer = arrayPool.Rent(_dynamicNtQueryChangedBufferLen);
             bool isReallocate = false;
             // ReSharper disable once RedundantAssignment
-            uint length = 0;
 
             // Get size of UNICODE_STRING struct
-            int sizeOfUnicodeString = Marshal.SizeOf<UNICODE_STRING>();
+            int sizeOfUnicodeString = sizeof(UNICODE_STRING);
 
         StartOver:
             try
             {
                 // If the buffer request is more than 2 MiB, then return false
-                if (DynamicNtQueryChangedBufferLen > (2 << 20))
+                if (_dynamicNtQueryChangedBufferLen > 2 << 20)
                     return false;
 
                 // If buffer reallocation is requested, then re-rent the buffer
                 // from ArrayPool<T>.Shared
                 if (isReallocate)
-                    ntQueryCachedBuffer = arrayPool.Rent(DynamicNtQueryChangedBufferLen);
+                    ntQueryCachedBuffer = arrayPool.Rent(_dynamicNtQueryChangedBufferLen);
 
                 // Get the pointer of the buffer
                 byte* dataBufferPtr = (byte*)Marshal.UnsafeAddrOfPinnedArrayElement(ntQueryCachedBuffer, 0);
                 {
                     // Get the query of the current running process and store it to the buffer
-                    uint hNtQuerySystemInformationResult = PInvoke.NtQuerySystemInformation(SystemProcessInformation, dataBufferPtr, (uint)ntQueryCachedBuffer.Length, out length);
+                    uint hNtQuerySystemInformationResult = PInvoke.NtQuerySystemInformation(SystemProcessInformation, dataBufferPtr, (uint)ntQueryCachedBuffer.Length, out var length);
 
                     // If the required length of the data is exceeded than the current buffer,
                     // then try to reallocate and start over to the top.
-                    const uint STATUS_INFO_LENGTH_MISMATCH = 0xC0000004;
-                    if (hNtQuerySystemInformationResult == STATUS_INFO_LENGTH_MISMATCH || length > ntQueryCachedBuffer.Length)
+                    const uint statusInfoLengthMismatch = 0xC0000004;
+                    if (hNtQuerySystemInformationResult == statusInfoLengthMismatch || length > ntQueryCachedBuffer.Length)
                     {
                         // Round up length
-                        DynamicNtQueryChangedBufferLen = (int)BitOperations.RoundUpToPowerOf2(length);
+                        _dynamicNtQueryChangedBufferLen = (int)BitOperations.RoundUpToPowerOf2(length);
                         logger?.LogWarning($"Buffer requested is insufficient! Requested: {length} > Capacity: {ntQueryCachedBuffer.Length}, Resizing the buffer...");
                         isReallocate = true;
                         goto StartOver;
@@ -89,8 +88,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
                     // Start reading data from the buffer
                     int currentOffset = 0;
-                    bool isCommandPathEqual;
-                ReadQueryData:
+                    ReadQueryData:
                     // Get the current position of the pointer based on its offset
                     byte* curPosPtr = dataBufferPtr + currentOffset;
 
@@ -102,7 +100,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
                     // Use the struct buffer into the ReadOnlySpan<char> to be compared with
                     // the input from "processName" argument.
-                    ReadOnlySpan<char> imageNameSpan = new ReadOnlySpan<char>(unicodeString->Buffer, unicodeString->Length / 2);
+                    ReadOnlySpan<char> imageNameSpan = new(unicodeString->Buffer, unicodeString->Length / 2);
                     bool isMatchedExecutable = !useStartsWithMatch ? 
                         imageNameSpan.Equals(processName, StringComparison.OrdinalIgnoreCase) :
                         imageNameSpan.StartsWith(processName, StringComparison.OrdinalIgnoreCase);
@@ -133,9 +131,9 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                         }
 
                         // Try rent the new buffer to get the command line
-                        int bufferProcessCmdLen = 1 << 10;
-                        int bufferProcessCmdLenReturn = bufferProcessCmdLen;
-                        char[] bufferProcessCmd = ArrayPool<char>.Shared.Rent(bufferProcessCmdLen);
+                        const int bufferProcessCmdLen       = 1 << 10;
+                        int       bufferProcessCmdLenReturn = bufferProcessCmdLen;
+                        char[]    bufferProcessCmd          = ArrayPool<char>.Shared.Rent(bufferProcessCmdLen);
                         try
                         {
                             // Cast processCmd buffer as pointer
@@ -158,13 +156,13 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                                 }
 
                                 // Get the command line query
-                                ReadOnlySpan<char> processCmdLineSpan = new ReadOnlySpan<char>(bufferProcessCmdPtr, bufferProcessCmdLenReturn);
+                                ReadOnlySpan<char> processCmdLineSpan = new(bufferProcessCmdPtr, bufferProcessCmdLenReturn);
 
                                 // Get the span of origin path to compare
                                 ReadOnlySpan<char> checkForOriginPathDir = checkForOriginPath;
 
                                 // Compare and return if any of result is equal
-                                isCommandPathEqual = !useStartsWithMatch ? 
+                                var isCommandPathEqual = !useStartsWithMatch ? 
                                     processCmdLineSpan.Equals(checkForOriginPathDir, StringComparison.OrdinalIgnoreCase) :
                                     processCmdLineSpan.StartsWith(checkForOriginPathDir, StringComparison.OrdinalIgnoreCase);
 
@@ -243,28 +241,28 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             }
         }
 
-        public static nint GetProcessWindowHandle(string ProcName) => Process.GetProcessesByName(Path.GetFileNameWithoutExtension(ProcName), ".")[0].MainWindowHandle;
+        public static nint GetProcessWindowHandle(string procName) => Process.GetProcessesByName(Path.GetFileNameWithoutExtension(procName), ".")[0].MainWindowHandle;
 
         public static Process[] GetInstanceProcesses()
         {
-            var currentProcess = Process.GetCurrentProcess();
-            var processes = Process.GetProcessesByName(currentProcess.ProcessName);
+            var       currentProcess = Process.GetCurrentProcess();
+            Process[] processes      = Process.GetProcessesByName(currentProcess.ProcessName);
 
             return processes;
         }
 
         public static int EnumerateInstances(ILogger? logger = null)
         {
-            var instanceProc = GetInstanceProcesses();
+            Process[] instanceProc = GetInstanceProcesses();
             var instanceCount = instanceProc.Length;
 
             var finalInstanceCount = 0;
 
             if (instanceCount > 1)
             {
-                var curPId = Process.GetCurrentProcess().Id;
+                var curPId = Environment.ProcessId;
                 logger?.LogTrace($"Detected {instanceCount} instances! Current PID: {curPId}");
-                logger?.LogTrace($"Enumerating instances...");
+                logger?.LogTrace("Enumerating instances...");
                 foreach (Process p in instanceProc)
                 {
                     // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -285,7 +283,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                     }
                     catch (Exception ex)
                     {
-                        logger?.LogError($"Failed when trying to fetch an instance information! " +
+                        logger?.LogError("Failed when trying to fetch an instance information! " +
                                      $"InstanceCount is not incremented.\r\n{ex}");
                         throw;
                     }

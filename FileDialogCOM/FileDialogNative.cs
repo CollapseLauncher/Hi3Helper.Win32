@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+// ReSharper disable ForCanBeConvertedToForeach
 
 namespace Hi3Helper.Win32.FileDialogCOM
 {
@@ -22,14 +23,14 @@ namespace Hi3Helper.Win32.FileDialogCOM
     [SuppressMessage("ReSharper", "UnusedTypeParameter")]
     public static class FileDialogNative
     {
-        private static nint parentHandler = nint.Zero;
-        public static void InitHandlerPointer(nint handle) => parentHandler = handle;
+        private static nint _parentHandler = nint.Zero;
+        public static void InitHandlerPointer(nint handle) => _parentHandler = handle;
 
-        public static async ValueTask<string> GetFilePicker(Dictionary<string, string>? FileTypeFilter = null, string? title = null) =>
-            (string)await GetPickerOpenTask<string>(string.Empty, FileTypeFilter, title);
+        public static async ValueTask<string> GetFilePicker(Dictionary<string, string>? fileTypeFilter = null, string? title = null) =>
+            (string)await GetPickerOpenTask<string>(string.Empty, fileTypeFilter, title);
 
-        public static async ValueTask<string[]> GetMultiFilePicker(Dictionary<string, string>? FileTypeFilter = null, string? title = null) =>
-            (string[])await GetPickerOpenTask<string[]>(Array.Empty<string>(), FileTypeFilter, title, true);
+        public static async ValueTask<string[]> GetMultiFilePicker(Dictionary<string, string>? fileTypeFilter = null, string? title = null) =>
+            (string[])await GetPickerOpenTask<string[]>(Array.Empty<string>(), fileTypeFilter, title, true);
 
         public static async ValueTask<string> GetFolderPicker(string? title = null) =>
             (string)await GetPickerOpenTask<string>(string.Empty, null, title, false, true);
@@ -37,10 +38,10 @@ namespace Hi3Helper.Win32.FileDialogCOM
         public static async ValueTask<string[]> GetMultiFolderPicker(string? title = null) =>
             (string[])await GetPickerOpenTask<string[]>(Array.Empty<string>(), null, title, true, true);
 
-        public static async ValueTask<string> GetFileSavePicker(Dictionary<string, string>? FileTypeFilter = null, string? title = null) =>
-            await GetPickerSaveTask<string>(string.Empty, FileTypeFilter, title);
+        public static async ValueTask<string> GetFileSavePicker(Dictionary<string, string>? fileTypeFilter = null, string? title = null) =>
+            await GetPickerSaveTask<string>(string.Empty, fileTypeFilter, title);
 
-        private static ValueTask<object> GetPickerOpenTask<T>(object defaultValue, Dictionary<string, string>? FileTypeFilter = null,
+        private static ValueTask<object> GetPickerOpenTask<T>(object defaultValue, Dictionary<string, string>? fileTypeFilter = null,
             string? title = null, bool isMultiple = false, bool isFolder = false)
         {
             ComMarshal.CreateInstance(
@@ -53,8 +54,8 @@ namespace Hi3Helper.Win32.FileDialogCOM
 
             try
             {
-                if (title != null) dialog!.SetTitle(titlePtr = UnicodeStringToCOMPtr(title));
-                SetFileTypeFilter(dialog, FileTypeFilter);
+                if (title != null) dialog!.SetTitle(titlePtr = UnicodeStringToComPtr(title));
+                SetFileTypeFilter(dialog, fileTypeFilter);
 
                 FOS mode = isMultiple ? FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT | FOS.FOS_ALLOWMULTISELECT :
                                         FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT;
@@ -62,20 +63,18 @@ namespace Hi3Helper.Win32.FileDialogCOM
                 if (isFolder) mode |= FOS.FOS_PICKFOLDERS;
 
                 dialog!.SetOptions(mode);
-                if (dialog.Show(parentHandler) < 0) return new ValueTask<object>(defaultValue);
+                if (dialog.Show(_parentHandler) < 0) return new ValueTask<object>(defaultValue);
 
                 if (isMultiple)
                 {
-                    IShellItemArray resShell;
-                    dialog.GetResults(out resShell);
+                    dialog.GetResults(out var resShell);
                     return new ValueTask<object>(GetIShellItemArray(resShell));
                 }
                 else
                 {
-                    IShellItem resShell;
-                    dialog.GetResult(out resShell);
+                    dialog.GetResult(out var resShell);
                     resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
-                    return new ValueTask<object>(COMPtrToUnicodeString(resultPtr) ?? "");
+                    return new ValueTask<object>(ComPtrToUnicodeString(resultPtr) ?? "");
                 }
             }
             finally
@@ -86,7 +85,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
             }
         }
 
-        private static ValueTask<string> GetPickerSaveTask<T>(string defaultValue, Dictionary<string, string>? FileTypeFilter = null, string? title = null)
+        private static ValueTask<string> GetPickerSaveTask<T>(string defaultValue, Dictionary<string, string>? fileTypeFilter = null, string? title = null)
         {
             ComMarshal.CreateInstance(
                 new Guid(CLSIDGuid.FileSaveDialog),
@@ -98,18 +97,17 @@ namespace Hi3Helper.Win32.FileDialogCOM
 
             try
             {
-                if (title != null) dialog!.SetTitle(titlePtr = UnicodeStringToCOMPtr(title));
-                SetFileTypeFilter(dialog, FileTypeFilter);
+                if (title != null) dialog!.SetTitle(titlePtr = UnicodeStringToComPtr(title));
+                SetFileTypeFilter(dialog, fileTypeFilter);
 
-                FOS mode = FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT;
+                const FOS mode = FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT;
 
                 dialog!.SetOptions(mode);
-                if (dialog.Show(parentHandler) < 0) return new ValueTask<string>(defaultValue);
+                if (dialog.Show(_parentHandler) < 0) return new ValueTask<string>(defaultValue);
 
-                IShellItem resShell;
-                dialog.GetResult(out resShell);
+                dialog.GetResult(out var resShell);
                 resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
-                return new ValueTask<string>(COMPtrToUnicodeString(resultPtr) ?? "");
+                return new ValueTask<string>(ComPtrToUnicodeString(resultPtr) ?? "");
             }
             finally
             {
@@ -119,57 +117,73 @@ namespace Hi3Helper.Win32.FileDialogCOM
             }
         }
 
-        private static void SetFileTypeFilter(IFileOpenDialog? dialog, Dictionary<string, string>? FileTypeFilter)
+        private static void SetFileTypeFilter(IFileOpenDialog? dialog, Dictionary<string, string>? fileTypeFilter)
         {
-            if (FileTypeFilter != null)
+            if (fileTypeFilter == null)
             {
-                int len = FileTypeFilter.Count;
-                int i = 0;
-                COMDLG_FILTERSPEC[] array = new COMDLG_FILTERSPEC[len];
-                foreach (KeyValuePair<string, string> entry in FileTypeFilter)
-                    array[i++] = new COMDLG_FILTERSPEC { pszName = entry.Key, pszSpec = entry.Value };
-
-                nint structPtr = ArrayToHGlobalPtr(array);
-                dialog?.SetFileTypes((uint)len, structPtr);
-                Marshal.FreeHGlobal(structPtr);
+                return;
             }
+
+            int                 len   = fileTypeFilter.Count;
+            int                 i     = 0;
+            COMDLG_FILTERSPEC[] array = new COMDLG_FILTERSPEC[len];
+            foreach (KeyValuePair<string, string> entry in fileTypeFilter)
+            {
+                array[i++] = new COMDLG_FILTERSPEC
+                {
+                    pszName = UnicodeStringToComPtr(entry.Key),
+                    pszSpec = UnicodeStringToComPtr(entry.Value)
+                };
+            }
+
+            nint structPtr = ArrayToHGlobalPtr(array);
+            dialog?.SetFileTypes((uint)len, structPtr);
+            Marshal.FreeHGlobal(structPtr);
         }
 
         private static void SetFileTypeFilter(IFileSaveDialog? dialog, Dictionary<string, string>? fileTypeFilter)
         {
-            if (fileTypeFilter != null)
+            if (fileTypeFilter == null)
             {
-                int len = fileTypeFilter.Count;
-                int i = 0;
-                COMDLG_FILTERSPEC[] array = new COMDLG_FILTERSPEC[len];
-                foreach (KeyValuePair<string, string> entry in fileTypeFilter)
-                    array[i++] = new COMDLG_FILTERSPEC { pszName = entry.Key, pszSpec = entry.Value };
-
-                nint structPtr = ArrayToHGlobalPtr(array);
-                dialog?.SetFileTypes((uint)len, structPtr);
-                Marshal.FreeHGlobal(structPtr);
+                return;
             }
+
+            int                 len   = fileTypeFilter.Count;
+            int                 i     = 0;
+            COMDLG_FILTERSPEC[] array = new COMDLG_FILTERSPEC[len];
+            foreach (KeyValuePair<string, string> entry in fileTypeFilter)
+            {
+                array[i++] = new COMDLG_FILTERSPEC
+                {
+                    pszName = UnicodeStringToComPtr(entry.Key),
+                    pszSpec = UnicodeStringToComPtr(entry.Value)
+                };
+            }
+
+            nint structPtr = ArrayToHGlobalPtr(array);
+            dialog?.SetFileTypes((uint)len, structPtr);
+            Marshal.FreeHGlobal(structPtr);
         }
 
-        private static nint ArrayToHGlobalPtr<T>(T[] array)
+        private static unsafe nint ArrayToHGlobalPtr<T>(T[] array)
+            where T : unmanaged
         {
-            int sizeOf = Marshal.SizeOf<T>();
-
-            nint structPtr = Marshal.AllocHGlobal(sizeOf * array.Length);
-            long partPtrLong = structPtr.ToInt64();
-            for (int i = 0; i < array.Length; i++)
+            int  bufferSize = sizeof(T) * array.Length;
+            nint structPtr  = Marshal.AllocHGlobal(bufferSize);
+            fixed (void* arrayPtr = &MemoryMarshal.GetArrayDataReference(array))
             {
-                nint partPtr = new nint(partPtrLong);
-                Marshal.StructureToPtr(array[i]!, partPtr, false);
-                partPtrLong += sizeOf;
+                Buffer.MemoryCopy(arrayPtr,
+                                  (void*)structPtr,
+                                  bufferSize,
+                                  bufferSize);
             }
 
             return structPtr;
         }
 
-        private static nint UnicodeStringToCOMPtr(string str) => Marshal.StringToCoTaskMemUni(str);
+        private static nint UnicodeStringToComPtr(string str) => Marshal.StringToCoTaskMemUni(str);
 
-        private static string? COMPtrToUnicodeString(nint ptr)
+        private static string? ComPtrToUnicodeString(nint ptr)
         {
             try
             {
@@ -198,7 +212,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
                 item?.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out resPtr);
 
                 if (resPtr != nint.Zero)
-                    results[i] = COMPtrToUnicodeString(resPtr) ?? "";
+                    results[i] = ComPtrToUnicodeString(resPtr) ?? "";
             }
 
             return results;

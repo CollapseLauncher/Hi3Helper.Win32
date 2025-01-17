@@ -5,7 +5,7 @@ namespace Hi3Helper.Win32.Native.Structs
 {
     // Reference:
     // http://www.codeproject.com/KB/dotnet/changing-display-settings.aspx
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Size = 220)]
     public unsafe struct DEVMODEW
     {
         public fixed char dmDeviceName[32];

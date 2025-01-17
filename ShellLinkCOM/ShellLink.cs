@@ -5,11 +5,13 @@ using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 // ReSharper disable ArrangeTypeMemberModifiers
 // ReSharper disable NotAccessedField.Local
 // ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable IdentifierTypo
 
 #pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 namespace Hi3Helper.Win32.ShellLinkCOM
@@ -21,11 +23,11 @@ namespace Hi3Helper.Win32.ShellLinkCOM
     public partial class ShellLink : IDisposable
     {
         // Use Unicode (W) under NT, otherwise use ANSI      
-        IShellLinkW? linkW;
-        IPersistFile? persistFileW;
-        IPersist? persistW;
-        IPropertyStore? propertyStoreW;
-        string shortcutFile = "";
+        readonly IShellLinkW?    _linkW;
+        readonly IPropertyStore? _propertyStoreW;
+        readonly IPersistFile?   _persistFileW;
+        readonly IPersist?       _persistW;
+        string                   _shortcutFile = "";
 
         /// <summary>
         /// Creates an instance of the Shell Link object.
@@ -39,10 +41,10 @@ namespace Hi3Helper.Win32.ShellLinkCOM
                 out IShellLinkW? shellLink
                 ).ThrowOnFailure();
 
-            linkW = shellLink;
-            persistFileW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersistFile>(in CLSIDGuid.IGuid_IPersistFile);
-            persistW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersist>(in CLSIDGuid.IGuid_IPersist);
-            propertyStoreW = shellLink?.CastComInterfaceAs<IShellLinkW, IPropertyStore>(in CLSIDGuid.IGuid_IPropertyStore);
+            _linkW = shellLink;
+            _persistFileW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersistFile>(in CLSIDGuid.IGuid_IPersistFile);
+            _persistW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersist>(in CLSIDGuid.IGuid_IPersist);
+            _propertyStoreW = shellLink?.CastComInterfaceAs<IShellLinkW, IPropertyStore>(in CLSIDGuid.IGuid_IPropertyStore);
         }
 
         /// <summary>
@@ -60,12 +62,12 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// <summary>
         /// Dispose the object, releasing the COM ShellLink object
         /// </summary>
-        public void Dispose() => ComMarshal.FreeInstance(linkW);
+        public void Dispose() => ComMarshal.FreeInstance(_linkW);
 
-        public string ShortCutFile
+        public string? ShortCutFile
         {
-            get => shortcutFile;
-            set => shortcutFile = value;
+            get => field;
+            set => field = value;
         }
 
         /// <summary>
@@ -76,7 +78,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         {
             // Get icon index and path:
             string iconFile = IconPath;
-            int iconIndex = IconIndex;
+            int iconIndex = IconIndex ?? 0;
 
             // If there are no details set for the icon, then we must use
             // the shell to get the icon for the target:
@@ -87,7 +89,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
                     SHGetFileInfoConstants.SHGFI_ICON |
                         SHGetFileInfoConstants.SHGFI_ATTRIBUTES;
 
-                flags = flags | (large ? SHGetFileInfoConstants.SHGFI_LARGEICON : SHGetFileInfoConstants.SHGFI_SMALLICON);
+                flags |= large ? SHGetFileInfoConstants.SHGFI_LARGEICON : SHGetFileInfoConstants.SHGFI_SMALLICON;
 
                 FileIcon fileIcon = new FileIcon(Target, flags);
                 return fileIcon.ShellIcon;
@@ -119,73 +121,74 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             }
         }
 
-        private string? _iconPath;
         /// <summary>
         /// Gets the path to the file containing the icon for this shortcut.
         /// </summary>
+        [field: AllowNull, MaybeNull]
         public unsafe string IconPath
         {
-            get => _iconPath ??= GetStringFromIMethod(260, (ptr, len) => linkW?.GetIconLocation(ptr, len, out _));
-            set => linkW?.SetIconLocation(_iconPath = value, IconIndex);
+            get => field ??= GetStringFromIMethod(260, (ptr, len) => _linkW?.GetIconLocation(ptr, len, out _));
+            set => _linkW?.SetIconLocation(field = value, IconIndex ?? 0);
         }
 
-        private int? _iconIndex;
         /// <summary>
         /// Gets the index of this icon within the icon path's resources
         /// </summary>
-        public unsafe int IconIndex
+        public unsafe int? IconIndex
         {
             get
             {
-                if (_iconIndex == null)
+                if (field != null)
                 {
-                    int iconIndex = 0;
-                    _ = GetStringFromIMethod(260, (ptr, len) => linkW?.GetIconLocation(ptr, len, out iconIndex));
-                    _iconIndex = iconIndex;
+                    return field ?? 0;
                 }
-                return _iconIndex ?? 0;
+
+                int iconIndex = 0;
+                _     = GetStringFromIMethod(260, (ptr, len) => _linkW?.GetIconLocation(ptr, len, out iconIndex));
+                field = iconIndex;
+                return field ?? 0;
             }
-            set => linkW?.SetIconLocation(IconPath, value);
+            set => _linkW?.SetIconLocation(IconPath, (field = value) ?? 0);
         }
 
-        private string? _target;
         /// <summary>
         /// Gets/sets the fully qualified path to the link's target
         /// </summary>
+        [field: AllowNull, MaybeNull]
         public unsafe string Target
         {
-            get => _target ??= GetStringAndW32FindDataFromIMethod(260, (ptr, fd, len) => linkW?.GetPath(ptr, len, fd, (uint)EShellLinkGP.SLGP_UNCPRIORITY));
-            set => linkW?.SetPath(_target = value);
+            get => field ??= GetStringAndW32FindDataFromIMethod(260, (ptr, fd, len) => _linkW?.GetPath(ptr, len, fd, (uint)EShellLinkGP.SLGP_UNCPRIORITY));
+            set => _linkW?.SetPath(field = value);
         }
 
-        private string? _workingDirectory;
         /// <summary>
         /// Gets/sets the Working Directory for the Link
         /// </summary>
+        [field: AllowNull, MaybeNull]
         public unsafe string WorkingDirectory
         {
-            get => _workingDirectory ??= GetStringFromIMethod(260, (ptr, len) => linkW?.GetWorkingDirectory(ptr, len));
-            set => linkW?.SetWorkingDirectory(_workingDirectory = value);
+            get => field ??= GetStringFromIMethod(260, (ptr, len) => _linkW?.GetWorkingDirectory(ptr, len));
+            set => _linkW?.SetWorkingDirectory(field = value);
         }
 
-        private string? _description;
         /// <summary>
         /// Gets/sets the description of the link
         /// </summary>
+        [field: AllowNull, MaybeNull]
         public unsafe string Description
         {
-            get => _description ??= GetStringFromIMethod(1024, (ptr, len) => linkW?.GetDescription(ptr, len));
-            set => linkW?.SetDescription(_description = value);
+            get => field ??= GetStringFromIMethod(1024, (ptr, len) => _linkW?.GetDescription(ptr, len));
+            set => _linkW?.SetDescription(field = value);
         }
 
-        private string? _arguments;
         /// <summary>
         /// Gets/sets any command line arguments associated with the link
         /// </summary>
+        [field: AllowNull, MaybeNull]
         public unsafe string Arguments
         {
-            get => _arguments ??= GetStringFromIMethod(260, (ptr, len) => linkW?.GetArguments(ptr, len));
-            set => linkW?.SetArguments(_arguments = value);
+            get => field ??= GetStringFromIMethod(260, (ptr, len) => _linkW?.GetArguments(ptr, len));
+            set => _linkW?.SetArguments(field = value);
         }
 
         /// <summary>
@@ -197,10 +200,10 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             get
             {
                 uint cmd = 0;
-                linkW?.GetShowCmd(out cmd);
+                _linkW?.GetShowCmd(out cmd);
                 return (LinkDisplayMode)cmd;
             }
-            set => linkW?.SetShowCmd((uint)value);
+            set => _linkW?.SetShowCmd((uint)value);
         }
 
         /// <summary>
@@ -211,15 +214,15 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             get
             {
                 short key = 0;
-                linkW?.GetHotkey(out key);
+                _linkW?.GetHotkey(out key);
                 return key;
             }
-            set => linkW?.SetHotkey(value);
+            set => _linkW?.SetHotkey(value);
         }
 
-        private unsafe string GetStringAndW32FindDataFromIMethod(int length, ToDelegateWithW32FindDataInvoke toInvokeDelegate)
+        private static unsafe string GetStringAndW32FindDataFromIMethod(int length, ToDelegateWithW32FindDataInvoke toInvokeDelegate)
         {
-            int    sizeOfFindData = Marshal.SizeOf<Win32FindDataW>();
+            int    sizeOfFindData = sizeof(Win32FindDataW);
 
             var    win32FindDataBuffer = new byte[sizeOfFindData];
             char[] buffer              = ArrayPool<char>.Shared.Rent(length);
@@ -240,7 +243,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             }
         }
 
-        private unsafe string GetStringFromIMethod(int length, ToDelegateInvoke toInvokeDelegate)
+        private static unsafe string GetStringFromIMethod(int length, ToDelegateInvoke toInvokeDelegate)
         {
             char[] buffer = ArrayPool<char>.Shared.Rent(length);
             try
@@ -271,31 +274,31 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         {
             var pkey = PropertyKey.PKEY_AppUserModel_ID;
             var str = PropVariant.FromString(appId);
-            propertyStoreW?.SetValue(ref pkey, ref str);
+            _propertyStoreW?.SetValue(ref pkey, ref str);
         }
 
         /// <summary>
         /// Sets the ToastActivatorCLSID
         /// </summary>
-        public void SetToastActivatorCLSID(string clsid)
+        public void SetToastActivatorClsid(string clsid)
         {
             var guid = Guid.Parse(clsid);
-            SetToastActivatorCLSID(guid);
+            SetToastActivatorClsid(guid);
         }
 
         /// <summary>
         /// Sets the ToastActivatorCLSID
         /// </summary>
-        public void SetToastActivatorCLSID(Guid clsid)
+        public void SetToastActivatorClsid(Guid clsid)
         {
             PropertyKey pkey = PropertyKey.PKEY_AppUserModel_ToastActivatorCLSID;
             PropVariant varGuid = PropVariant.FromGuid(clsid);
             try
             {
-                int errCode = propertyStoreW?.SetValue(ref pkey, ref varGuid) ?? unchecked((int)0x80004003);
+                int errCode = _propertyStoreW?.SetValue(ref pkey, ref varGuid) ?? unchecked((int)0x80004003);
                 Marshal.ThrowExceptionForHR(errCode);
 
-                errCode = propertyStoreW?.Commit() ?? unchecked((int)0x80004003);
+                errCode = _propertyStoreW?.Commit() ?? unchecked((int)0x80004003);
                 Marshal.ThrowExceptionForHR(errCode);
             }
             finally
@@ -309,14 +312,14 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         public void Save()
         {
-            Save(shortcutFile);
+            Save(_shortcutFile);
         }
 
         /// <summary>
         /// Saves the shortcut to the specified file
         /// </summary>
         /// <param name="linkFile">The shortcut file (.lnk)</param>
-        public void Save(string linkFile) => persistFileW?.Save(linkFile, true);
+        public void Save(string linkFile) => _persistFileW?.Save(linkFile, true);
 
         /// <summary>
         /// Loads a shortcut from the specified file
@@ -344,8 +347,8 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// <param name="timeOut">Timeout if SLR_NO_UI is specified, in ms.</param>
         public void Open(string linkFile, nint hWnd, EShellLinkResolveFlags resolveFlags, ushort timeOut)
         {
-            persistFileW?.Load(linkFile, 0);
-            this.shortcutFile = linkFile;
+            _persistFileW?.Load(linkFile, 0);
+            this._shortcutFile = linkFile;
         }
     }
 
@@ -357,19 +360,19 @@ namespace Hi3Helper.Win32.ShellLinkCOM
     [SupportedOSPlatform("windows")]
     public class FileIcon
     {
-        string? fileName;
-        string? displayName;
-        string? typeName;
-        SHGetFileInfoConstants flags;
-        nint fileIcon;
+        string? _fileName;
+        string? _displayName;
+        string? _typeName;
+        SHGetFileInfoConstants _flags;
+        nint _fileIcon;
 
         /// <summary>
         /// Gets/sets the flags used to extract the icon
         /// </summary>
         public SHGetFileInfoConstants Flags
         {
-            get => flags;
-            set => flags = value;
+            get => _flags;
+            set => _flags = value;
         }
 
         /// <summary>
@@ -377,61 +380,59 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         public string? FileName
         {
-            get => fileName;
-            set => fileName = value;
+            get => _fileName;
+            set => _fileName = value;
         }
 
         /// <summary>
         /// Gets the icon for the chosen file
         /// </summary>
-        public nint ShellIcon => fileIcon;
+        public nint ShellIcon => _fileIcon;
 
         /// <summary>
         /// Gets the display name for the selected file
         /// if the SHGFI_DISPLAYNAME flag was set.
         /// </summary>
-        public string? DisplayName => displayName;
+        public string? DisplayName => _displayName;
 
         /// <summary>
         /// Gets the type name for the selected file
         /// if the SHGFI_TYPENAME flag was set.
         /// </summary>
-        public string? TypeName => typeName;
+        public string? TypeName => _typeName;
 
         /// <summary>
         ///  Gets the information for the specified 
         ///  file name and flags.
         /// </summary>
-        private void GetInfo()
+        private unsafe void GetInfo()
         {
-            fileIcon = nint.Zero;
-            typeName = "";
-            displayName = "";
+            _fileIcon = nint.Zero;
+            _typeName = "";
+            _displayName = "";
 
-            int shfiSize = Marshal.SizeOf<SHFILEINFOW>();
+            int shfiSize = sizeof(SHFILEINFOW);
             nint shfiHandle = Marshal.AllocCoTaskMem(shfiSize);
 
             try
             {
                 nint ret = PInvoke.SHGetFileInfo(
-                    fileName ?? string.Empty, 0, shfiHandle, (uint)shfiSize, (uint)flags);
-                SHFILEINFOW shfi = Marshal.PtrToStructure<SHFILEINFOW>(shfiHandle);
+                    _fileName ?? string.Empty, 0, shfiHandle, (uint)shfiSize, (uint)_flags);
+                ref SHFILEINFOW shfi = ref Unsafe.AsRef<SHFILEINFOW>((void*)shfiHandle);
 
                 if (ret != nint.Zero)
                 {
                     if (shfi.hIcon != nint.Zero)
                     {
-                        fileIcon = shfi.hIcon; // need to dispose this
+                        _fileIcon = shfi.hIcon; // need to dispose this
                     }
-                    typeName = shfi.szTypeName;
-                    displayName = shfi.szDisplayName;
+                    _typeName = shfi.szTypeName;
+                    _displayName = shfi.szDisplayName;
                 }
                 else
                 {
                     Console.WriteLine(Win32Error.GetLastWin32ErrorMessage());
                 }
-
-                Marshal.DestroyStructure<SHFILEINFOW>(shfiHandle);
             }
             finally
             {
@@ -446,7 +447,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         public FileIcon()
         {
-            flags = SHGetFileInfoConstants.SHGFI_ICON |
+            _flags = SHGetFileInfoConstants.SHGFI_ICON |
                 SHGetFileInfoConstants.SHGFI_DISPLAYNAME |
                 SHGetFileInfoConstants.SHGFI_TYPENAME |
                 SHGetFileInfoConstants.SHGFI_ATTRIBUTES |
@@ -463,7 +464,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         public FileIcon(string fileName)
             : this()
         {
-            this.fileName = fileName;
+            this._fileName = fileName;
             GetInfo();
         }
 
@@ -478,8 +479,8 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// icon and other shell information.</param>
         public FileIcon(string fileName, SHGetFileInfoConstants flags)
         {
-            this.fileName = fileName;
-            this.flags = flags;
+            this._fileName = fileName;
+            this._flags = flags;
             GetInfo();
         }
     }

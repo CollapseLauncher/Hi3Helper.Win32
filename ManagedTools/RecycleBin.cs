@@ -41,7 +41,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             // Calculate the length of the buffer needed to store the concatenated file paths
             // and SHFILEOPSTRUCTW_UNSAFE structure
             int concatBufLen = GetConcatBufferLength(filePathSpan);
-            int structBufLen = Marshal.SizeOf<SHFILEOPSTRUCTW_UNSAFE>();
+            int structBufLen = sizeof(SHFILEOPSTRUCTW_UNSAFE);
 
             // Rent a buffer from the shared array pool
             char[] concatBuf = GC.AllocateUninitializedArray<char>(concatBufLen);

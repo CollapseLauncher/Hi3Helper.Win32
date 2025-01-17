@@ -13,11 +13,13 @@ namespace Hi3Helper.Win32.Screen
     {
         public static Size CurrentResolution { get => GetScreenSize(); }
 
+        private static unsafe int GetSizeOf<T>() where T : unmanaged => sizeof(T);
+
         public static IEnumerable<Size> EnumerateScreenSizes()
         {
             int index = 0;
             int found = 0;
-            int sizeOfDevMode = Marshal.SizeOf<DEVMODEW>();
+            int sizeOfDevMode = GetSizeOf<DEVMODEW>();
 
             byte[] buffer = ArrayPool<byte>.Shared.Rent(sizeOfDevMode);
             nint bufferPtr = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
@@ -29,13 +31,15 @@ namespace Hi3Helper.Win32.Screen
                 {
                     ++index;
                     Size currentSize = GetSizeFromPtr(bufferPtr);
-                    if (lastWidth != currentSize.Width || lastHeight != currentSize.Height)
+                    if (lastWidth == currentSize.Width && lastHeight == currentSize.Height)
                     {
-                        ++found;
-                        lastWidth = currentSize.Width;
-                        lastHeight = currentSize.Height;
-                        yield return currentSize;
+                        continue;
                     }
+
+                    ++found;
+                    lastWidth  = currentSize.Width;
+                    lastHeight = currentSize.Height;
+                    yield return currentSize;
                 }
             }
             finally
@@ -57,7 +61,7 @@ namespace Hi3Helper.Win32.Screen
             return new Size { Width = (int)localDevMode->dmPelsWidth, Height = (int)localDevMode->dmPelsHeight };
         }
 
-        private static Size GetScreenSize() => new Size
+        private static Size GetScreenSize() => new()
         {
             Width = PInvoke.GetSystemMetrics(SystemMetric.SM_CXSCREEN),
             Height = PInvoke.GetSystemMetrics(SystemMetric.SM_CYSCREEN)
