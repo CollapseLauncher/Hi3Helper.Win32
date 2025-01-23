@@ -47,12 +47,12 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             if (userInput != null && userInput.Count > 0)
             {
                 inputDataDictionary = new Dictionary<string, string?>();
-                foreach (KeyValuePair<string, string?> data in userInput)
+                foreach (KeyValuePair<string?, string?> data in userInput)
                 {
 #if DEBUG
                     Logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking additional data to ToastCallback with key: {data.Key} and data: {data.Value}");
 #endif
-                    inputDataDictionary.Add(data.Key, data.Value);
+                    inputDataDictionary.TryAdd(data.Key ?? "", data.Value);
                 }
             }
 
