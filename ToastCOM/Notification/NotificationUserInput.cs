@@ -128,11 +128,6 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         public bool TryGetValue(string? key, out string? value)
         {
-            for (int i = 0; i < _data.Length; i++)
-            {
-                nint item = _data[i];
-
-            }
             foreach (var item in _data)
             {
                 if (GetDataKey(item) != key)

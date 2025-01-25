@@ -10,21 +10,21 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 {
     public static class Sleep
     {
-        public static  CancellationTokenSource? _preventSleepToken;
+        public static  CancellationTokenSource? PreventSleepToken;
         private static bool                     _preventSleepRunning;
         private static ILogger?                 _logger;
-        
+
         public static async void RestoreSleep()
         {
             try
             {
                 // Return early if token is disposed/already cancelled
-                if (_preventSleepToken == null || _preventSleepToken.IsCancellationRequested) return;
+                if (PreventSleepToken == null || PreventSleepToken.IsCancellationRequested) return;
                 _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new StackTrace()}");
             #if DEBUG
-            _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new System.Diagnostics.StackTrace()}");   
+            _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new StackTrace()}");   
             #endif
-                await _preventSleepToken.CancelAsync();
+                await PreventSleepToken.CancelAsync();
             }
             catch (Exception ex)
             {
@@ -39,10 +39,10 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             _logger = logger;
 
             // Initialize instance if it's still null
-            _preventSleepToken ??= new CancellationTokenSource();
+            PreventSleepToken ??= new CancellationTokenSource();
 
             // If the instance cancellation has been requested, return
-            if (_preventSleepToken.IsCancellationRequested) return;
+            if (PreventSleepToken.IsCancellationRequested) return;
 
             // Set flag
             _preventSleepRunning = true;
@@ -56,11 +56,11 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 #if DEBUG
                 _logger?.LogDebug($"[InvokeProp::RestoreSleep()] Called by {new StackTrace()}");   
 #endif
-                while (!_preventSleepToken.IsCancellationRequested)
+                while (!PreventSleepToken.IsCancellationRequested)
                 {
                     // Set ES to SystemRequired every 60s
                     SetThreadExecutionState(ExecutionState.EsContinuous | ExecutionState.EsSystemRequired);
-                    await Task.Delay(60000, _preventSleepToken.Token);
+                    await Task.Delay(60000, PreventSleepToken.Token);
                 }
             }
             catch (TaskCanceledException)
@@ -79,7 +79,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                 logger?.LogInformation("[InvokeProp::PreventSleep()] Stopped preventing sleep!");
 
                 // Null the token for the next time method is called
-                _preventSleepToken = null;
+                PreventSleepToken = null;
                 _logger            = null;
             }
         }
