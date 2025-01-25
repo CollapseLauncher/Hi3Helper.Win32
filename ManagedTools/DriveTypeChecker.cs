@@ -83,9 +83,8 @@ public static class DriveTypeChecker
         // Allocate buffer
         byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
 
-        // Assign buffer for STORAGE_PROPERTY_QUERY
-        ReadOnlySpan<byte>  queryBuffer = buffer.AsSpan(0);
-        nint                queryPtr    = MemoryMarshal.GetReference(queryBuffer);
+        // Get the pointer to store STORAGE_PROPERTY_QUERY into the buffer
+        nint queryPtr = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
         try
         {
             STORAGE_PROPERTY_QUERY* query   = (STORAGE_PROPERTY_QUERY*)queryPtr;
@@ -93,8 +92,7 @@ public static class DriveTypeChecker
             query->QueryType                = 0;
 
             // Assign buffer for DEVICE_TRIM_DESCRIPTOR
-            ReadOnlySpan<byte>  trimDescBuffer  = buffer.AsSpan(querySize); // Set offset, move forward from query buffer
-            nint                trimDescPtr     = MemoryMarshal.GetReference(trimDescBuffer);
+            nint trimDescPtr = queryPtr + querySize; // Set offset, move forward from query buffer
             if (DeviceIoControl(
                 hDevice,
                 IOCTL_STORAGE_QUERY_PROPERTY,
@@ -131,9 +129,8 @@ public static class DriveTypeChecker
         // Allocate buffer
         byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
 
-        // Assign buffer for STORAGE_PROPERTY_QUERY
-        ReadOnlySpan<byte> queryBuffer = buffer.AsSpan(0);
-        nint queryPtr = MemoryMarshal.GetReference(queryBuffer);
+        // Get the pointer to store STORAGE_PROPERTY_QUERY into the buffer
+        nint queryPtr = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
         try
         {
             STORAGE_PROPERTY_QUERY* query = (STORAGE_PROPERTY_QUERY*)queryPtr;
@@ -141,8 +138,7 @@ public static class DriveTypeChecker
             query->QueryType  = 0;
 
             // Assign buffer for DEVICE_SEEK_PENALTY_DESCRIPTOR
-            ReadOnlySpan<byte> seekPenaltyDescBuffer = buffer.AsSpan(querySize); // Set offset, move forward from query buffer
-            nint seekPenaltyDescPtr = MemoryMarshal.GetReference(seekPenaltyDescBuffer);
+            nint seekPenaltyDescPtr = queryPtr + querySize; // Set offset, move forward from query buffer
             if (DeviceIoControl(
                 hDevice,
                 IOCTL_STORAGE_QUERY_PROPERTY,
