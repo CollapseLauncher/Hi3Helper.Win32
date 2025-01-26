@@ -38,13 +38,13 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         public event ToastCallback? ToastCallback;
 
-        protected override void OnActivated(string arguments, NotificationUserInput userInput, string appUserModelId)
+        protected override void OnActivated(string arguments, NotificationUserInput? userInput, string appUserModelId)
         {
 #if DEBUG
             Logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking ToastCallback for application name: {appUserModelId} with argument: {arguments}");
 #endif
             Dictionary<string, string?>? inputDataDictionary = null;
-            if (userInput != null && userInput.Count > 0)
+            if (userInput is { Count: > 0 })
             {
                 inputDataDictionary = new Dictionary<string, string?>();
                 foreach (KeyValuePair<string?, string?> data in userInput)

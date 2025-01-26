@@ -26,14 +26,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         /// </summary>
         public void Clear()
         {
-            if (_aumId != null)
-            {
-                _history.Clear(_aumId);
-            }
-            else
-            {
-                _history.Clear();
-            }
+            _history.Clear(_aumId);
         }
 
         /// <summary>
@@ -42,7 +35,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         /// <returns>A collection of toasts.</returns>
         public IReadOnlyList<ToastNotification> GetHistory()
         {
-            return _aumId != null ? _history.GetHistory(_aumId) : _history.GetHistory();
+            return _history.GetHistory(_aumId);
         }
 
         /// <summary>
@@ -51,14 +44,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         /// <param name="tag">The tag label of the toast notification to be removed.</param>
         public void Remove(string tag)
         {
-            if (_aumId != null)
-            {
-                _history.Remove(tag, string.Empty, _aumId);
-            }
-            else
-            {
-                _history.Remove(tag);
-            }
+            _history.Remove(tag, string.Empty, _aumId);
         }
 
         /// <summary>
@@ -68,14 +54,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         /// <param name="group">The group label of the toast notification to be removed.</param>
         public void Remove(string tag, string group)
         {
-            if (_aumId != null)
-            {
-                _history.Remove(tag, group, _aumId);
-            }
-            else
-            {
-                _history.Remove(tag, group);
-            }
+            _history.Remove(tag, group, _aumId);
         }
 
         /// <summary>
@@ -84,14 +63,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         /// <param name="group">The group label of the toast notifications to be removed.</param>
         public void RemoveGroup(string group)
         {
-            if (_aumId != null)
-            {
-                _history.RemoveGroup(group, _aumId);
-            }
-            else
-            {
-                _history.RemoveGroup(group);
-            }
+            _history.RemoveGroup(group, _aumId);
         }
         #endregion
     }

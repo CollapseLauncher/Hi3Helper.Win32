@@ -19,7 +19,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             OnActivated(invokedArgs, new NotificationUserInput(data, dataCount, Logger), appUserModelId);
         }
 
-        protected abstract void OnActivated(string arguments, NotificationUserInput userInput, string appUserModelId);
+        protected abstract void OnActivated(string arguments, NotificationUserInput? userInput, string appUserModelId);
 
         public void Dispose()
         {
