@@ -123,5 +123,19 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("kernel32.dll", EntryPoint = "RtlCopyMemory", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial void RtlCopyMemory(nint dest, nint src, uint count);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "CreateToolhelp32Snapshot", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial nint CreateToolhelp32Snapshot(SnapshotFlags dwFlags, int th32ProcessID);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "Process32NextW", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static unsafe partial bool Process32Next(nint hSnapshot, PROCESSENTRY32W* lppe);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "SetPriorityClass", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static unsafe partial bool SetPriorityClass(nint hProcess, PriorityClass dwPriorityClass);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Hi3Helper.Win32.Native.LibraryImport;
+﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using Microsoft.Extensions.Logging;
 using System;
@@ -28,7 +29,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
         public static unsafe bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", ILogger? logger = null)
             => IsProcessExist(processName, out processId, out windowHandle, checkForOriginPath, false, logger);
 
-        public static unsafe bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", bool useStartsWithMatch = false, ILogger? logger = null)
+        public static unsafe bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", bool useStartsWithMatch = true, ILogger? logger = null)
         {
             // Set default process id number to 0
             processId = 0;
@@ -107,18 +108,15 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
                     if (isMatchedExecutable)
                     {
-                        // If the origin path argument is null, then return as true.
-                        if (string.IsNullOrEmpty(checkForOriginPath))
-                            return true;
-
-                        // If the string is not null, then check if the file path is exactly the same.
-                        // START!!
-
                         // Move the offset of the current pointer and get the processId value
                         processId = *(int*)(curPosPtr + 56 + sizeOfUnicodeString + 8);
 
                         // Try find the window id and assign it to windowHandle
                         windowHandle = MainWindowFinder.FindMainWindow(processId);
+
+                        // If the origin path argument is null, then return as true.
+                        if (string.IsNullOrEmpty(checkForOriginPath))
+                            return true;
 
                         // Try open the process and get the handle
                         nint processHandle = PInvoke.OpenProcess(QueryLimitedInformation, false, processId);
@@ -129,6 +127,9 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                             logger?.LogError($"Error happened while operating OpenProcess(): {Win32Error.GetLastWin32ErrorMessage()}");
                             return false;
                         }
+
+                        // If the string is not null, then check if the file path is exactly the same.
+                        // START!!
 
                         // Try rent the new buffer to get the command line
                         const int bufferProcessCmdLen       = 1 << 10;
@@ -294,6 +295,76 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             else finalInstanceCount = 1;
 
             return finalInstanceCount;
+        }
+
+        public static bool TryGetProcessIdWithActiveWindow(string processName,              out int processId,                 out nint windowHandle,
+                                                           string checkFromOriginPath = "", bool    useStartsWithMatch = true, ILogger? logger       = null)
+        {
+            // Try get the process id and window handle
+            if (!IsProcessExist(processName, out processId, out windowHandle, checkFromOriginPath, useStartsWithMatch, logger))
+            {
+                return false;
+            }
+
+            // Determine whether the process has window handle initialized.
+            return windowHandle != nint.Zero;
+        }
+
+        public static bool TrySetProcessPriority(string   processName,              PriorityClass priority,
+                                                 string   checkFromOriginPath = "", bool          useStartsWithMatch = true,
+                                                 ILogger? logger              = null)
+        {
+            // Try get the process id
+            if (!IsProcessExist(processName, out int processId, out _, checkFromOriginPath, useStartsWithMatch, logger))
+            {
+                logger?.LogError("Cannot find process for such name: {} at: {}", processName, string.IsNullOrEmpty(checkFromOriginPath) ? "[default]" : checkFromOriginPath);
+                return false;
+            }
+
+            // Try set the process priority
+            return TrySetProcessPriority(processId, priority, logger);
+        }
+
+        public static bool TrySetProcessPriority(int processId, PriorityClass priority, ILogger? logger = null)
+        {
+            const nint invalidHandleValue = -1;
+            const int processSetInformation = 0x0200;
+
+            // Open the process handle to set the process information
+            nint openProcHandle = PInvoke.OpenProcess(processSetInformation, true, processId);
+            // Return false if it handles INVALID_HANDLE_VALUE due to permissions (for example: Process protection)
+            if (openProcHandle == invalidHandleValue
+             || openProcHandle == nint.Zero)
+            {
+                PrintErrMessage("Cannot open process handle as it returns INVALID_HANDLE_VALUE or null");
+                return false;
+            }
+
+            try
+            {
+                // Try set the priority class of the process
+                if (!PInvoke.SetPriorityClass(openProcHandle, priority))
+                {
+                    // If not, return false
+                    PrintErrMessage("Cannot set process priority");
+                    return false;
+                }
+
+                // Return true as successful
+                logger?.LogInformation("Process Id: {} priority has been set to: {}", processId, priority);
+                return true;
+            }
+            finally
+            {
+                // Close the process handle
+                PInvoke.CloseHandle(openProcHandle);
+            }
+
+            void PrintErrMessage(string message)
+            {
+                logger?.LogError("{} for ProccessId: {} to Priority: {}", message, processId, priority);
+                logger?.LogError("Error: {}", Win32Error.GetLastWin32ErrorMessage());
+            }
         }
     }
 }

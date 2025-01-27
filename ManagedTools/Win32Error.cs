@@ -29,8 +29,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             try
             {
                 // Get the message
-                int messageSize = FormatMessage(
-                                                FormatMessageFlag,
+                int messageSize = FormatMessage(FormatMessageFlag,
                                                 nint.Zero,
                                                 errCode,
                                                 0,
