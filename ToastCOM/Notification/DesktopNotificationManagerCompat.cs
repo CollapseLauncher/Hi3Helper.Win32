@@ -87,15 +87,15 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             ).ThrowOnFailure();
 
             PropVariant aumId = PropVariant.FromString(aumid);
-            PropertyKey aumIdPropkey = new PropertyKey
+            PropertyKey aumIdPropkey = new()
             {
-                fmtid = ToastG,
+                formatId = ToastG,
                 pid = 5
             };
             PropVariant toastId = PropVariant.FromGuid(applicationId);
-            PropertyKey toastIdPropkey = new PropertyKey
+            PropertyKey toastIdPropkey = new()
             {
-                fmtid = ToastG,
+                formatId = ToastG,
                 pid = 26
             };
 
@@ -186,7 +186,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             CLSCTX    classContext = CLSCTX.CLSCTX_LOCAL_SERVER;
             TagREGCLS registerFlag = TagREGCLS.REGCLS_MULTIPLEUSE;
 
-            NotificationActivatorClassFactory classFactory = new NotificationActivatorClassFactory();
+            NotificationActivatorClassFactory classFactory = new();
             classFactory.UseExistingInstance(currentInstance, asElevatedUser);
 
             PInvoke.CoRegisterClassObject(

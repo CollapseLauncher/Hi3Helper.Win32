@@ -2,6 +2,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+// ReSharper disable CommentTypo
 
 namespace Hi3Helper.Win32.ShellLinkCOM
 {
@@ -14,7 +15,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
 
         public static PropVariant FromString(string str)
         {
-            var pv = new PropVariant()
+            PropVariant pv = new()
             {
                 variantType = 31,  // VT_LPWSTR
                 pointerValue = Marshal.StringToCoTaskMemUni(str),
@@ -26,7 +27,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         public static PropVariant FromGuid(Guid guid)
         {
             byte[] bytes = guid.ToByteArray();
-            var pv = new PropVariant()
+            PropVariant pv = new()
             {
                 variantType = 72,  // VT_CLSID
                 pointerValue = Marshal.AllocCoTaskMem(bytes.Length),

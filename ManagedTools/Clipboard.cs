@@ -1,6 +1,7 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.Native.ManagedTools
@@ -41,7 +42,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                 mStrToHGlobalPtr = Marshal.StringToHGlobalUni(inputString);
                 if (mStrToHGlobalPtr == nint.Zero)
                 {
-                    logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Cannot allocate string to HGlobal");
+                    logger?.LogError("[InvokeProp::CopyStringToClipboard()] Cannot allocate string to HGlobal");
                     return;
                 }
 
@@ -54,7 +55,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                 }
 
                 // Lock the Global for writing
-                var hGlobalAllocPtrPinned = PInvoke.GlobalLock(hGlobalAllocPtr);
+                IntPtr hGlobalAllocPtrPinned = PInvoke.GlobalLock(hGlobalAllocPtr);
                 if (hGlobalAllocPtrPinned == nint.Zero)
                 {
                     logger?.LogError($"[InvokeProp::CopyStringToClipboard()] Cannot lock global buffer for writing! Error: {Win32Error.GetLastWin32ErrorMessage()}");

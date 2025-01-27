@@ -70,10 +70,10 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             Logger?.LogDebug($"[NotificationServiceSub::ShowNotificationToast] Showing toast using this XML:\r\n{xmlDocumentString}");
 #endif
 
-            DomXmlDocument domXmlDocument = new DomXmlDocument();
+            DomXmlDocument domXmlDocument = new();
             domXmlDocument.LoadXml(xmlDocumentString);
 
-            ToastNotification toast = new ToastNotification(domXmlDocument);
+            ToastNotification toast = new(domXmlDocument);
             toast.Tag = Guid.CreateVersion7().ToString();
             return toast;
         }
@@ -85,7 +85,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         {
             DomXmlElement actions = GetAction(xml);
 
-            foreach (var para in paras)
+            foreach (ToastAction? para in paras)
             {
                 DomXmlElement input = xml.CreateElement("input");
                 input.SetAttribute("type", "text");
@@ -121,7 +121,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         public static void TestMethod()
         {
             string processPath = Process.GetCurrentProcess().MainModule?.FileName ?? "";
-            NotificationService manager = new NotificationService();
+            NotificationService manager = new();
 
             string appName = "Hi3Helper.Win32 ToastCOM Test";
             manager.Initialize(

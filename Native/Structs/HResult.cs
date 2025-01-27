@@ -9,17 +9,17 @@ namespace Hi3Helper.Win32.Native.Structs
             : IEquatable<HResult>
     {
         internal readonly int Value;
-        internal HResult(int value) => Value = value;
-        public static implicit operator int(HResult value) => value.Value;
-        public static implicit operator uint(HResult value) => (uint)value.Value;
-        public static explicit operator HResult(int value) => new HResult(value);
-        public static explicit operator HResult(uint value) => new HResult((int)value);
-        public static bool operator ==(HResult left, HResult right) => left.Value == right.Value;
-        public static bool operator !=(HResult left, HResult right) => !(left == right);
-        public bool Equals(HResult other) => Value == other.Value;
-        public override bool Equals(object? obj) => obj is HResult other && Equals(other);
-        public override int GetHashCode() => Value.GetHashCode();
-        public override string ToString() => string.Format(CultureInfo.InvariantCulture, "0x{0:X8}", Value);
+        internal HResult(int                                     value) => Value = value;
+        public static implicit operator int(HResult              value)               => value.Value;
+        public static implicit operator uint(HResult             value)               => (uint)value.Value;
+        public static explicit operator HResult(int              value)               => new(value);
+        public static explicit operator HResult(uint             value)               => new((int)value);
+        public static                   bool operator ==(HResult left, HResult right) => left.Value == right.Value;
+        public static                   bool operator !=(HResult left, HResult right) => !(left == right);
+        public                          bool   Equals(HResult    other) => Value == other.Value;
+        public override                 bool   Equals(object?    obj)   => obj is HResult other && Equals(other);
+        public override                 int    GetHashCode()            => Value.GetHashCode();
+        public override                 string ToString()               => string.Format(CultureInfo.InvariantCulture, "0x{0:X8}", Value);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal bool Succeeded => Value >= 0;

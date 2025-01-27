@@ -67,12 +67,12 @@ namespace Hi3Helper.Win32.FileDialogCOM
 
                 if (isMultiple)
                 {
-                    dialog.GetResults(out var resShell);
+                    dialog.GetResults(out IShellItemArray? resShell);
                     return new ValueTask<object>(GetIShellItemArray(resShell));
                 }
                 else
                 {
-                    dialog.GetResult(out var resShell);
+                    dialog.GetResult(out IShellItem? resShell);
                     resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
                     return new ValueTask<object>(ComPtrToUnicodeString(resultPtr) ?? "");
                 }
@@ -105,7 +105,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
                 dialog!.SetOptions(mode);
                 if (dialog.Show(_parentHandler) < 0) return new ValueTask<string>(defaultValue);
 
-                dialog.GetResult(out var resShell);
+                dialog.GetResult(out IShellItem? resShell);
                 resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
                 return new ValueTask<string>(ComPtrToUnicodeString(resultPtr) ?? "");
             }

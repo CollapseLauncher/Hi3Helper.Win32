@@ -1,33 +1,34 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+// ReSharper disable IdentifierTypo
 
 namespace Hi3Helper.Win32.ShellLinkCOM
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct PropertyKey
     {
-        public Guid fmtid;
+        public Guid formatId;
         public nuint pid;
 
-        public static PropertyKey PKEY_AppUserModel_ID
+        public static PropertyKey PkeyAppUserModelID
         {
             get
             {
-                return new PropertyKey()
+                return new PropertyKey
                 {
-                    fmtid = Guid.ParseExact("{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}", "B"),
+                    formatId = Guid.ParseExact("{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}", "B"),
                     pid = new nuint(5),
                 };
             }
         }
 
-        public static PropertyKey PKEY_AppUserModel_ToastActivatorCLSID
+        public static PropertyKey PkeyAppUserModelToastActivatorClsid
         {
             get
             {
-                return new PropertyKey()
+                return new PropertyKey
                 {
-                    fmtid = Guid.ParseExact("{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}", "B"),
+                    formatId = Guid.ParseExact("{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}", "B"),
                     pid = new nuint(26),
                 };
             }

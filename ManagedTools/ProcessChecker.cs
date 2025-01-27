@@ -80,7 +80,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                 byte* dataBufferPtr = (byte*)Marshal.UnsafeAddrOfPinnedArrayElement(ntQueryCachedBuffer, 0);
                 {
                     // Get the query of the current running process and store it to the buffer
-                    uint hNtQuerySystemInformationResult = PInvoke.NtQuerySystemInformation(SystemProcessInformation, dataBufferPtr, (uint)ntQueryCachedBuffer.Length, out var length);
+                    uint hNtQuerySystemInformationResult = PInvoke.NtQuerySystemInformation(SystemProcessInformation, dataBufferPtr, (uint)ntQueryCachedBuffer.Length, out uint length);
 
                     // If the required length of the data is exceeded than the current buffer,
                     // then try to reallocate and start over to the top.
@@ -178,7 +178,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                                 ReadOnlySpan<char> checkForOriginPathDir = checkForOriginPath;
 
                                 // Compare and return if any of result is equal
-                                var isCommandPathEqual = !useStartsWithMatch ? 
+                                bool isCommandPathEqual = !useStartsWithMatch ? 
                                     processCmdLineSpan.Equals(checkForOriginPathDir, StringComparison.OrdinalIgnoreCase) :
                                     processCmdLineSpan.StartsWith(checkForOriginPathDir, StringComparison.OrdinalIgnoreCase);
 
@@ -268,7 +268,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
         public static Process[] GetInstanceProcesses()
         {
-            var       currentProcess = Process.GetCurrentProcess();
+            Process   currentProcess = Process.GetCurrentProcess();
             Process[] processes      = Process.GetProcessesByName(currentProcess.ProcessName);
 
             return processes;
@@ -277,13 +277,13 @@ namespace Hi3Helper.Win32.Native.ManagedTools
         public static int EnumerateInstances(ILogger? logger = null)
         {
             Process[] instanceProc = GetInstanceProcesses();
-            var instanceCount = instanceProc.Length;
+            int instanceCount = instanceProc.Length;
 
-            var finalInstanceCount = 0;
+            int finalInstanceCount = 0;
 
             if (instanceCount > 1)
             {
-                var curPId = Environment.ProcessId;
+                int curPId = Environment.ProcessId;
                 logger?.LogTrace($"Detected {instanceCount} instances! Current PID: {curPId}");
                 logger?.LogTrace("Enumerating instances...");
                 foreach (Process p in instanceProc)

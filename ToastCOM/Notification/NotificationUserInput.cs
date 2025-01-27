@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -128,7 +129,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         public bool TryGetValue(string? key, out string? value)
         {
-            foreach (var item in _data)
+            foreach (IntPtr item in _data)
             {
                 if (GetDataKey(item) != key)
                 {

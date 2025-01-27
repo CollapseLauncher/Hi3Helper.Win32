@@ -41,14 +41,14 @@ public static class DriveTypeChecker
             return true; // Assume SSD
         }
 
-        var pathRoot = Path.GetPathRoot(path);
+        string? pathRoot = Path.GetPathRoot(path);
         if (string.IsNullOrWhiteSpace(pathRoot))
         {
             logger?.LogError(new ArgumentException("Invalid path", nameof(path)).ToString());
             return true; // Assume SSD
         }
         
-        var    devicePath = $@"\\.\{pathRoot[..^1]}";
+        string    devicePath = $@"\\.\{pathRoot[..^1]}";
         nint   hDevice    = CreateFile(devicePath, 0, 3, nint.Zero, 3, 0, nint.Zero);
         if (hDevice == nint.Zero || hDevice == new nint(-1))
         {

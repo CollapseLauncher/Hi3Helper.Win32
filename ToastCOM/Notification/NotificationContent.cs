@@ -8,17 +8,17 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
     {
         public record AppHeroImageRecord(Uri? imageUri, bool isHero);
 
-        public string? Title { get; internal set; }
-        public string? Content { get; internal set; }
-        public Uri? AppLogo { get; internal set; }
-        public List<AppHeroImageRecord> AppHeroImages { get; internal set; } = new List<AppHeroImageRecord>();
-        public bool UseCircleCroppedAppLogo { get; internal set; }
-        public List<ToastCommand> ToastCommands { get; internal set; } = new List<ToastCommand>();
-        public string? Launch { get; set; }
-        public ToastDuration? Duration { get; set; }
-        public string? DisplayTimestamp { get; set; }
-        public ToastScenario? Scenario { get; set; }
-        public bool? UseButtonStyle { get; set; }
+        public string?                  Title                   { get; internal set; }
+        public string?                  Content                 { get; internal set; }
+        public Uri?                     AppLogo                 { get; internal set; }
+        public List<AppHeroImageRecord> AppHeroImages           { get; internal set; } = new();
+        public bool                     UseCircleCroppedAppLogo { get; internal set; }
+        public List<ToastCommand>       ToastCommands           { get; internal set; } = new();
+        public string?                  Launch                  { get; set; }
+        public ToastDuration?           Duration                { get; set; }
+        public string?                  DisplayTimestamp        { get; set; }
+        public ToastScenario?           Scenario                { get; set; }
+        public bool?                    UseButtonStyle          { get; set; }
 
         private XmlDocument? _xml;
         public XmlDocument Xml
@@ -26,7 +26,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             get => _xml ??= GenerateXmlDocument();
         }
 
-        public static NotificationContent Create() => new NotificationContent();
+        public static NotificationContent Create() => new();
 
         public void UpdateXml()                    => _xml = GenerateXmlDocument();
         public void UpdateXmlWith(XmlDocument xml) => _xml = xml;

@@ -10,10 +10,10 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         internal const string Id_IPersistIGuid = "0000010C-0000-0000-C000-000000000046";
         internal const string Id_IPropertyStoreIGuid = "886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99";
 
-        internal static readonly Guid ClsId_ShellLink = new Guid(Id_ShellLinkClsId);
-        internal static readonly Guid IGuid_ShellLink = new Guid(Id_ShellLinkIGuid);
-        internal static readonly Guid IGuid_IPersistFile = new Guid(Id_IPersistFileIGuid);
-        internal static readonly Guid IGuid_IPersist = new Guid(Id_IPersistIGuid);
-        internal static readonly Guid IGuid_IPropertyStore = new Guid(Id_IPropertyStoreIGuid);
+        internal static readonly Guid ClsId_ShellLink      = new(Id_ShellLinkClsId);
+        internal static readonly Guid IGuid_ShellLink      = new(Id_ShellLinkIGuid);
+        internal static readonly Guid IGuid_IPersistFile   = new(Id_IPersistFileIGuid);
+        internal static readonly Guid IGuid_IPersist       = new(Id_IPersistIGuid);
+        internal static readonly Guid IGuid_IPropertyStore = new(Id_IPropertyStoreIGuid);
     }
 }

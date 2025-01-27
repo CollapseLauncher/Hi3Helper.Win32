@@ -91,34 +91,32 @@ namespace Hi3Helper.Win32.ShellLinkCOM
 
                 flags |= large ? SHGetFileInfoConstants.SHGFI_LARGEICON : SHGetFileInfoConstants.SHGFI_SMALLICON;
 
-                FileIcon fileIcon = new FileIcon(Target, flags);
+                FileIcon fileIcon = new(Target, flags);
                 return fileIcon.ShellIcon;
+            }
+
+            // Use ExtractIconEx to get the icon:
+            nint[] hIconEx   = [nint.Zero];
+            if (large)
+            {
+                PInvoke.ExtractIconEx(
+                                      iconFile,
+                                      iconIndex,
+                                      hIconEx,
+                                      null,
+                                      1);
             }
             else
             {
-                // Use ExtractIconEx to get the icon:
-                nint[] hIconEx   = [nint.Zero];
-                if (large)
-                {
-                    PInvoke.ExtractIconEx(
-                                          iconFile,
-                                          iconIndex,
-                                          hIconEx,
-                                          null,
-                                          1);
-                }
-                else
-                {
-                    PInvoke.ExtractIconEx(
-                                          iconFile,
-                                          iconIndex,
-                                          null,
-                                          hIconEx,
-                                          1);
-                }
-
-                return hIconEx[0];
+                PInvoke.ExtractIconEx(
+                                      iconFile,
+                                      iconIndex,
+                                      null,
+                                      hIconEx,
+                                      1);
             }
+
+            return hIconEx[0];
         }
 
         /// <summary>
@@ -224,7 +222,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         {
             int    sizeOfFindData = sizeof(Win32FindDataW);
 
-            var    win32FindDataBuffer = new byte[sizeOfFindData];
+            byte[] win32FindDataBuffer = new byte[sizeOfFindData];
             char[] buffer              = ArrayPool<char>.Shared.Rent(length);
             try
             {
@@ -272,8 +270,8 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         public void SetAppUserModelId(string appId)
         {
-            var pkey = PropertyKey.PKEY_AppUserModel_ID;
-            var str = PropVariant.FromString(appId);
+            PropertyKey pkey = PropertyKey.PkeyAppUserModelID;
+            PropVariant str = PropVariant.FromString(appId);
             _propertyStoreW?.SetValue(ref pkey, ref str);
         }
 
@@ -282,7 +280,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         public void SetToastActivatorClsid(string clsid)
         {
-            var guid = Guid.Parse(clsid);
+            Guid guid = Guid.Parse(clsid);
             SetToastActivatorClsid(guid);
         }
 
@@ -291,7 +289,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         public void SetToastActivatorClsid(Guid clsid)
         {
-            PropertyKey pkey = PropertyKey.PKEY_AppUserModel_ToastActivatorCLSID;
+            PropertyKey pkey = PropertyKey.PkeyAppUserModelToastActivatorClsid;
             PropVariant varGuid = PropVariant.FromGuid(clsid);
             try
             {

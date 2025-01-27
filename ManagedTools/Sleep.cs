@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
+// ReSharper disable AsyncVoidMethod
 
 namespace Hi3Helper.Win32.Native.ManagedTools
 {
