@@ -21,10 +21,24 @@ namespace Hi3Helper.Win32.Native.ManagedTools
         private const int SystemProcessInformation = 5;
         private const int QueryLimitedInformation = 0x1000;
 
-        private const int DefaultNtQueryChangedLen = 4 << 17;
+        private const int  DefaultNtQueryChangedLen = 4 << 17;
+        private const nint InvalidHandleValue = -1;
+        private const int  ProcessSetInformation = 0x0200;
         private static int _dynamicNtQueryChangedBufferLen = DefaultNtQueryChangedLen;
 
-        public static unsafe bool IsProcessExist(int processId) => PInvoke.OpenProcess(QueryLimitedInformation, false, processId) != nint.Zero;
+        public static unsafe bool IsProcessExist(int processId)
+        {
+            // Get the handler and return true if procHandler is not null
+            nint procHandler = PInvoke.OpenProcess(QueryLimitedInformation, false, processId);
+            if (procHandler != nint.Zero)
+            {
+                PInvoke.CloseHandle(procHandler);
+                return true;
+            }
+
+            // Otherwise, return false
+            return false;
+        }
 
         public static unsafe bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", ILogger? logger = null)
             => IsProcessExist(processName, out processId, out windowHandle, checkForOriginPath, false, logger);
@@ -122,7 +136,8 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                         nint processHandle = PInvoke.OpenProcess(QueryLimitedInformation, false, processId);
 
                         // If failed, then log the Win32 error and return false.
-                        if (processHandle == nint.Zero)
+                        if (processHandle == InvalidHandleValue
+                         || processHandle == nint.Zero)
                         {
                             logger?.LogError($"Error happened while operating OpenProcess(): {Win32Error.GetLastWin32ErrorMessage()}");
                             return false;
@@ -175,6 +190,9 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                         {
                             // Return the buffer
                             ArrayPool<char>.Shared.Return(bufferProcessCmd);
+
+                            // Close the OpenProcess handle
+                            PInvoke.CloseHandle(processHandle);
                         }
                     }
 
@@ -238,7 +256,11 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             }
             finally
             {
+                // Return the buffer
                 ArrayPool<char>.Shared.Return(bufferProcessCmd);
+
+                // Close the process handle
+                PInvoke.CloseHandle(processHandle);
             }
         }
 
@@ -327,13 +349,10 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
         public static bool TrySetProcessPriority(int processId, PriorityClass priority, ILogger? logger = null)
         {
-            const nint invalidHandleValue = -1;
-            const int processSetInformation = 0x0200;
-
             // Open the process handle to set the process information
-            nint openProcHandle = PInvoke.OpenProcess(processSetInformation, true, processId);
+            nint openProcHandle = PInvoke.OpenProcess(ProcessSetInformation, true, processId);
             // Return false if it handles INVALID_HANDLE_VALUE due to permissions (for example: Process protection)
-            if (openProcHandle == invalidHandleValue
+            if (openProcHandle == InvalidHandleValue
              || openProcHandle == nint.Zero)
             {
                 PrintErrMessage("Cannot open process handle as it returns INVALID_HANDLE_VALUE or null");

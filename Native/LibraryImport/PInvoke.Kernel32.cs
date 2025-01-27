@@ -70,7 +70,6 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         );
 
         public const uint FORMAT_MESSAGE_FROM_HMODULE = 0x800;
-
         public const uint FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x100;
         public const uint FORMAT_MESSAGE_IGNORE_INSERTS = 0x200;
         public const uint FORMAT_MESSAGE_FROM_SYSTEM = 0x1000;
