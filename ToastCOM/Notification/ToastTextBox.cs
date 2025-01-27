@@ -1,4 +1,6 @@
 ﻿using System.Xml;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {

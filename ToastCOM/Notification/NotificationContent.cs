@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace Hi3Helper.Win32.ToastCOM.Notification
 {
     public class NotificationContent
     {
-        public record AppHeroImageRecord(Uri? imageUri, bool isHero);
+        public record AppHeroImageRecord(Uri? ImageUri, bool IsHero);
 
         public string?                  Title                   { get; internal set; }
         public string?                  Content                 { get; internal set; }
         public Uri?                     AppLogo                 { get; internal set; }
-        public List<AppHeroImageRecord> AppHeroImages           { get; internal set; } = new();
+        public List<AppHeroImageRecord> AppHeroImages           { get; internal set; } = [];
         public bool                     UseCircleCroppedAppLogo { get; internal set; }
-        public List<ToastCommand>       ToastCommands           { get; internal set; } = new();
+        public List<ToastCommand>       ToastCommands           { get; internal set; } = [];
         public string?                  Launch                  { get; set; }
         public ToastDuration?           Duration                { get; set; }
         public string?                  DisplayTimestamp        { get; set; }
@@ -81,13 +83,13 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                 // Append Hero Image if any
                 foreach (AppHeroImageRecord heroImageRecord in AppHeroImages)
                 {
-                    if (heroImageRecord.imageUri == null)
+                    if (heroImageRecord.ImageUri == null)
                         continue;
 
                     XmlNode? xmlAppLogoElement = xmlBindingElement.AppendChild(_xml.CreateElement("image"));
-                    xmlAppLogoElement.AddAttribute(_xml, "src", heroImageRecord.imageUri.ToString());
+                    xmlAppLogoElement.AddAttribute(_xml, "src", heroImageRecord.ImageUri.ToString());
 
-                    if (heroImageRecord.isHero)
+                    if (heroImageRecord.IsHero)
                         xmlAppLogoElement.AddAttribute(_xml, "placement", "hero");
                 }
             }

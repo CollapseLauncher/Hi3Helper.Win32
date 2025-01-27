@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+// ReSharper disable CollectionNeverQueried.Global
 
 namespace Hi3Helper.Win32.ShellLinkCOM
 {
