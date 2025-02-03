@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.Native.LibraryImport
@@ -16,7 +17,7 @@ namespace Hi3Helper.Win32.Native.LibraryImport
             nint hKey,
             [MarshalAs(UnmanagedType.Bool)] bool bWatchSubtree,
             RegChangeNotifyFilter dwNotifyFilter,
-            nint hEvent,
+            SafeWaitHandle hEvent,
             [MarshalAs(UnmanagedType.Bool)] bool fAsynchronous);
 
         [LibraryImport("advapi32.dll", EntryPoint = "RegCloseKey")]
