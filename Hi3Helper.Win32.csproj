@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	
 	<PropertyGroup>
-		<TargetFramework>net9.0-windows10.0.22621.0</TargetFramework>
+		<TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
 		<Platforms>x64</Platforms>
 		<Configurations>Debug;Release</Configurations>
 		<LangVersion>preview</LangVersion>
@@ -45,14 +45,14 @@
         <DirectPInvoke Include="user32.dll" />
         <DirectPInvoke Include="uxtheme.dll" />
 
-        <NativeLibrary Include="StaticLib\WindowsKits\10.0.22621.0_um_x64\AdvAPI32.Lib" />
-        <NativeLibrary Include="StaticLib\WindowsKits\10.0.22621.0_um_x64\dwmapi.lib" />
-        <NativeLibrary Include="StaticLib\WindowsKits\10.0.22621.0_um_x64\kernel32.Lib" />
-        <NativeLibrary Include="StaticLib\WindowsKits\10.0.22621.0_um_x64\ntdll.lib" />
-        <NativeLibrary Include="StaticLib\WindowsKits\10.0.22621.0_um_x64\Ole32.Lib" />
-        <NativeLibrary Include="StaticLib\WindowsKits\10.0.22621.0_um_x64\shcore.lib" />
-        <NativeLibrary Include="StaticLib\WindowsKits\10.0.22621.0_um_x64\shell32.lib" />
-        <NativeLibrary Include="StaticLib\WindowsKits\10.0.22621.0_um_x64\User32.Lib" />
-        <NativeLibrary Include="StaticLib\WindowsKits\10.0.22621.0_um_x64\Uxtheme.lib" />
+        <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\AdvAPI32.Lib" />
+        <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\dwmapi.lib" />
+        <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\kernel32.Lib" />
+        <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\ntdll.lib" />
+        <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\Ole32.Lib" />
+        <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\shcore.lib" />
+        <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\shell32.lib" />
+        <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\User32.Lib" />
+        <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\Uxtheme.lib" />
     </ItemGroup>
 </Project>
