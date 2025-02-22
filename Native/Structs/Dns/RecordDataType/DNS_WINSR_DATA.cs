@@ -7,11 +7,15 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     /// See http://msdn.microsoft.com/en-us/library/windows/desktop/ms682113(v=vs.85).aspx
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct DNS_WINSR_DATA
+    public unsafe struct DNS_WINSR_DATA
     {
         public uint dwMappingFlag;
         public uint dwLookupTimeout;
         public uint dwCacheTimeout;
-        public IntPtr pNameResultDomain;    // string
+        public char* pNameResultDomain;
+
+        public ReadOnlySpan<char> GetNameResultDomain() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pNameResultDomain);
+
+        public override string ToString() => GetNameResultDomain().ToString();
     }
 }

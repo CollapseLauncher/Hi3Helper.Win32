@@ -1,5 +1,4 @@
-﻿using Hi3Helper.Win32.Native.Enums.Dns;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.Native.Structs.Dns
@@ -20,5 +19,7 @@ namespace Hi3Helper.Win32.Native.Structs.Dns
         public readonly DnsDataUnion Data;
 
         public unsafe ReadOnlySpan<char> GetRecordName() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pName);
+
+        public override string ToString() => GetRecordName().ToString();
     }
 }

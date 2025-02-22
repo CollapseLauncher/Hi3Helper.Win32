@@ -51,7 +51,7 @@ public static unsafe class Dns
     /// <param name="bypassCache">Whether to bypass OS's DNS cache. Default: <c>false</c></param>
     /// <param name="logger">Logger to display any debug or error message while requesting the record.</param>
     /// <returns>An enumerable of the record union (<seealso cref="DnsDataUnion"/>)</returns>
-    public static IEnumerable<DnsDataUnion> EnumerateDnsRecord(string host, DnsRecordTypes recordType, bool bypassCache, ILogger? logger = null)
+    public static IEnumerable<DnsDataUnion> EnumerateDnsRecord(string host, DnsRecordTypes recordType, bool bypassCache = false, ILogger? logger = null)
     {
         // Initialize the pointer of the record array information
         nint recordAPtr = nint.Zero;

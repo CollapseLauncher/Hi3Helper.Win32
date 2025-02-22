@@ -41,7 +41,7 @@ namespace Hi3Helper.Win32.Native.Structs.Dns
         [FieldOffset(0)]
         public DNS_DS_DATA DS;
         [FieldOffset(0)]
-        public DNS_RRSIG_DATA RRSIG;
+        public DNS_SIG_DATA RRSIG;
         [FieldOffset(0)]
         public DNS_NSEC_DATA NSEC;
         [FieldOffset(0)]

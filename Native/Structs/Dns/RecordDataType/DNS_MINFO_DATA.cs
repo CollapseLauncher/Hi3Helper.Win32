@@ -7,9 +7,14 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     /// See http://msdn.microsoft.com/en-us/library/windows/desktop/ms682067(v=vs.85).aspx
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct DNS_MINFO_DATA
+    public unsafe struct DNS_MINFO_DATA
     {
-        public IntPtr pNameMailbox;     // string
-        public IntPtr pNameErrorsMailbox;       // string
+        public char* pNameMailbox;
+        public char* pNameErrorsMailbox;
+
+        public ReadOnlySpan<char> GetNameMailbox() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pNameMailbox);
+        public ReadOnlySpan<char> GetNameErrorsMailbox() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pNameErrorsMailbox);
+
+        public override string ToString() => $"Mailbox: {GetNameMailbox()} | ErrorMailbox: {GetNameErrorsMailbox()}";
     }
 }

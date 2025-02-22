@@ -7,12 +7,16 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     /// See http://msdn.microsoft.com/en-us/library/windows/desktop/ms682097(v=vs.85).aspx
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct DNS_SRV_DATA
+    public unsafe struct DNS_SRV_DATA
     {
-        public IntPtr pNameTarget;      // string
+        public char* pNameTarget;
         public ushort uPriority;
         public ushort wWeight;
         public ushort wPort;
         public ushort Pad;
+
+        public ReadOnlySpan<char> GetNameTarget() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pNameTarget);
+
+        public override string ToString() => GetNameTarget().ToString();
     }
 }
