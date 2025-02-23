@@ -6,9 +6,14 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+// ReSharper disable CommentTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 
 namespace Hi3Helper.Win32.ManagedTools;
 
+#pragma warning disable CA1859
 public static unsafe class Dns
 {
     /// <summary>
@@ -17,7 +22,7 @@ public static unsafe class Dns
     /// <param name="host">The hostname where the A and AAAA record to be resolved.</param>
     /// <param name="bypassCache">Whether to bypass OS's DNS cache. Default: <c>false</c></param>
     /// <param name="logger">Logger to display any debug or error message while requesting the record.</param>
-    /// <returns>An enumerable of the <seealso cref="IDNS_WITH_IPADDR"/></returns>
+    /// <returns>Enumerable of the <seealso cref="IDNS_WITH_IPADDR"/></returns>
     public static IEnumerable<IDNS_WITH_IPADDR> EnumerateIPAddressFromHost(string host, bool bypassCache = false, ILogger? logger = null)
     {
         // Enumerate the A Record first (for IPv4)
@@ -31,7 +36,7 @@ public static unsafe class Dns
             yield return ipv4AddrRecord;
         }
 
-        // Then try enumerate the AAAA record (for IPv6)
+        // Then try to enumerate the AAAA record (for IPv6)
         foreach (DnsDataUnion dataUnion in EnumerateDnsRecord(host, DnsRecordTypes.DNS_TYPE_AAAA, bypassCache, logger))
         {
             IDNS_WITH_IPADDR ipv6AddrRecord = dataUnion.AAAA;
@@ -50,12 +55,11 @@ public static unsafe class Dns
     /// <param name="recordType">Record type to resolve.</param>
     /// <param name="bypassCache">Whether to bypass OS's DNS cache. Default: <c>false</c></param>
     /// <param name="logger">Logger to display any debug or error message while requesting the record.</param>
-    /// <returns>An enumerable of the record union (<seealso cref="DnsDataUnion"/>)</returns>
+    /// <returns>Enumerable of the record union (<seealso cref="DnsDataUnion"/>)</returns>
     public static IEnumerable<DnsDataUnion> EnumerateDnsRecord(string host, DnsRecordTypes recordType, bool bypassCache = false, ILogger? logger = null)
     {
         // Initialize the pointer of the record array information
-        nint recordAPtr = nint.Zero;
-        nint recordAPtrNext = nint.Zero;
+        nint recordAPtr        = nint.Zero;
         nint recordAInitialPos = nint.Zero;
 
         try
@@ -69,7 +73,7 @@ public static unsafe class Dns
                                    recordType,
                                    bypassCache,
                                    ref recordAPtr,
-                                   out recordAPtrNext,
+                                   out nint recordAPtrNext,
                                    out lastError,
                                    out DnsDataUnion recordResult))
             {
@@ -105,13 +109,13 @@ public static unsafe class Dns
         }
     }
 
-    private unsafe static bool EnumerateRecord(string host,
-                                               DnsRecordTypes recordType,
-                                               bool bypassCache,
-                                               ref nint lastRecord,
-                                               out nint nextRecord,
-                                               out int lastError,
-                                               out DnsDataUnion resultData)
+    private static bool EnumerateRecord(string           host,
+                                        DnsRecordTypes   recordType,
+                                        bool             bypassCache,
+                                        ref nint         lastRecord,
+                                        out nint         nextRecord,
+                                        out int          lastError,
+                                        out DnsDataUnion resultData)
     {
         // Initialize the options and result data
         DnsQueryOptions queryOptions = DnsQueryOptions.DNS_QUERY_ACCEPT_TRUNCATED_RESPONSE;
@@ -127,14 +131,13 @@ public static unsafe class Dns
 
         // If the lastRecord is empty, then begin to query the
         // record information and get the data.
-        DNS_RECORD* dnsArray = null;
         if (lastRecord == nint.Zero)
         {
             lastError = PInvoke.DnsQuery(host,
                                          recordType,
                                          queryOptions,
                                          nint.Zero,
-                                         out dnsArray,
+                                         out DNS_RECORD* dnsArray,
                                          nint.Zero);
             lastRecord = (nint)dnsArray;
         }

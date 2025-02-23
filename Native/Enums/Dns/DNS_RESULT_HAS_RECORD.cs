@@ -1,4 +1,7 @@
 ﻿using System;
+// ReSharper disable UnusedMember.Global
+// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
 
 namespace Hi3Helper.Win32.Native.Enums.Dns
 {
@@ -7,6 +10,6 @@ namespace Hi3Helper.Win32.Native.Enums.Dns
     {
         HasNone = 0b_0000_0000_0000_0000,
         HasARecord = 0b_0000_0000_0000_0001,
-        HasAAAARecord = 0b_0000_0000_0000_0010,
+        HasAAAARecord = 0b_0000_0000_0000_0010
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using Hi3Helper.Win32.Native.Structs.Dns.RecordDataType;
+// ReSharper disable IdentifierTypo
 
 namespace Hi3Helper.Win32.Native.Structs.Dns
 {
@@ -27,7 +28,7 @@ namespace Hi3Helper.Win32.Native.Structs.Dns
         [FieldOffset(0)]
         public DNS_KEY_DATA KEY;
         [FieldOffset(0)]
-        public DNS_SIG_DATA SIG;
+        public DNS_SIG_DATA SIG, RRSIG;
         [FieldOffset(0)]
         public DNS_ATMA_DATA ATMA;
         [FieldOffset(0)]
@@ -40,8 +41,6 @@ namespace Hi3Helper.Win32.Native.Structs.Dns
         public DNS_OPT_DATA OPT;
         [FieldOffset(0)]
         public DNS_DS_DATA DS;
-        [FieldOffset(0)]
-        public DNS_SIG_DATA RRSIG;
         [FieldOffset(0)]
         public DNS_NSEC_DATA NSEC;
         [FieldOffset(0)]

@@ -1,4 +1,7 @@
 ﻿using System.Runtime.InteropServices;
+// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
 {

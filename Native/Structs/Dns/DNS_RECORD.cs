@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+// ReSharper disable InconsistentNaming
+// ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnassignedReadonlyField
 
 namespace Hi3Helper.Win32.Native.Structs.Dns
 {
@@ -18,7 +22,7 @@ namespace Hi3Helper.Win32.Native.Structs.Dns
         public readonly uint dwReserved;
         public readonly DnsDataUnion Data;
 
-        public unsafe ReadOnlySpan<char> GetRecordName() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pName);
+        public ReadOnlySpan<char> GetRecordName() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pName);
 
         public override string ToString() => GetRecordName().ToString();
     }

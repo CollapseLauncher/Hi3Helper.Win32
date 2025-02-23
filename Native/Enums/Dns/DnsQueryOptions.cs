@@ -1,5 +1,9 @@
 ﻿using System;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
+
 namespace Hi3Helper.Win32.Native.Enums.Dns
 {
     /// <summary>

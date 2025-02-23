@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Runtime.InteropServices;
+// ReSharper disable InconsistentNaming
+// ReSharper disable CommentTypo
 
 namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
 {
@@ -17,7 +19,7 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
             const int sizeOf = sizeof(uint);
             fixed (void* ptr = &this)
             {
-                IPAddress returnAddress = new IPAddress(new ReadOnlySpan<byte>(ptr, sizeOf));
+                IPAddress returnAddress = new(new ReadOnlySpan<byte>(ptr, sizeOf));
                 return returnAddress;
             }
         }
