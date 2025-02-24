@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable ConvertIfStatementToSwitchStatement
 
 namespace Hi3Helper.Win32.ManagedTools;
 
@@ -21,10 +22,51 @@ public static unsafe class Dns
     /// </summary>
     /// <param name="host">The hostname where the A and AAAA record to be resolved.</param>
     /// <param name="bypassCache">Whether to bypass OS's DNS cache. Default: <c>false</c></param>
+    /// <param name="zigzagResult">Instead of getting both IPv4 and IPv6 result sequentially, the result will begin from IPv4 then IPv6 and so-on.</param>
     /// <param name="logger">Logger to display any debug or error message while requesting the record.</param>
     /// <returns>Enumerable of the <seealso cref="IDNS_WITH_IPADDR"/></returns>
-    public static IEnumerable<IDNS_WITH_IPADDR> EnumerateIPAddressFromHost(string host, bool bypassCache = false, ILogger? logger = null)
+    public static IEnumerable<IDNS_WITH_IPADDR> EnumerateIPAddressFromHost(string host, bool bypassCache = false, bool zigzagResult = false, ILogger? logger = null)
     {
+        if (zigzagResult)
+        {
+            IEnumerator<DnsDataUnion> recordIpv4 =
+                EnumerateDnsRecord(host, DnsRecordTypes.DNS_TYPE_A, bypassCache, logger)
+                   .GetEnumerator();
+
+            IEnumerator<DnsDataUnion> recordIpv6 =
+                EnumerateDnsRecord(host, DnsRecordTypes.DNS_TYPE_AAAA, bypassCache, logger)
+                   .GetEnumerator();
+
+            try
+            {
+                EnumerateZigZag:
+                bool isNextIpv4 = recordIpv4.MoveNext();
+                bool isNextIpv6 = recordIpv6.MoveNext();
+
+                if (!isNextIpv4 && !isNextIpv6)
+                {
+                    yield break;
+                }
+
+                if (isNextIpv4)
+                {
+                    yield return recordIpv4.Current.A;
+                }
+
+                if (isNextIpv6)
+                {
+                    yield return recordIpv6.Current.AAAA;
+                }
+
+                goto EnumerateZigZag;
+            }
+            finally
+            {
+                recordIpv4.Dispose();
+                recordIpv6.Dispose();
+            }
+        }
+
         // Enumerate the A Record first (for IPv4)
         foreach (DnsDataUnion dataUnion in EnumerateDnsRecord(host, DnsRecordTypes.DNS_TYPE_A, bypassCache, logger))
         {
