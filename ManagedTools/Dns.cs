@@ -185,14 +185,14 @@ public static unsafe class Dns
                                          out DNS_RECORD* dnsArray,
                                          nint.Zero);
 
+            // If it errors out, return false
+            if (lastError != 0)
+            {
+                return false;
+            }
+
             resultDataTtl = dnsArray->dwTtl;
             lastRecord    = (nint)dnsArray;
-        }
-
-        // If it errors out, return false
-        if (lastError != 0)
-        {
-            return false;
         }
 
         // Get the result data and output the next pointer of the record
