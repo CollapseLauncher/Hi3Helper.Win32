@@ -24,16 +24,16 @@ public static unsafe class Dns
     /// <param name="bypassCache">Whether to bypass OS's DNS cache. Default: <c>false</c></param>
     /// <param name="zigzagResult">Instead of getting both IPv4 and IPv6 result sequentially, the result will begin from IPv4 then IPv6 and so-on.</param>
     /// <param name="logger">Logger to display any debug or error message while requesting the record.</param>
-    /// <returns>Enumerable of the <seealso cref="IDNS_WITH_IPADDR"/></returns>
-    public static IEnumerable<IDNS_WITH_IPADDR> EnumerateIPAddressFromHost(string host, bool bypassCache = false, bool zigzagResult = false, ILogger? logger = null)
+    /// <returns>Enumerable of the tuple of <seealso cref="IDNS_WITH_IPADDR"/> as the record and <see cref="uint"/> as the TTL</returns>
+    public static IEnumerable<(IDNS_WITH_IPADDR Record, uint TimeToLive)> EnumerateIPAddressFromHost(string host, bool bypassCache = false, bool zigzagResult = false, ILogger? logger = null)
     {
         if (zigzagResult)
         {
-            IEnumerator<DnsDataUnion> recordIpv4 =
+            IEnumerator<(DnsDataUnion RecordUnion, uint TimeToLive)> recordIpv4 =
                 EnumerateDnsRecord(host, DnsRecordTypes.DNS_TYPE_A, bypassCache, logger)
                    .GetEnumerator();
 
-            IEnumerator<DnsDataUnion> recordIpv6 =
+            IEnumerator<(DnsDataUnion RecordUnion, uint TimeToLive)> recordIpv6 =
                 EnumerateDnsRecord(host, DnsRecordTypes.DNS_TYPE_AAAA, bypassCache, logger)
                    .GetEnumerator();
 
@@ -50,12 +50,12 @@ public static unsafe class Dns
 
                 if (isNextIpv4)
                 {
-                    yield return recordIpv4.Current.A;
+                    yield return (recordIpv4.Current.RecordUnion.A, recordIpv4.Current.TimeToLive);
                 }
 
                 if (isNextIpv6)
                 {
-                    yield return recordIpv6.Current.AAAA;
+                    yield return (recordIpv4.Current.RecordUnion.AAAA, recordIpv4.Current.TimeToLive);
                 }
 
                 goto EnumerateZigZag;
@@ -68,25 +68,25 @@ public static unsafe class Dns
         }
 
         // Enumerate the A Record first (for IPv4)
-        foreach (DnsDataUnion dataUnion in EnumerateDnsRecord(host, DnsRecordTypes.DNS_TYPE_A, bypassCache, logger))
+        foreach ((DnsDataUnion RecordUnion, uint TimeToLive) data in EnumerateDnsRecord(host, DnsRecordTypes.DNS_TYPE_A, bypassCache, logger))
         {
-            IDNS_WITH_IPADDR ipv4AddrRecord = dataUnion.A;
+            IDNS_WITH_IPADDR ipv4AddrRecord = data.RecordUnion.A;
 #if DEBUG
             string? ipv4AddrString = ipv4AddrRecord.ToString();
             logger?.LogDebug("Found A Record from host: {host} -> IPv4: {ipv4AddrString}", host, ipv4AddrString);
 #endif
-            yield return ipv4AddrRecord;
+            yield return (ipv4AddrRecord, data.TimeToLive);
         }
 
         // Then try to enumerate the AAAA record (for IPv6)
-        foreach (DnsDataUnion dataUnion in EnumerateDnsRecord(host, DnsRecordTypes.DNS_TYPE_AAAA, bypassCache, logger))
+        foreach ((DnsDataUnion RecordUnion, uint TimeToLive) data in EnumerateDnsRecord(host, DnsRecordTypes.DNS_TYPE_AAAA, bypassCache, logger))
         {
-            IDNS_WITH_IPADDR ipv6AddrRecord = dataUnion.AAAA;
+            IDNS_WITH_IPADDR ipv6AddrRecord = data.RecordUnion.AAAA;
 #if DEBUG
             string? ipv6AddrString = ipv6AddrRecord.ToString();
             logger?.LogDebug("Found AAAA Record from host: {host} -> IPv6: {ipv6AddrString}", host, ipv6AddrString);
 #endif
-            yield return ipv6AddrRecord;
+            yield return (ipv6AddrRecord, data.TimeToLive);
         }
     }
 
@@ -97,8 +97,8 @@ public static unsafe class Dns
     /// <param name="recordType">Record type to resolve.</param>
     /// <param name="bypassCache">Whether to bypass OS's DNS cache. Default: <c>false</c></param>
     /// <param name="logger">Logger to display any debug or error message while requesting the record.</param>
-    /// <returns>Enumerable of the record union (<seealso cref="DnsDataUnion"/>)</returns>
-    public static IEnumerable<DnsDataUnion> EnumerateDnsRecord(string host, DnsRecordTypes recordType, bool bypassCache = false, ILogger? logger = null)
+    /// <returns>Enumerable of the tuple of <seealso cref="DnsDataUnion"/> and <see cref="uint"/> as the TTL</returns>
+    public static IEnumerable<(DnsDataUnion RecordUnion, uint TimeToLive)> EnumerateDnsRecord(string host, DnsRecordTypes recordType, bool bypassCache = false, ILogger? logger = null)
     {
         // Initialize the pointer of the record array information
         nint recordAPtr        = nint.Zero;
@@ -117,7 +117,8 @@ public static unsafe class Dns
                                    ref recordAPtr,
                                    out nint recordAPtrNext,
                                    out lastError,
-                                   out DnsDataUnion recordResult))
+                                   out DnsDataUnion recordResult,
+                                   out uint recordTimeToLive))
             {
                 // Save the initial pointer where it determines the first position of the record array.
                 // This to ensure that the array pointer can be flushed once the enumeration is completed.
@@ -132,7 +133,7 @@ public static unsafe class Dns
                 recordAPtr = recordAPtrNext;
 
                 // Then yield the record result
-                yield return recordResult;
+                yield return (recordResult, recordTimeToLive);
             }
 
             // If it fails to resolve the record, log the error
@@ -157,11 +158,13 @@ public static unsafe class Dns
                                         ref nint         lastRecord,
                                         out nint         nextRecord,
                                         out int          lastError,
-                                        out DnsDataUnion resultData)
+                                        out DnsDataUnion resultData,
+                                        out uint         resultDataTtl)
     {
         // Initialize the options and result data
         DnsQueryOptions queryOptions = DnsQueryOptions.DNS_QUERY_ACCEPT_TRUNCATED_RESPONSE;
         Unsafe.SkipInit(out resultData);
+        Unsafe.SkipInit(out resultDataTtl);
         nextRecord = nint.Zero;
         lastError = 0;
 
@@ -181,7 +184,9 @@ public static unsafe class Dns
                                          nint.Zero,
                                          out DNS_RECORD* dnsArray,
                                          nint.Zero);
-            lastRecord = (nint)dnsArray;
+
+            resultDataTtl = dnsArray->dwTtl;
+            lastRecord    = (nint)dnsArray;
         }
 
         // If it errors out, return false
@@ -193,8 +198,9 @@ public static unsafe class Dns
         // Get the result data and output the next pointer of the record
         // from the array.
         DNS_RECORD* currentRecord = (DNS_RECORD*)lastRecord;
-        nextRecord = (nint)currentRecord->pNext;
-        resultData = currentRecord->Data;
+        nextRecord    = (nint)currentRecord->pNext;
+        resultData    = currentRecord->Data;
+        resultDataTtl = currentRecord->dwTtl;
         return true;
     }
 }
