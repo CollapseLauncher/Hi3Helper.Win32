@@ -2,23 +2,20 @@
 using System.Buffers;
 using System.Security.Cryptography;
 using System.Text;
-// ReSharper disable InconsistentNaming
 
-namespace Hi3Helper.Win32.ToastCOM
+#pragma warning disable CA2211
+
+namespace Hi3Helper.Win32.Native.ClassIds
 {
-    internal class IidGuid
+    public class ClassFactoryClsId
     {
-        internal const  string NotificationActivationCallback = "53e31837-6600-4a81-9395-75cffe746f94";
-        internal const  string IClassFactory                  = "00000001-0000-0000-c000-000000000046";
-        internal static Guid   GuidIClassFactory              = new(IClassFactory);
-    }
+        public const   string IClassFactory                  = "00000001-0000-0000-c000-000000000046";
+        public static  Guid   GuidIClassFactory              = new(IClassFactory);
 
-    internal class ClsidGuid
-    {
-        internal static Guid GetGuidFromString(string fromString)
+        public static Guid GetGuidFromString(string fromString)
         {
-            int bufferLen = fromString.Length + 16;
-            byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferLen);
+            int        bufferLen  = fromString.Length + 16;
+            byte[]     buffer     = ArrayPool<byte>.Shared.Rent(bufferLen);
             Span<byte> hashBuffer = buffer.AsSpan(buffer.Length - 16);
 
             try

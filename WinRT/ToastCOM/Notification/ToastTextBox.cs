@@ -2,7 +2,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 
-namespace Hi3Helper.Win32.ToastCOM.Notification
+namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     /// <summary>
     /// Specifies a text box input shown in a toast notification.<br/>

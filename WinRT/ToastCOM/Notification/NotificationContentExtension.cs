@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 
-namespace Hi3Helper.Win32.ToastCOM.Notification
+namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     public static class NotificationContentExtension
     {

@@ -1,4 +1,4 @@
-﻿namespace Hi3Helper.Win32.ToastCOM
+﻿namespace Hi3Helper.Win32.WinRT.ToastCOM
 {
     public enum ToastActivationType
     {

@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Hi3Helper.Win32.Native.ClassIds;
+using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable PartialTypeWithSinglePart
 
-namespace Hi3Helper.Win32.ShellLinkCOM
+namespace Hi3Helper.Win32.Native.Interfaces
 {
-    [Guid(CLSIDGuid.Id_IPersistFileIGuid)]
+    [Guid(ShellLinkClsId.Id_IPersistFileIGuid)]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
-    internal partial interface IPersistFile
+    public partial interface IPersistFile
     {
         // can't get this to go if I extend IPersist, so put it here:
         [PreserveSig]

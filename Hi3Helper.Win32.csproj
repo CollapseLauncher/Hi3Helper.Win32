@@ -1,38 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	
-	<PropertyGroup>
-		<TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
-		<Platforms>x64</Platforms>
-		<Configurations>Debug;Release</Configurations>
-		<LangVersion>preview</LangVersion>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Nullable>enable</Nullable>
-		<DebugType>portable</DebugType>
-		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-		<TieredCompilation>true</TieredCompilation>
-		<!-- Assembly Info Properties -->
-		<AssemblyName>Hi3Helper.Win32</AssemblyName>
-		<ProductName>Hi3Helper.Win32</ProductName>
-		<Product>Hi3Helper.Win32</Product>
-		<Description>An Extension for Accessing Win32 API and COM Component used within Collapse Launcher with Trimming and NativeAOT support</Description>
-		<Company>Collapse Launcher Team</Company>
-		<Authors>$(Company). neon-nyan, Cry0, bagusnl, shatyuka, gablm.</Authors>
-		<Copyright>Copyright 2022-2024 $(Company)</Copyright>
-		<IsAotCompatible>true</IsAotCompatible>
-		<DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
-	</PropertyGroup>
+    
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Platforms>x64</Platforms>
+        <Configurations>Debug;Release</Configurations>
+        <LangVersion>preview</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Nullable>enable</Nullable>
+        <DebugType>portable</DebugType>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <TieredCompilation>true</TieredCompilation>
+        <!-- Assembly Info Properties -->
+        <AssemblyName>Hi3Helper.Win32</AssemblyName>
+        <ProductName>Hi3Helper.Win32</ProductName>
+        <Product>Hi3Helper.Win32</Product>
+        <Description>An Extension for Accessing Win32 API and COM Component used within Collapse Launcher with Trimming and NativeAOT support</Description>
+        <Company>Collapse Launcher Team</Company>
+        <Authors>$(Company). neon-nyan, Cry0, bagusnl, shatyuka, gablm.</Authors>
+        <Copyright>Copyright 2022-2024 $(Company)</Copyright>
+        <IsAotCompatible>true</IsAotCompatible>
+        <DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
+    </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-		<Optimize>True</Optimize>
-	</PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <Optimize>True</Optimize>
+    </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<Optimize>False</Optimize>
-	</PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <Optimize>False</Optimize>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2" />
+    </ItemGroup>
 
     <ItemGroup Condition="'$(PublishAot)' == 'true'">
         <DirectPInvoke Include="advapi32.dll" />
@@ -54,5 +54,11 @@
         <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\shell32.lib" />
         <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\User32.Lib" />
         <NativeLibrary Include="StaticLib\WindowsKits\10.0.26100.0_um_x64\Uxtheme.lib" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="WinRT\**" />
+        <EmbeddedResource Remove="WinRT\**" />
+        <None Remove="WinRT\**" />
     </ItemGroup>
 </Project>

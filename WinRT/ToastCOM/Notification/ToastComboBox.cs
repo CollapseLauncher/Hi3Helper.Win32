@@ -6,7 +6,7 @@ using System.Xml;
 // ReSharper disable InconsistentNaming
 // ReSharper disable CollectionNeverUpdated.Global
 
-namespace Hi3Helper.Win32.ToastCOM.Notification
+namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     /// <summary>
     /// Specifies a combo box / selection input shown in a toast notification.<br/>

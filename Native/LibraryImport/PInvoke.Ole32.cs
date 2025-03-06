@@ -1,10 +1,13 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.ShellLinkCOM;
-using Hi3Helper.Win32.ToastCOM;
 using System;
 using System.Runtime.InteropServices;
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
 
+#pragma warning disable CA1401
 namespace Hi3Helper.Win32.Native.LibraryImport
 {
     public static partial class PInvoke
@@ -28,7 +31,6 @@ namespace Hi3Helper.Win32.Native.LibraryImport
             CLSCTX                                             dwClsContext,
             TagREGCLS                                          flags,
             out uint                                           dwRegister);
-
 
         [LibraryImport("ole32.dll", EntryPoint = "CoRevokeClassObject")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]

@@ -1,6 +1,6 @@
 ﻿using System.Xml;
 
-namespace Hi3Helper.Win32.ToastCOM.Notification
+namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     /// <summary>
     /// To see details for all included properties, see this URL:<br/>

@@ -1,4 +1,6 @@
-﻿using Hi3Helper.Win32.Native.Enums;
+﻿using Hi3Helper.Win32.Native.ClassIds;
+using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.ManagedTools;
 using Hi3Helper.Win32.Native.Structs;
@@ -35,16 +37,16 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         public ShellLink()
         {
             ComMarshal.CreateInstance(
-                CLSIDGuid.ClsId_ShellLink,
+                ShellLinkClsId.ClsId_ShellLink,
                 nint.Zero,
                 CLSCTX.CLSCTX_INPROC_SERVER,
                 out IShellLinkW? shellLink
                 ).ThrowOnFailure();
 
             _linkW = shellLink;
-            _persistFileW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersistFile>(in CLSIDGuid.IGuid_IPersistFile);
-            _persistW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersist>(in CLSIDGuid.IGuid_IPersist);
-            _propertyStoreW = shellLink?.CastComInterfaceAs<IShellLinkW, IPropertyStore>(in CLSIDGuid.IGuid_IPropertyStore);
+            _persistFileW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersistFile>(in ShellLinkClsId.IGuid_IPersistFile);
+            _persistW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersist>(in ShellLinkClsId.IGuid_IPersist);
+            _propertyStoreW = shellLink?.CastComInterfaceAs<IShellLinkW, IPropertyStore>(in ShellLinkClsId.IGuid_IPropertyStore);
         }
 
         /// <summary>

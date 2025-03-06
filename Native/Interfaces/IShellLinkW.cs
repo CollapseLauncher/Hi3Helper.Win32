@@ -1,13 +1,16 @@
-﻿using System.Runtime.InteropServices;
+﻿using Hi3Helper.Win32.Native.ClassIds;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 
-namespace Hi3Helper.Win32.ShellLinkCOM
+namespace Hi3Helper.Win32.Native.Interfaces
 {
-    [Guid(CLSIDGuid.Id_ShellLinkIGuid)]
+    [Guid(ShellLinkClsId.Id_ShellLinkIGuid)]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
-    internal partial interface IShellLinkW
+    public partial interface IShellLinkW
     {
         //[helpstring("Retrieves the path and filename of a shell link object")]
         unsafe void GetPath(

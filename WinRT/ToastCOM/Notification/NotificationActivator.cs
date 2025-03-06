@@ -1,8 +1,10 @@
-﻿using Hi3Helper.Win32.Native.LibraryImport;
+﻿using Hi3Helper.Win32.Native.Interfaces;
+using Hi3Helper.Win32.Native.LibraryImport;
 using Microsoft.Extensions.Logging;
 using System;
+#pragma warning disable SYSLIB1097
 
-namespace Hi3Helper.Win32.ToastCOM.Notification
+namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     public abstract unsafe class NotificationActivator(ILogger? logger = null)
         : INotificationActivationCallback, IDisposable

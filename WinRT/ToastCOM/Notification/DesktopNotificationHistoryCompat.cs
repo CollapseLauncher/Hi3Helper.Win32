@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Windows.UI.Notifications;
 
-namespace Hi3Helper.Win32.ToastCOM.Notification
+namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     internal class DesktopNotificationHistoryCompat
     {

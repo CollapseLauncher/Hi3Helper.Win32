@@ -1,7 +1,7 @@
 ﻿using Hi3Helper.Win32.Native.LibraryImport;
 using System;
 
-namespace Hi3Helper.Win32.ToastCOM.Notification
+namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     /// <summary>
     /// Code from https://github.com/qmatteoq/DesktopBridgeHelpers/edit/master/DesktopBridge.Helpers/Helpers.cs

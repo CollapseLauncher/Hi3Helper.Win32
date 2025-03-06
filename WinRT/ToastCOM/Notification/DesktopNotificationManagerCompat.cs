@@ -1,4 +1,6 @@
-﻿using Hi3Helper.Win32.Native.Enums;
+﻿using Hi3Helper.Win32.Native.ClassIds;
+using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.ManagedTools;
 using Hi3Helper.Win32.ShellLinkCOM;
@@ -12,7 +14,7 @@ using Windows.UI.Notifications;
 // ReSharper disable RedundantStringInterpolation
 // ReSharper disable CommentTypo
 
-namespace Hi3Helper.Win32.ToastCOM.Notification
+namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     internal class DesktopNotificationManagerCompat
     {
@@ -80,7 +82,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
             }
 
             ComMarshal.CreateInstance(
-                CLSIDGuid.ClsId_ShellLink,
+                ShellLinkClsId.ClsId_ShellLink,
                 nint.Zero,
                 CLSCTX.CLSCTX_INPROC_SERVER,
             out IShellLinkW? shellLink
@@ -103,8 +105,8 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
             try
             {
-                IPersistFile? persistFileW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersistFile>(in CLSIDGuid.IGuid_IPersistFile);
-                IPropertyStore? propertyStoreW = shellLink?.CastComInterfaceAs<IShellLinkW, IPropertyStore>(in CLSIDGuid.IGuid_IPropertyStore);
+                IPersistFile? persistFileW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersistFile>(in ShellLinkClsId.IGuid_IPersistFile);
+                IPropertyStore? propertyStoreW = shellLink?.CastComInterfaceAs<IShellLinkW, IPropertyStore>(in ShellLinkClsId.IGuid_IPropertyStore);
 
                 try
                 {
@@ -181,16 +183,14 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
         internal static void RegisterActivator<T>(T currentInstance, Guid applicationId, bool asElevatedUser)
             where T : NotificationActivator
         {
-            Guid guid = applicationId;
-
-            CLSCTX    classContext = CLSCTX.CLSCTX_LOCAL_SERVER;
-            TagREGCLS registerFlag = TagREGCLS.REGCLS_MULTIPLEUSE;
+            const CLSCTX    classContext = CLSCTX.CLSCTX_LOCAL_SERVER;
+            const TagREGCLS registerFlag = TagREGCLS.REGCLS_MULTIPLEUSE;
 
             NotificationActivatorClassFactory classFactory = new();
             classFactory.UseExistingInstance(currentInstance, asElevatedUser);
 
             PInvoke.CoRegisterClassObject(
-                in guid,
+                in applicationId,
                 classFactory,
                 classContext,
                 registerFlag,
@@ -198,7 +198,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
             _registeredActivator = true;
 
-            currentInstance.Logger?.LogInformation($"[DesktopNotificationManagerCompat::RegisterActivator] Registered Toast Activator for application id: {guid} with CLSCTX: {classContext}");
+            currentInstance.Logger?.LogInformation($"[DesktopNotificationManagerCompat::RegisterActivator] Registered Toast Activator for application id: {applicationId} with CLSCTX: {classContext}");
         }
 
 

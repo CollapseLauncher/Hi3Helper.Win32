@@ -1,13 +1,16 @@
-﻿using System.Runtime.InteropServices;
+﻿using Hi3Helper.Win32.Native.ClassIds;
+using Hi3Helper.Win32.ShellLinkCOM;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable IdentifierTypo
 
-namespace Hi3Helper.Win32.ShellLinkCOM
+namespace Hi3Helper.Win32.Native.Interfaces
 {
-    [Guid(CLSIDGuid.Id_IPropertyStoreIGuid)]
+    [Guid(ShellLinkClsId.Id_IPropertyStoreIGuid)]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [GeneratedComInterface]
-    internal partial interface IPropertyStore
+    public partial interface IPropertyStore
     {
         [PreserveSig]
         int GetCount(out uint cProps);

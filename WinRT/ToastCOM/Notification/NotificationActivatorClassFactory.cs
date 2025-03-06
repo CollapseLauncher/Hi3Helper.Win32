@@ -1,14 +1,17 @@
 ﻿#if DEBUG
 using Microsoft.Extensions.Logging;
 #endif
+using Hi3Helper.Win32.Native.ClassIds;
+using Hi3Helper.Win32.Native.Interfaces;
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable CommentTypo
 // ReSharper disable PartialTypeWithSinglePart
 // ReSharper disable NotAccessedField.Local
+// ReSharper disable IdentifierTypo
 
-namespace Hi3Helper.Win32.ToastCOM.Notification
+namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     [GeneratedComClass]
     [ComVisible(true)]
@@ -35,7 +38,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
                     return unchecked((int)0x80004002); // Return CLASS_E_NOAGGREGATION
                 }
 
-                if (riid == IidGuid.GuidIClassFactory)
+                if (riid == ClassFactoryClsId.GuidIClassFactory)
                 {
                     ppvObject = (nint)ComInterfaceMarshaller<NotificationActivator>.ConvertToUnmanaged(_instance);
                 }

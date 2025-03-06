@@ -2,7 +2,7 @@
 using System.Xml;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace Hi3Helper.Win32.ToastCOM.Notification
+namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     /// <summary>
     /// Specifies a button shown in a toast.<br/>

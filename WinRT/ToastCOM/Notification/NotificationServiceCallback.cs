@@ -10,7 +10,7 @@ using DomXmlDocument = Windows.Data.Xml.Dom.XmlDocument;
 using DomXmlElement = Windows.Data.Xml.Dom.XmlElement;
 // ReSharper disable PartialTypeWithSinglePart
 
-namespace Hi3Helper.Win32.ToastCOM.Notification
+namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     /// <summary>
     /// An abstract class inherited by <seealso cref="NotificationService"/>.
@@ -28,7 +28,7 @@ namespace Hi3Helper.Win32.ToastCOM.Notification
 
         public Guid Initialize(string appName, string executablePath, string shortcutPath, Guid? applicationId = null, bool asElevatedUser = false)
         {
-            applicationId ??= ClsidGuid.GetGuidFromString(appName);
+            applicationId ??= Extensions.GetGuidFromString(appName);
 
             DesktopNotificationManagerCompat.RegisterAumidAndComServer(this, appName, executablePath, shortcutPath, applicationId.Value, asElevatedUser);
             DesktopNotificationManagerCompat.RegisterActivator(this, applicationId.Value, asElevatedUser);
