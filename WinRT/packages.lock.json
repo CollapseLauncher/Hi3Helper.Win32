@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net9.0-windows10.0.22621": {
+    "net9.0-windows10.0.26100": {
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Direct",
         "requested": "[9.0.2, )",
@@ -21,12 +21,6 @@
         "type": "Transitive",
         "resolved": "9.0.2",
         "contentHash": "MNe7GSTBf3jQx5vYrXF0NZvn6l7hUKF6J54ENfAgCO8y6xjN1XUmKKWG464LP2ye6QqDiA1dkaWEZBYnhoZzjg=="
-      },
-      "hi3helper.win32": {
-        "type": "Project",
-        "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "[9.0.2, )"
-        }
       }
     }
   }
