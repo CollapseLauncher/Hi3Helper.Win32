@@ -1,14 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices.Marshalling;
 using System.Xml;
 using Windows.UI.Notifications;
 using DomXmlDocument = Windows.Data.Xml.Dom.XmlDocument;
 using DomXmlElement = Windows.Data.Xml.Dom.XmlElement;
 // ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
@@ -25,13 +24,12 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
         #endregion
 
         #region Methods
-
-        public Guid Initialize(string appName, string executablePath, string shortcutPath, Guid? applicationId = null, bool asElevatedUser = false)
+        public Guid Initialize(string appName, string executablePath, string shortcutPath, Guid? applicationId = null, string? toastIconPngPath = null)
         {
             applicationId ??= Extensions.GetGuidFromString(appName);
 
-            DesktopNotificationManagerCompat.RegisterAumidAndComServer(this, appName, executablePath, shortcutPath, applicationId.Value, asElevatedUser);
-            DesktopNotificationManagerCompat.RegisterActivator(this, applicationId.Value, asElevatedUser);
+            DesktopNotificationManagerCompat.RegisterAumidAndComServer(this, appName, executablePath, shortcutPath, toastIconPngPath, applicationId.Value);
+            DesktopNotificationManagerCompat.RegisterActivator(this, applicationId.Value);
 
             return applicationId.Value;
         }
@@ -73,8 +71,10 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             DomXmlDocument domXmlDocument = new();
             domXmlDocument.LoadXml(xmlDocumentString);
 
-            ToastNotification toast = new(domXmlDocument);
-            toast.Tag = Guid.CreateVersion7().ToString();
+            ToastNotification toast = new(domXmlDocument)
+            {
+                Tag = Guid.CreateVersion7().ToString()
+            };
             return toast;
         }
 
@@ -114,32 +114,5 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             _desktopNotificationHistoryCompat?.Clear();
         }
         #endregion
-    }
-
-    public class Test
-    {
-        public static void TestMethod()
-        {
-            string processPath = Process.GetCurrentProcess().MainModule?.FileName ?? "";
-            NotificationService manager = new();
-
-            string appName = "Hi3Helper.Win32 ToastCOM Test";
-            manager.Initialize(
-                appName,
-                processPath,
-                Path.Combine("Collapse Launcher Team", appName));
-
-            NotificationContent content = NotificationContent.Create()
-                .SetTitle("Welcome to Collapse Launcher!")
-                .SetContent("You are currently selecting Honkai: Star Rail - Global as your game. There are more games awaits you, find out more!")
-                .SetAppLogoPath(@"Assets\Images/GameLogo\starrail-logo.png", true)
-                .AddAppHeroImagePath(@"Assets\Images\GamePoster/poster_starrail.png");
-
-            content.Duration = ToastDuration.Short;
-
-            ToastNotification toastNotification = manager.CreateToastNotification(content);
-            ToastNotifier toastNotifier = manager.CreateToastNotifier();
-            toastNotifier.Show(toastNotification);
-        }
     }
 }

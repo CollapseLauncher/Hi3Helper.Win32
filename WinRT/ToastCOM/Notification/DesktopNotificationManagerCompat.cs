@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
 using System.IO;
+using System.Security.Principal;
 using Windows.UI.Notifications;
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
@@ -28,7 +29,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
         #endregion
 
         #region Methods
-        internal static void RegisterAumidAndComServer<T>(T currentInstance, string aumId, string executablePath, string shortcutPath, Guid applicationId, bool asElevatedUser)
+        internal static void RegisterAumidAndComServer<T>(T currentInstance, string aumId, string executablePath, string shortcutPath, string? toastIconPngPath, Guid applicationId)
             where T : NotificationActivator
         {
             if (string.IsNullOrWhiteSpace(aumId))
@@ -46,8 +47,13 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 
             _aumId = aumId;
 
+            // Get the state whether the current process is being run by elevated user.
+            WindowsIdentity  currentUserIdentity  = WindowsIdentity.GetCurrent();
+            WindowsPrincipal currentUserPrincipal = new WindowsPrincipal(currentUserIdentity);
+            bool             asElevatedUser       = currentUserPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
+
             CreateAumidShortcut(currentInstance, aumId, executablePath, shortcutPath, applicationId, asElevatedUser);
-            RegisterComServer(currentInstance, executablePath, applicationId, asElevatedUser);
+            RegisterComServer(currentInstance, executablePath, toastIconPngPath, applicationId, asElevatedUser);
 
             _registeredAumIdAndComServer = true;
         }
@@ -137,7 +143,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             }
         }
 
-        private static void RegisterComServer<T>(T currentInstance, string exePath, Guid applicationId, bool asElevatedUser)
+        private static void RegisterComServer<T>(T currentInstance, string exePath, string? toastIconPng, Guid applicationId, bool asElevatedUser)
             where T : NotificationActivator
         {
             // Throw if the _aumId is blank
@@ -153,41 +159,45 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 
             // Add LOCAL_SERVER registration path
             RegistryKey regLocalServerKey = localKey.CreateSubKey(regLocalServerString);
-            regLocalServerKey.SetValue(null,             '"' + exePath + '"' + $" {ToastActivatedLaunchArg}", RegistryValueKind.ExpandString);
-            regLocalServerKey.SetValue("ServerExecutable", exePath, RegistryValueKind.ExpandString);
+            regLocalServerKey.SetValue(null, '"' + exePath + '"' + $" {ToastActivatedLaunchArg}", RegistryValueKind.String);
+            regLocalServerKey.SetValue("ServerExecutable", exePath, RegistryValueKind.String);
             currentInstance.Logger?.LogInformation($"[DesktopNotificationManagerCompat::RegisterComServer] Registered ComServer for toast registration: {(asElevatedUser ? "HKEY_LOCAL_MACHINE" : "HKEY_CURRENT_USER")}\\{regLocalServerString}");
 
-            // If asElevatedUser is enabled, then add "Elevation" key on COM Activator moniker
+            // If asElevatedUser is enabled, then tell the action center if the process is being run as "Interactive User"
+            // https://github.com/CommunityToolkit/WindowsCommunityToolkit/blob/c8f76d072df53d3622fb5440d63afb06cb9e7a10/Microsoft.Toolkit.Uwp.Notifications/Toasts/Compat/ToastNotificationManagerCompat.cs#L296
             if (asElevatedUser)
             {
-                // Remove one if the duplicated key from non-elevated user exist
-                RegistryKey  localKeyNonElevated = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
-                RegistryKey? regLocalServerKeyNonElevated = localKeyNonElevated.OpenSubKey(regLocalServerString);
-                if (regLocalServerKeyNonElevated != null)
-                {
-                    localKey.DeleteSubKeyTree(regLocalServerString);
-                }
-
-                RegistryKey monikerKey = localKey.CreateSubKey(monikerPath);
-                monikerKey.SetValue(null, _aumId, RegistryValueKind.String);
-                monikerKey.SetValue("AppID", $"{{{applicationId}}}");
-                monikerKey.SetValue("LocalizedString", _aumId);
-
-                string regElevateString = Path.Combine(monikerPath, "Elevation");
-                RegistryKey regElevateKey = localKey.CreateSubKey(regElevateString);
-                regElevateKey.SetValue("Enabled", 1, RegistryValueKind.DWord);
-                currentInstance.Logger?.LogInformation($"[DesktopNotificationManagerCompat::RegisterComServer] Activator will run under elevated access!");
+                string      actionCenterPath = @$"SOFTWARE\Classes\AppID\{{{applicationId}}}";
+                RegistryKey actionCenterKey  = localKey.CreateSubKey(actionCenterPath);
+                actionCenterKey.SetValue(null,    _aumId,             RegistryValueKind.String);
+                actionCenterKey.SetValue("RunAs", "Interactive User", RegistryValueKind.String);
             }
+
+            string      activatorAumidKeyString = @$"SOFTWARE\Classes\AppUserModelId\{_aumId}";
+            RegistryKey activatorAumidKey       = localKey.CreateSubKey(activatorAumidKeyString);
+            activatorAumidKey.SetValue("DisplayName",     _aumId,                 RegistryValueKind.String);
+            activatorAumidKey.SetValue("CustomActivator", $"{{{applicationId}}}", RegistryValueKind.String);
+
+            // If it has no custom toast icon defined or the file is not found, return
+            if (string.IsNullOrEmpty(toastIconPng) || !File.Exists(toastIconPng))
+            {
+                return;
+            }
+
+            // Otherwise, set the custom icon file for the toast
+            // https://github.com/CommunityToolkit/WindowsCommunityToolkit/blob/c8f76d072df53d3622fb5440d63afb06cb9e7a10/Microsoft.Toolkit.Uwp.Notifications/Toasts/Compat/ToastNotificationManagerCompat.cs#L296
+            activatorAumidKey.SetValue("IconBackgroundColor", "FFDDDDDD",   RegistryValueKind.String);
+            activatorAumidKey.SetValue("IconUri",             toastIconPng, RegistryValueKind.String);
         }
 
-        internal static void RegisterActivator<T>(T currentInstance, Guid applicationId, bool asElevatedUser)
+        internal static void RegisterActivator<T>(T currentInstance, Guid applicationId)
             where T : NotificationActivator
         {
             const CLSCTX    classContext = CLSCTX.CLSCTX_LOCAL_SERVER;
             const TagREGCLS registerFlag = TagREGCLS.REGCLS_MULTIPLEUSE;
 
             NotificationActivatorClassFactory classFactory = new();
-            classFactory.UseExistingInstance(currentInstance, asElevatedUser);
+            classFactory.UseExistingInstance(currentInstance);
 
             PInvoke.CoRegisterClassObject(
                 in applicationId,

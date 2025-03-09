@@ -19,12 +19,10 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
     public partial class NotificationActivatorClassFactory : IClassFactory
     {
         private NotificationActivator? _instance;
-        private bool _asElevatedUser;
 
-        public void UseExistingInstance(NotificationActivator instance, bool asElevatedUser)
+        public void UseExistingInstance(NotificationActivator instance)
         {
             _instance = instance;
-            _asElevatedUser = asElevatedUser;
         }
 
         public unsafe int CreateInstance(nint pUnkOuter, in Guid riid, out nint ppvObject)
