@@ -249,16 +249,26 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             currentInstance.Logger?.LogInformation($"[DesktopNotificationManagerCompat::RegisterActivator] Registered Toast Activator for application id: {applicationId} with CLSCTX: {classContext}");
         }
 
-
-        internal static ToastNotifier CreateToastNotifier()
+        internal static ToastNotifier? CreateToastNotifier(ILogger? logger, bool throwOnFault)
         {
-            EnsureRegistered();
+            try
+            {
+                EnsureRegistered();
 
-            return _aumId != null ?
-                // Non-Desktop Bridge
-                ToastNotificationManager.CreateToastNotifier(_aumId) :
-                // Desktop Bridge
-                ToastNotificationManager.CreateToastNotifier();
+                return _aumId != null ?
+                    // Non-Desktop Bridge
+                    ToastNotificationManager.CreateToastNotifier(_aumId) :
+                    // Desktop Bridge
+                    ToastNotificationManager.CreateToastNotifier();
+            }
+            catch
+            {
+                if (throwOnFault)
+                    throw;
+
+                logger?.LogError("Cannot create a toast notifier as the COM Activator is not registered. Returning null!");
+                return null;
+            }
         }
 
         /// <summary>
