@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.Marshalling;
@@ -78,8 +78,14 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             return toast;
         }
 
-        public ToastNotifier CreateToastNotifier()
-            => DesktopNotificationManagerCompat.CreateToastNotifier();
+        public ToastNotifier? CreateToastNotifier(bool throwOnFault =
+#if DEBUG
+            true
+#else
+            false
+#endif
+            )
+            => DesktopNotificationManagerCompat.CreateToastNotifier(Logger, throwOnFault);
 
         protected void AddInput(DomXmlDocument xml, params ToastAction[] paras)
         {
@@ -113,6 +119,6 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             _desktopNotificationHistoryCompat ??= new DesktopNotificationHistoryCompat(appid);
             _desktopNotificationHistoryCompat?.Clear();
         }
-        #endregion
+#endregion
     }
 }
