@@ -294,7 +294,16 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                     {
                         if (p.MainWindowHandle == nint.Zero)
                         {
-                            logger?.LogTrace("Process does not have window, skipping...");
+                            logger?.LogTrace($"Process {p.Id} does not have a window, stopping...");
+                            try
+                            {
+                                if (!p.CloseMainWindow()) // Try to gracefully kill
+                                    p.Kill(); // He's not joking around anymore
+                            }
+                            catch (Exception ex)
+                            {
+                                logger?.LogError(ex, $"Error closing window for PID {p.Id}");
+                            }
                             continue;
                         }
 
