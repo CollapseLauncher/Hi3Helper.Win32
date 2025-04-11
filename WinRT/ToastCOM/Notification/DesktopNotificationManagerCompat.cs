@@ -160,7 +160,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             bool isUwp = DesktopBridgeHelpers.IsRunningAsUwp();
 
             // Create the AUMID key from Current User root key
-            using RegistryKey? aumidKey = Registry.CurrentUser.CreateSubKey($@"SOFTWARE\Classes\AppUserModelId\{_aumId}", true);
+            using RegistryKey aumidKey = Registry.CurrentUser.CreateSubKey($@"SOFTWARE\Classes\AppUserModelId\{_aumId}", true);
             // If the app is non-UWP app, then set the "Identity" of the app, including the display name of the app.
             if (!isUwp)
             {
