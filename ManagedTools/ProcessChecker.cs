@@ -268,8 +268,8 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
         public static Process[] GetInstanceProcesses()
         {
-            Process   currentProcess = Process.GetCurrentProcess();
-            Process[] processes      = Process.GetProcessesByName(currentProcess.ProcessName);
+            using Process currentProcess = Process.GetCurrentProcess();
+            Process[]     processes      = Process.GetProcessesByName(currentProcess.ProcessName);
 
             return processes;
         }
@@ -288,8 +288,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                 logger?.LogTrace("Enumerating instances...");
                 foreach (Process p in instanceProc)
                 {
-                    // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-                    if (p == null) continue;
+                    if (p == null || curPId == p.Id) continue;
                     try
                     {
                         if (p.MainWindowHandle == nint.Zero)
@@ -318,6 +317,10 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                         logger?.LogError("Failed when trying to fetch an instance information! " +
                                      $"InstanceCount is not incremented.\r\n{ex}");
                         throw;
+                    }
+                    finally
+                    {
+                        p.Dispose();
                     }
                 }
 
