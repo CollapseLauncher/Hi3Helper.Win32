@@ -1,4 +1,6 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Structs;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.Native.LibraryImport
@@ -136,5 +138,24 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static unsafe partial bool SetPriorityClass(nint hProcess, PriorityClass dwPriorityClass);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "FindFirstFileExW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static unsafe partial nint FindFirstFileEx(string             lpFileName,
+                                                          FINDEX_INFO_LEVELS fInfoLevelId,
+                                                          WIN32_FIND_DATA*   lpFindFileData,
+                                                          FINDEX_SEARCH_OPS  fSearchOp,
+                                                          void*              lpSearchFilter,
+                                                          FINDEX_FLAGS       dwAdditionalFlags);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "FindNextFileW", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static unsafe partial bool FindNextFile(nint hFindFile, WIN32_FIND_DATA* lpFindFileData);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "FindClose", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool FindClose(nint hFindFile);
     }
 }
