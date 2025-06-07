@@ -286,11 +286,16 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                 int curPId = Environment.ProcessId;
                 logger?.LogTrace($"Detected {instanceCount} instances! Current PID: {curPId}");
                 logger?.LogTrace("Enumerating instances...");
-                foreach (Process p in instanceProc)
+                foreach (var p in instanceProc)
                 {
-                    if (p == null || curPId == p.Id) continue;
                     try
                     {
+                        p.Refresh();
+                        
+                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                        // Do null check anyway to prevent NullReferenceException
+                        if (p == null || p.HasExited || curPId == p.Id) continue;
+                        
                         if (p.MainWindowHandle == nint.Zero)
                         {
                             logger?.LogTrace($"Process {p.Id} does not have a window, stopping...");
