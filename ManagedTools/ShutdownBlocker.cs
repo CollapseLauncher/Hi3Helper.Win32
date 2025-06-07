@@ -1,11 +1,7 @@
-using Hi3Helper.Win32.Native.Enums;
 using Microsoft.Extensions.Logging;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 
 namespace Hi3Helper.Win32.ManagedTools
