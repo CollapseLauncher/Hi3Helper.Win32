@@ -22,6 +22,7 @@
         "resolved": "9.0.5",
         "contentHash": "cjnRtsEAzU73aN6W7vkWy8Phj5t3Xm78HSqgrbh/O4Q9SK/yN73wZVa21QQY6amSLQRQ/M8N+koGnY6PuvKQsw=="
       }
-    }
+    },
+    "net9.0/win-x64": {}
   }
 }
