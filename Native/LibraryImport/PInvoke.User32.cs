@@ -131,5 +131,13 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("user32.dll", EntryPoint = "MessageBoxW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         public static partial MessageBoxResult MessageBox(nint hWnd, string lpContent, string? lpTitle, MessageBoxFlags uType);
-    }
+        
+        [LibraryImport("user32.dll", EntryPoint = "ShutdownBlockReasonCreate", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool ShutdownBlockReasonCreate(nint hWnd, [MarshalAs(UnmanagedType.LPWStr)] string pwszReason);
+        
+        [LibraryImport("user32.dll", EntryPoint = "ShutdownBlockReasonDestroy", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool ShutdownBlockReasonDestroy(nint hWnd);
+        }
 }

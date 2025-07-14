@@ -30,6 +30,16 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool AllocConsole();
+        
+        [LibraryImport("kernel32.dll", EntryPoint = "FreeConsole", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool FreeConsole();
+        
+        [LibraryImport("kernel32.dll", EntryPoint = "AttachConsole", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool AttachConsole(uint dwProcessId);
 
         [LibraryImport("kernel32.dll", EntryPoint = "CreateFileW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
