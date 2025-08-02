@@ -9,6 +9,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+// ReSharper disable UnusedMember.Global
 
 // ReSharper disable CommentTypo
 // ReSharper disable StringLiteralTypo
@@ -210,11 +211,11 @@ public static class Dns
     /// <returns>Enumerable of the tuple of <seealso cref="IDNS_WITH_IPADDR"/> as the record and <see cref="uint"/> as the TTL</returns>
     /// <param name="token">A cancellation token to cancel the async operation.</param>
     public static async IAsyncEnumerable<(IDNS_WITH_IPADDR Record, uint TimeToLive)>
-        EnumerateIPAddressFromHostAsync(string   host,
-                                        bool     bypassCache  = false,
-                                        bool     zigzagResult = false,
-                                        ILogger? logger       = null,
-                                        [EnumeratorCancellation] CancellationToken token = default)
+        EnumerateIPAddressFromHostAsync(string                                     host,
+                                        bool                                       bypassCache  = false,
+                                        bool                                       zigzagResult = false,
+                                        ILogger?                                   logger       = null,
+                                        [EnumeratorCancellation] CancellationToken token        = default)
     {
         if (zigzagResult)
         {

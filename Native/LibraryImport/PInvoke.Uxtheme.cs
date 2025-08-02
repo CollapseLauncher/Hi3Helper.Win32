@@ -1,5 +1,7 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
 using System.Runtime.InteropServices;
+// ReSharper disable StringLiteralTypo
+#pragma warning disable CA1401
 
 namespace Hi3Helper.Win32.Native.LibraryImport
 {

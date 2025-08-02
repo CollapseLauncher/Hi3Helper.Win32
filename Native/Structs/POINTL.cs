@@ -1,4 +1,6 @@
 ﻿using System.Runtime.InteropServices;
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 
 namespace Hi3Helper.Win32.Native.Structs
 {

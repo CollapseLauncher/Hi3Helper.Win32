@@ -11,8 +11,10 @@ namespace Hi3Helper.Win32.Native.Interfaces
     [GeneratedComInterface]
     public partial interface IPersist
     {
+        /// <summary>
+        /// Returns the class identifier for the component object
+        /// </summary>
         [PreserveSig]
-        //[helpstring("Returns the class identifier for the component object")]
         void GetClassID(out Guid pClassID);
     }
 }

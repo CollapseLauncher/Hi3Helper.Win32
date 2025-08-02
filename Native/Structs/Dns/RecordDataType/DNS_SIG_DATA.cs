@@ -11,16 +11,16 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct DNS_SIG_DATA
     {
-        public char* pNameSigner;
+        public char*  pNameSigner;
         public ushort wTypeCovered;
-        public byte chAlgorithm;
-        public byte chLabelCount;
-        public uint dwOriginalTtl;
-        public uint dwExpiration;
-        public uint dwTimeSigned;
+        public byte   chAlgorithm;
+        public byte   chLabelCount;
+        public uint   dwOriginalTtl;
+        public uint   dwExpiration;
+        public uint   dwTimeSigned;
         public ushort wKeyTag;
         public ushort Pad;
-        public IntPtr Signature;      // BYTE  Signature[1];
+        public IntPtr Signature; // BYTE  Signature[1];
 
         public ReadOnlySpan<char> GetNameSigner() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pNameSigner);
 

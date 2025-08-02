@@ -3,30 +3,20 @@
 
 namespace Hi3Helper.Win32.ShellLinkCOM
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 4, Size = 0)]
-    // ReSharper disable once PartialTypeWithSinglePart
-    public partial struct Win32FindDataW
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe struct Win32FindDataW
     {
-        public uint dwFileAttributes; // 4
-        public Filetime ftCreationTime; // 12
-        public Filetime ftLastAccessTime; // 20
-        public Filetime ftLastWriteTime; // 28
-        public uint nFileSizeHigh; // 32
-        public uint nFileSizeLow; // 36
-        public uint dwReserved0; // 40
-        public uint dwReserved1; // 44
-
-        [MarshalAs(UnmanagedType.ByValArray,
-            // SizeConst = 260
-            SizeConst = 520
-            )]
-        public char[] cFileName;
-
-        [MarshalAs(UnmanagedType.ByValArray,
-            // SizeConst = 14
-            SizeConst = 28
-            )]
-        public char[] cAlternateFileName;
+        public uint     dwFileAttributes; // 4
+        public FileTime ftCreationTime;   // 12
+        public FileTime ftLastAccessTime; // 20
+        public FileTime ftLastWriteTime;  // 28
+        public uint     nFileSizeHigh;    // 32
+        public uint     nFileSizeLow;     // 36
+        public uint     dwReserved0;      // 40
+        public uint     dwReserved1;      // 44
+        
+        public fixed char cFileName[520];
+        public fixed char cAlternateFileName[28];
 
         public uint dwFileType;
         public uint dwCreatorType;

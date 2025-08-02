@@ -1,3 +1,4 @@
+// ReSharper disable InconsistentNaming
 namespace Hi3Helper.Win32.TaskbarListCOM
 {
     public class IIDGuid

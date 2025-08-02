@@ -1,4 +1,5 @@
-﻿namespace Hi3Helper.Win32.Native.Enums
+﻿// ReSharper disable UnusedMember.Global
+namespace Hi3Helper.Win32.Native.Enums
 {
     public enum PreferredAppMode
     {

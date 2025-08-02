@@ -11,8 +11,8 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     public struct DNS_KEY_DATA
     {
         public ushort wFlags;
-        public byte chProtocol;
-        public byte chAlgorithm;
-        public IntPtr Key;        // BYTE Key[1];
+        public byte   chProtocol;
+        public byte   chAlgorithm;
+        public IntPtr Key; // BYTE Key[1];
     }
 }

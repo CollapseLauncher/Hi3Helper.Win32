@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.TaskbarListCOM
 {
@@ -13,22 +14,22 @@ namespace Hi3Helper.Win32.TaskbarListCOM
         [PreserveSig]
         void HrInit();
         [PreserveSig]
-        void AddTab(nint hwnd);
+        void AddTab(nint windowHandle);
         [PreserveSig]
-        void DeleteTab(nint hwnd);
+        void DeleteTab(nint windowHandle);
         [PreserveSig]
-        void ActivateTab(nint hwnd);
+        void ActivateTab(nint windowHandle);
         [PreserveSig]
-        void SetActiveAlt(nint hwnd);
+        void SetActiveAlt(nint windowHandle);
 
         // ITaskbarList2
         [PreserveSig]
-        void MarkFullscreenWindow(nint hwnd, [MarshalAs(UnmanagedType.Bool)] bool fFullscreen);
+        void MarkFullscreenWindow(nint windowHandle, [MarshalAs(UnmanagedType.Bool)] bool fFullscreen);
 
         // ITaskbarList3
         [PreserveSig]
-        int SetProgressValue(nint hwnd, ulong ullCompleted, ulong ullTotal);
+        int SetProgressValue(nint windowHandle, ulong ullCompleted, ulong ullTotal);
         [PreserveSig]
-        int SetProgressState(nint hwnd, TaskbarState state);
+        int SetProgressState(nint windowHandle, TaskbarState state);
     }
 }

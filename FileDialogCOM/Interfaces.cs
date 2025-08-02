@@ -2,6 +2,9 @@ using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.FileDialogCOM
 {
@@ -13,7 +16,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
         // Not supported: IBindCtx
         void BindToHandler(nint pbc, ref Guid rbhid, ref Guid riid, out nint ppvOut);
 
-        void GetPropertyStore(int Flags, ref Guid riid, out nint ppv);
+        void GetPropertyStore(int flags, ref Guid riid, out nint ppv);
 
         void GetPropertyDescriptionList(ref PROPERTYKEY keyType, ref Guid riid, out nint ppv);
 
@@ -149,7 +152,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
 
         void GetProperties(out nint ppStore);
 
-        void ApplyProperties(IShellItem psi, nint pStore, ref nint hwnd, nint pSink);
+        void ApplyProperties(IShellItem psi, nint pStore, ref nint windowHandle, nint pSink);
     }
 
     [Guid(IIDGuid.IFileDialogEvents)]

@@ -10,7 +10,7 @@ namespace Hi3Helper.Win32.ManagedTools
     {
         private static ILogger? _logger;
         
-        public static void StartBlocking(nint hWnd, string reason, ILogger? logger)
+        public static void StartBlocking(nint windowHandle, string reason, ILogger? logger)
         {
             try
             {
@@ -18,21 +18,21 @@ namespace Hi3Helper.Win32.ManagedTools
                 _logger = logger;
                 
                 // Log the blocking reason
-                _logger?.LogInformation($"Starting shutdown block for reason: {reason}");
+                _logger?.LogInformation("Starting shutdown block for reason: {reason}", reason);
 
                 // Call the Windows API to block shutdown
-                if (!ShutdownBlockReasonCreate(hWnd, reason))
+                if (!ShutdownBlockReasonCreate(windowHandle, reason))
                 {
                     throw new Win32Exception("Failed to block shutdown. Error code: " + Marshal.GetLastWin32Error());
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Error while blocking shutdown!\r\n{ex.Message}");
+                _logger?.LogError(ex, "Error while blocking shutdown!");
             }
         }
         
-        public static void StopBlocking(nint hWnd, ILogger? logger)
+        public static void StopBlocking(nint windowHandle, ILogger? logger)
         {
             try
             {
@@ -43,14 +43,14 @@ namespace Hi3Helper.Win32.ManagedTools
                 _logger?.LogInformation("Stopping shutdown block");
 
                 // Call the Windows API to remove the shutdown block
-                if (!ShutdownBlockReasonDestroy(hWnd))
+                if (!ShutdownBlockReasonDestroy(windowHandle))
                 {
                     throw new Win32Exception("Failed to remove shutdown block. Error code: " + Marshal.GetLastWin32Error());
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Error while stopping shutdown block!\r\n{ex.Message}");
+                _logger?.LogError(ex, "Error while stopping shutdown block!");
             }
         }
     }

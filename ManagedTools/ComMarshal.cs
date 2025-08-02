@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 
-namespace Hi3Helper.Win32.Native.ManagedTools
+namespace Hi3Helper.Win32.ManagedTools
 {
     // ReSharper disable once PartialTypeWithSinglePart
     public static class ComMarshal

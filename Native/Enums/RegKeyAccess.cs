@@ -1,4 +1,5 @@
 ﻿using System;
+// ReSharper disable InconsistentNaming
 
 namespace Hi3Helper.Win32.Native.Enums
 {
@@ -6,6 +7,6 @@ namespace Hi3Helper.Win32.Native.Enums
     public enum RegKeyAccess : uint
     {
         KEY_QUERY_VALUE = 0x0001,
-        KEY_NOTIFY = 0x0010
+        KEY_NOTIFY      = 0x0010
     }
 }

@@ -1,8 +1,8 @@
-﻿using Hi3Helper.Win32.Native.ClassIds;
+﻿using Hi3Helper.Win32.ManagedTools;
+using Hi3Helper.Win32.Native.ClassIds;
 using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
-using Hi3Helper.Win32.Native.ManagedTools;
 using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Buffers;
@@ -14,12 +14,15 @@ using System.Runtime.Versioning;
 // ReSharper disable NotAccessedField.Local
 // ReSharper disable PartialTypeWithSinglePart
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable CommentTypo
 
 #pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 namespace Hi3Helper.Win32.ShellLinkCOM
 {
-    unsafe delegate void ToDelegateInvoke(char* buffer, int length);
-    unsafe delegate void ToDelegateWithW32FindDataInvoke(char* buffer, nint findDataPtr, int length);
+    internal unsafe delegate void ToDelegateInvoke(char* buffer, int length);
+
+    internal unsafe delegate void ToDelegateWithW32FindDataInvoke(char* buffer, nint findDataPtr, int length);
 
     [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
     public partial class ShellLink : IDisposable
@@ -64,16 +67,16 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// <summary>
         /// Dispose the object, releasing the COM ShellLink object
         /// </summary>
-        public void Dispose() => ComMarshal.FreeInstance(_linkW);
-
-        public string? ShortCutFile
+        public void Dispose()
         {
-            get => field;
-            set => field = value;
+            ComMarshal.FreeInstance(_linkW);
+            GC.SuppressFinalize(this);
         }
 
+        public string? ShortcutFile { get; set; }
+
         /// <summary>
-        /// This pointer must be destroyed with DistroyIcon when you are done with it.
+        /// This pointer must be destroyed with DestroyIcon when you are done with it.
         /// </summary>
         /// <param name="large">Whether to return the small or large icon</param>
         public nint GetIcon(bool large)
@@ -98,14 +101,15 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             }
 
             // Use ExtractIconEx to get the icon:
-            nint[] hIconEx   = [nint.Zero];
+            nint[] hIconEx  = [nint.Zero];
+            nint   hIconExP = Marshal.UnsafeAddrOfPinnedArrayElement(hIconEx, 0);
             if (large)
             {
                 PInvoke.ExtractIconEx(
                                       iconFile,
                                       iconIndex,
-                                      hIconEx,
-                                      null,
+                                      hIconExP,
+                                      nint.Zero,
                                       1);
             }
             else
@@ -113,8 +117,8 @@ namespace Hi3Helper.Win32.ShellLinkCOM
                 PInvoke.ExtractIconEx(
                                       iconFile,
                                       iconIndex,
-                                      null,
-                                      hIconEx,
+                                      nint.Zero,
+                                      hIconExP,
                                       1);
             }
 
@@ -222,8 +226,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
 
         private static unsafe string GetStringAndW32FindDataFromIMethod(int length, ToDelegateWithW32FindDataInvoke toInvokeDelegate)
         {
-            int    sizeOfFindData = sizeof(Win32FindDataW);
-
+            int    sizeOfFindData      = sizeof(Win32FindDataW);
             byte[] win32FindDataBuffer = new byte[sizeOfFindData];
             char[] buffer              = ArrayPool<char>.Shared.Rent(length);
             try
@@ -332,9 +335,9 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// the UI behaviour if the shortcut's target isn't found to be set.
         /// </summary>
         /// <param name="linkFile">The shortcut file (.lnk) to load</param>
-        /// <param name="hWnd">The window handle of the application's UI, if any</param>
+        /// <param name="windowHandle">The window handle of the application's UI, if any</param>
         /// <param name="resolveFlags">Flags controlling resolution behaviour</param>
-        public void Open(string linkFile, nint hWnd, EShellLinkResolveFlags resolveFlags) => Open(linkFile, hWnd, resolveFlags, 1);
+        public void Open(string linkFile, nint windowHandle, EShellLinkResolveFlags resolveFlags) => Open(linkFile, windowHandle, resolveFlags, 1);
 
         /// <summary>
         /// Loads a shortcut from the specified file, and allows flags controlling
@@ -342,13 +345,13 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// no SLR_NO_UI is specified, you can also specify a timeout.
         /// </summary>
         /// <param name="linkFile">The shortcut file (.lnk) to load</param>
-        /// <param name="hWnd">The window handle of the application's UI, if any</param>
+        /// <param name="windowHandle">The window handle of the application's UI, if any</param>
         /// <param name="resolveFlags">Flags controlling resolution behaviour</param>
         /// <param name="timeOut">Timeout if SLR_NO_UI is specified, in ms.</param>
-        public void Open(string linkFile, nint hWnd, EShellLinkResolveFlags resolveFlags, ushort timeOut)
+        public void Open(string linkFile, nint windowHandle, EShellLinkResolveFlags resolveFlags, ushort timeOut)
         {
             _persistFileW?.Load(linkFile, 0);
-            this._shortcutFile = linkFile;
+            _shortcutFile = linkFile;
         }
     }
 
@@ -360,46 +363,32 @@ namespace Hi3Helper.Win32.ShellLinkCOM
     [SupportedOSPlatform("windows")]
     public class FileIcon
     {
-        string? _fileName;
-        string? _displayName;
-        string? _typeName;
-        SHGetFileInfoConstants _flags;
-        nint _fileIcon;
-
         /// <summary>
         /// Gets/sets the flags used to extract the icon
         /// </summary>
-        public SHGetFileInfoConstants Flags
-        {
-            get => _flags;
-            set => _flags = value;
-        }
+        public SHGetFileInfoConstants Flags { get; set; }
 
         /// <summary>
         /// Gets/sets the filename to get the icon for
         /// </summary>
-        public string? FileName
-        {
-            get => _fileName;
-            set => _fileName = value;
-        }
+        public string? FileName { get; set; }
 
         /// <summary>
         /// Gets the icon for the chosen file
         /// </summary>
-        public nint ShellIcon => _fileIcon;
+        public nint ShellIcon { get; private set; }
 
         /// <summary>
         /// Gets the display name for the selected file
         /// if the SHGFI_DISPLAYNAME flag was set.
         /// </summary>
-        public string? DisplayName => _displayName;
+        public string? DisplayName { get; private set; }
 
         /// <summary>
         /// Gets the type name for the selected file
         /// if the SHGFI_TYPENAME flag was set.
         /// </summary>
-        public string? TypeName => _typeName;
+        public string? TypeName { get; private set; }
 
         /// <summary>
         ///  Gets the information for the specified 
@@ -407,27 +396,26 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         private unsafe void GetInfo()
         {
-            _fileIcon = nint.Zero;
-            _typeName = "";
-            _displayName = "";
+            ShellIcon   = nint.Zero;
+            TypeName    = "";
+            DisplayName = "";
 
-            int shfiSize = sizeof(SHFILEINFOW);
+            int  shfiSize   = sizeof(SHFILEINFOW);
             nint shfiHandle = Marshal.AllocCoTaskMem(shfiSize);
 
             try
             {
-                nint ret = PInvoke.SHGetFileInfo(
-                    _fileName ?? string.Empty, 0, shfiHandle, (uint)shfiSize, (uint)_flags);
+                nint ret = PInvoke.SHGetFileInfo(FileName ?? string.Empty, 0, shfiHandle, (uint)shfiSize, (uint)Flags);
                 ref SHFILEINFOW shfi = ref Unsafe.AsRef<SHFILEINFOW>((void*)shfiHandle);
 
                 if (ret != nint.Zero)
                 {
                     if (shfi.hIcon != nint.Zero)
                     {
-                        _fileIcon = shfi.hIcon; // need to dispose this
+                        ShellIcon = shfi.hIcon; // need to dispose this
                     }
-                    _typeName = shfi.szTypeName;
-                    _displayName = shfi.szDisplayName;
+                    TypeName    = shfi.szTypeName;
+                    DisplayName = shfi.szDisplayName;
                 }
                 else
                 {
@@ -447,11 +435,11 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         public FileIcon()
         {
-            _flags = SHGetFileInfoConstants.SHGFI_ICON |
-                SHGetFileInfoConstants.SHGFI_DISPLAYNAME |
-                SHGetFileInfoConstants.SHGFI_TYPENAME |
-                SHGetFileInfoConstants.SHGFI_ATTRIBUTES |
-                SHGetFileInfoConstants.SHGFI_EXETYPE;
+            Flags = SHGetFileInfoConstants.SHGFI_ICON |
+                    SHGetFileInfoConstants.SHGFI_DISPLAYNAME |
+                    SHGetFileInfoConstants.SHGFI_TYPENAME |
+                    SHGetFileInfoConstants.SHGFI_ATTRIBUTES |
+                    SHGetFileInfoConstants.SHGFI_EXETYPE;
         }
 
         /// <summary>
@@ -464,7 +452,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         public FileIcon(string fileName)
             : this()
         {
-            this._fileName = fileName;
+            FileName = fileName;
             GetInfo();
         }
 
@@ -479,8 +467,8 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// icon and other shell information.</param>
         public FileIcon(string fileName, SHGetFileInfoConstants flags)
         {
-            this._fileName = fileName;
-            this._flags = flags;
+            FileName = fileName;
+            Flags    = flags;
             GetInfo();
         }
     }

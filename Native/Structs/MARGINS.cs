@@ -1,4 +1,7 @@
-﻿namespace Hi3Helper.Win32.Native.Structs
+﻿// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+namespace Hi3Helper.Win32.Native.Structs
 {
     public struct MARGINS
     {

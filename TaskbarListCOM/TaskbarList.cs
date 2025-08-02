@@ -1,12 +1,12 @@
+using Hi3Helper.Win32.ManagedTools;
 using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.ManagedTools;
 using System;
 
 namespace Hi3Helper.Win32.TaskbarListCOM
 {
     public class TaskbarList
     {
-        private readonly ITaskbarList3? m_taskbarList;
+        private readonly ITaskbarList3? _taskbarList;
 
         public TaskbarList()
         {
@@ -16,7 +16,7 @@ namespace Hi3Helper.Win32.TaskbarListCOM
                                           0,
                                           CLSCTX.CLSCTX_INPROC_SERVER,
                                           out ITaskbarList3? taskbarList).ThrowOnFailure();
-                m_taskbarList = taskbarList;
+                _taskbarList = taskbarList;
             }
             catch (Exception)
             {
@@ -26,17 +26,17 @@ namespace Hi3Helper.Win32.TaskbarListCOM
 
         ~TaskbarList()
         {
-            if (m_taskbarList != null)
+            if (_taskbarList != null)
             {
-                ComMarshal.FreeInstance(m_taskbarList);
+                ComMarshal.FreeInstance(_taskbarList);
             }
         }
 
-        public int SetProgressState(nint hwnd, TaskbarState state)
+        public int SetProgressState(nint windowHandle, TaskbarState state)
         {
             try
             {
-                return m_taskbarList?.SetProgressState(hwnd, state) ?? 0;
+                return _taskbarList?.SetProgressState(windowHandle, state) ?? 0;
             }
             catch (Exception)
             {
@@ -44,11 +44,11 @@ namespace Hi3Helper.Win32.TaskbarListCOM
             }
         }
 
-        public int SetProgressValue(nint hwnd, ulong ullCompleted, ulong ullTotal)
+        public int SetProgressValue(nint windowHandle, ulong ullCompleted, ulong ullTotal)
         {
             try
             {
-                return m_taskbarList?.SetProgressValue(hwnd, ullCompleted, ullTotal) ?? 0;
+                return _taskbarList?.SetProgressValue(windowHandle, ullCompleted, ullTotal) ?? 0;
             }
             catch (Exception)
             {

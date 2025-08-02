@@ -11,14 +11,14 @@ namespace Hi3Helper.Win32.Native.Structs.Dns
         public const DnsQueryOptions DefaultQueryOptions = DnsQueryOptions.DNS_QUERY_ACCEPT_TRUNCATED_RESPONSE;
         public delegate void DnsQueryCompletionRoutine(nint pQueryContext, nint pQueryResults);
 
-        public uint            Version;
-        public char*           QueryName;
-        public DnsRecordTypes  QueryType;
-        public ulong           QueryOptions;
-        public void*           pDnsServerList;
-        public uint            InterfaceIndex;
-        public void*           pQueryCompletionCallback;
-        public void*           pQueryContext;
+        public uint           Version;
+        public char*          QueryName;
+        public DnsRecordTypes QueryType;
+        public ulong          QueryOptions;
+        public void*          pDnsServerList;
+        public uint           InterfaceIndex;
+        public void*          pQueryCompletionCallback;
+        public void*          pQueryContext;
 
         /// <summary>
         /// Reserved. If you need to set this field, you must set the Version field to 3.<br/>

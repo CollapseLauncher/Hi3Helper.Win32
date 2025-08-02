@@ -8,27 +8,28 @@ using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ShiftExpressionZeroLeftOperand
 
-namespace Hi3Helper.Win32.Native.ManagedTools;
+namespace Hi3Helper.Win32.ManagedTools;
 
 public static class DriveTypeChecker
 {
     // For CreateFile to get handle to drive
-    private const uint GENERIC_READ             = 0x80000000;
-    private const uint GENERIC_WRITE            = 0x40000000;
-    private const uint FILE_SHARE_READ          = 0x00000001;
-    private const uint FILE_SHARE_WRITE         = 0x00000002;
-    private const uint OPEN_EXISTING            = 0x00000003;
-    private const uint FILE_ATTRIBUTE_NORMAL    = 0x00000080;
+    private const uint GenericRead         = 0x80000000;
+    private const uint GenericWrite        = 0x40000000;
+    private const uint FileShareRead       = 0x00000001;
+    private const uint FileShareWrite      = 0x00000002;
+    private const uint OpenExisting        = 0x00000003;
+    private const uint FileAttributeNormal = 0x00000080;
 
-    private const uint FILE_DEVICE_MASS_STORAGE     = 0x0000002D;
-    private const uint FILE_ANY_ACCESS              = 0x00000000;
-    private const uint METHOD_BUFFERED              = 0x00000000;
-    private const uint IOCTL_STORAGE_BASE           = FILE_DEVICE_MASS_STORAGE;
-    private const uint FILE_DEVICE_CONTROLLER       = 0x00000004;
-    private const uint IOCTL_SCSI_BASE              = FILE_DEVICE_CONTROLLER;
-    private const uint FILE_READ_ACCESS             = 0x00000001;
-    private const uint FILE_WRITE_ACCESS            = 0x00000002;
-    private const uint IOCTL_STORAGE_QUERY_PROPERTY = (IOCTL_STORAGE_BASE << 16) | (FILE_ANY_ACCESS << 14) | (0x500 << 2) | METHOD_BUFFERED;
+    private const uint FileDeviceMassStorage = 0x0000002D;
+    private const uint FileAnyAccess         = 0x00000000;
+    private const uint MethodBuffered        = 0x00000000;
+    private const uint IoctlStorageBase      = FileDeviceMassStorage;
+    private const uint FileDeviceController  = 0x00000004;
+    private const uint IoctlScsiBase         = FileDeviceController;
+    private const uint FileReadAccess        = 0x00000001;
+    private const uint FileWriteAccess       = 0x00000002;
+
+    private const uint IoctlStorageQueryProperty = (IoctlStorageBase << 16) | (FileAnyAccess << 14) | (0x500 << 2) | MethodBuffered;
 
     public static bool IsDriveSsd(FileInfo fileInfo, ILogger? logger = null) =>
         IsDriveSsd(fileInfo.FullName, logger);
@@ -94,7 +95,7 @@ public static class DriveTypeChecker
             nint trimDescPtr = queryPtr + querySize; // Set offset, move forward from query buffer
             if (DeviceIoControl(
                 hDevice,
-                IOCTL_STORAGE_QUERY_PROPERTY,
+                IoctlStorageQueryProperty,
                 queryPtr,
                 (uint)querySize,
                 trimDescPtr,
@@ -140,7 +141,7 @@ public static class DriveTypeChecker
             nint seekPenaltyDescPtr = queryPtr + querySize; // Set offset, move forward from query buffer
             if (DeviceIoControl(
                 hDevice,
-                IOCTL_STORAGE_QUERY_PROPERTY,
+                IoctlStorageQueryProperty,
                 queryPtr,
                 (uint)querySize,
                 seekPenaltyDescPtr,

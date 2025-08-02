@@ -1,12 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
-
-// ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
 
 namespace Hi3Helper.Win32.FileDialogCOM
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal partial struct PROPERTYKEY
+    internal struct PROPERTYKEY
     {
         internal Guid fmtid;
         internal uint pid;

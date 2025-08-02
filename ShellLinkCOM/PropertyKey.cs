@@ -7,7 +7,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
     [StructLayout(LayoutKind.Sequential)]
     public struct PropertyKey
     {
-        public Guid formatId;
+        public Guid  formatId;
         public nuint pid;
 
         public static PropertyKey PkeyAppUserModelID
@@ -17,7 +17,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
                 return new PropertyKey
                 {
                     formatId = Guid.ParseExact("{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}", "B"),
-                    pid = new nuint(5),
+                    pid = new nuint(5)
                 };
             }
         }
@@ -29,7 +29,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
                 return new PropertyKey
                 {
                     formatId = Guid.ParseExact("{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}", "B"),
-                    pid = new nuint(26),
+                    pid = new nuint(26)
                 };
             }
         }

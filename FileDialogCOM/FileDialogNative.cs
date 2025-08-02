@@ -1,11 +1,12 @@
+using Hi3Helper.Win32.ManagedTools;
 using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.ManagedTools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 // ReSharper disable ForCanBeConvertedToForeach
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.FileDialogCOM
 {
@@ -67,12 +68,12 @@ namespace Hi3Helper.Win32.FileDialogCOM
 
                 if (isMultiple)
                 {
-                    dialog.GetResults(out IShellItemArray? resShell);
+                    dialog.GetResults(out IShellItemArray resShell);
                     return new ValueTask<object>(GetIShellItemArray(resShell));
                 }
                 else
                 {
-                    dialog.GetResult(out IShellItem? resShell);
+                    dialog.GetResult(out IShellItem resShell);
                     resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
                     return new ValueTask<object>(ComPtrToUnicodeString(resultPtr) ?? "");
                 }
@@ -105,7 +106,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
                 dialog!.SetOptions(mode);
                 if (dialog.Show(_parentHandler) < 0) return new ValueTask<string>(defaultValue);
 
-                dialog.GetResult(out IShellItem? resShell);
+                dialog.GetResult(out IShellItem resShell);
                 resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
                 return new ValueTask<string>(ComPtrToUnicodeString(resultPtr) ?? "");
             }

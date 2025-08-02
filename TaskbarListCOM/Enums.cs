@@ -1,3 +1,4 @@
+// ReSharper disable UnusedMember.Global
 namespace Hi3Helper.Win32.TaskbarListCOM
 {
     public enum TaskbarState
