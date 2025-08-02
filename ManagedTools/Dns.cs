@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 // ReSharper disable UnusedMember.Global
@@ -330,7 +331,7 @@ public static class Dns
             // Free the record array if it's not null
             if (result != nint.Zero)
             {
-                PInvoke.DnsRecordListFree(result, DNS_FREE_TYPE.DnsFreeFlat);
+                PInvoke.DnsRecordListFree(result, DNS_FREE_TYPE.DnsFreeRecordList);
             }
         }
     }
@@ -359,15 +360,23 @@ public static class Dns
             options |= DnsQueryOptions.DNS_QUERY_BYPASS_CACHE;
         }
 
-        DNS_QUERY_CANCEL   queryCancel  = DNS_QUERY_CANCEL.Create();
-        DNS_QUERY_RESULT   queryResult  = DNS_QUERY_RESULT.Create();
-        DNS_QUERY_REQUEST3 queryRequest = DNS_QUERY_REQUEST3.Create(host, Impl, recordType, options);
+        DNS_QUERY_CANCEL*   queryCancel  = DNS_QUERY_CANCEL.Create();
+        DNS_QUERY_RESULT*   queryResult  = DNS_QUERY_RESULT.Create();
+        DNS_QUERY_REQUEST3* queryRequest = DNS_QUERY_REQUEST3.Create(host, Impl, recordType, options);
 
-        DnsStatus status = PInvoke.DnsQueryEx(in queryRequest, ref queryResult, ref queryCancel);
+        tcs.Task
+           .GetAwaiter()
+           .OnCompleted(() =>
+                        {
+                            NativeMemory.Free(queryCancel);
+                            NativeMemory.Free(queryResult);
+                            NativeMemory.Free(queryRequest);
+                        });
+
+        DnsStatus status = PInvoke.DnsQueryEx(queryRequest, queryResult, queryCancel);
         if (status == DnsStatus.Success)
         {
-            DNS_QUERY_REQUEST3* queryRequestP = &queryRequest;
-            Impl(nint.Zero, (nint)queryRequestP);
+            Impl(nint.Zero, (nint)queryRequest);
         }
         else if (status is not DnsStatus.DnsRequestPending)
         {
@@ -377,7 +386,7 @@ public static class Dns
         {
             token.Register(() =>
                            {
-                               PInvoke.DnsCancelQuery(in queryCancel);
+                               PInvoke.DnsCancelQuery(queryCancel);
                                tcs.SetCanceled(token);
                            });
         }
@@ -386,7 +395,7 @@ public static class Dns
 
         Win32Exception GetWin32ExceptionFromStatus(DnsStatus value)
             => new Win32Exception((int)value,
-                                  $"Failed while trying to get DNS query of: {host} ({recordType}) with error: {(int)value}/{value}");
+                                  $"Failed while trying to get DNS query of: {host} ({recordType}) with error: {(int)value}/{value} ({Marshal.GetPInvokeErrorMessage((int)value)})");
 
         void Impl(nint pQueryContext, nint pQueryResults)
         {

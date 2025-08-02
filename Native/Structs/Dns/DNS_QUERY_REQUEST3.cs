@@ -48,7 +48,7 @@ namespace Hi3Helper.Win32.Native.Structs.Dns
         /// </summary>
         public void* pCustomServers;
 
-        public static DNS_QUERY_REQUEST3 Create(
+        public static DNS_QUERY_REQUEST3* Create(
             string                    hostnameToQuery,
             DnsQueryCompletionRoutine completionCallback,
             DnsRecordTypes            recordType,
@@ -57,14 +57,15 @@ namespace Hi3Helper.Win32.Native.Structs.Dns
             fixed (char* hostnameToQueryP = &Utf16StringMarshaller.GetPinnableReference(hostnameToQuery))
             {
                 void* completionCallbackP = (void*)Marshal.GetFunctionPointerForDelegate(completionCallback);
-                return new DNS_QUERY_REQUEST3
-                {
-                    Version                  = 1,
-                    QueryName                = hostnameToQueryP,
-                    QueryType                = recordType,
-                    QueryOptions             = (ulong)queryOptions,
-                    pQueryCompletionCallback = completionCallbackP
-                };
+                DNS_QUERY_REQUEST3* ptr = (DNS_QUERY_REQUEST3*)NativeMemory.AllocZeroed((nuint)sizeof(DNS_QUERY_REQUEST3));
+
+                ptr->Version                  = 1;
+                ptr->QueryName                = hostnameToQueryP;
+                ptr->QueryType                = recordType;
+                ptr->QueryOptions             = (ulong)queryOptions;
+                ptr->pQueryCompletionCallback = completionCallbackP;
+
+                return ptr;
             }
         }
     }

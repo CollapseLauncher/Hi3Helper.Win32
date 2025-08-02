@@ -17,11 +17,11 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("dnsapi.dll", EntryPoint = "DnsQueryEx", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static partial DnsStatus DnsQueryEx(in DNS_QUERY_REQUEST3 requestQuery, ref DNS_QUERY_RESULT queryResult, ref DNS_QUERY_CANCEL queryCancel);
+        public static unsafe partial DnsStatus DnsQueryEx(DNS_QUERY_REQUEST3* requestQuery, DNS_QUERY_RESULT* queryResult, DNS_QUERY_CANCEL* queryCancel);
 
         [LibraryImport("dnsapi.dll", EntryPoint = "DnsCancelQuery", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static partial DnsStatus DnsCancelQuery(in DNS_QUERY_CANCEL queryCancel);
+        public static unsafe partial DnsStatus DnsCancelQuery(DNS_QUERY_CANCEL* queryCancel);
 
         public static unsafe void DnsRecordListFree(nint ppQueryResultsSet, DNS_FREE_TYPE freeType)
             => DnsRecordListFree((DNS_RECORD*)ppQueryResultsSet, freeType);
