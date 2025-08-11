@@ -95,17 +95,21 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             }
 
             // If ToastCommands is not empty, add actions
-            if (ToastCommands.Count != 0)
+            if (ToastCommands.Count == 0)
             {
-                XmlNode? xmlActionsElement = xmlToastRootElement?.AppendChild(_xml.CreateElement("actions"));
-                if (xmlActionsElement != null)
-                {
-                    // Enumerate and create command action
-                    foreach (ToastCommand toastCommand in ToastCommands)
-                    {
-                        xmlActionsElement.AppendChild(toastCommand.GetXmlNode(_xml));
-                    }
-                }
+                return _xml;
+            }
+
+            XmlNode? xmlActionsElement = xmlToastRootElement?.AppendChild(_xml.CreateElement("actions"));
+            if (xmlActionsElement == null)
+            {
+                return _xml;
+            }
+
+            // Enumerate and create command action
+            foreach (ToastCommand toastCommand in ToastCommands)
+            {
+                xmlActionsElement.AppendChild(toastCommand.GetXmlNode(_xml));
             }
 
             return _xml;

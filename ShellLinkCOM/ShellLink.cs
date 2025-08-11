@@ -414,8 +414,15 @@ namespace Hi3Helper.Win32.ShellLinkCOM
                     {
                         ShellIcon = shfi.hIcon; // need to dispose this
                     }
-                    TypeName    = shfi.szTypeName;
-                    DisplayName = shfi.szDisplayName;
+
+                    fixed (char* typeName = shfi.szTypeName)
+                    {
+                        fixed (char* displayName = shfi.szDisplayName)
+                        {
+                            TypeName    = new string(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(typeName));
+                            DisplayName = new string(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(displayName));
+                        }
+                    }
                 }
                 else
                 {
@@ -445,7 +452,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// <summary>
         /// Constructs a new instance of the FileIcon class
         /// and retrieves the icon, display name and type name
-        /// for the specified file.      
+        /// for the specified file.
         /// </summary>
         /// <param name="fileName">The filename to get the icon, 
         /// display name and type name for</param>

@@ -10,6 +10,7 @@ using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable PartialTypeWithSinglePart
 // ReSharper disable NotAccessedField.Local
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
 namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
@@ -51,7 +52,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             {
                 ComInterfaceMarshaller<NotificationService>.Free((void*)ppvObject);
             #if DEBUG
-                _instance?.Logger?.LogDebug($"[NotificationActivatorClassFactory::CreateInstance] NotificationActivator has been created successfully! (pUnkOuter: 0x{pUnkOuter:x8} riid: {riid} ppvObject: 0x{ppvObject:x8})");
+                _instance?.Logger?.LogDebug("[NotificationActivatorClassFactory::CreateInstance] NotificationActivator has been created successfully! (pUnkOuter: 0x{pUnkOuter} riid: {riid} ppvObject: {ppvObject})", pUnkOuter, riid, ppvObject);
             #endif
             }
         }

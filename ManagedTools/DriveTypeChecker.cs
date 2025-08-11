@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ShiftExpressionZeroLeftOperand
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.ManagedTools;
 
@@ -36,24 +37,26 @@ public static class DriveTypeChecker
     
     public static bool IsDriveSsd(string path, ILogger? logger = null)
     {
-        if (string.IsNullOrWhiteSpace(path))
+        if (string.IsNullOrWhiteSpace(path) ||
+            path.Length == 0)
         {
-            logger?.LogError(new ArgumentException("Path cannot be null or empty", nameof(path)).ToString());
+            logger?.LogError(new ArgumentException("Path cannot be null or empty", nameof(path)), "Argument {} has invalid value!", nameof(path));
             return true; // Assume SSD
         }
 
         string? pathRoot = Path.GetPathRoot(path);
-        if (string.IsNullOrWhiteSpace(pathRoot))
+        if (string.IsNullOrWhiteSpace(pathRoot) ||
+            pathRoot.Length == 0)
         {
-            logger?.LogError(new ArgumentException("Invalid path", nameof(path)).ToString());
+            logger?.LogError(new ArgumentException("Invalid Root Path", nameof(path)), "Argument {} has invalid value!", nameof(path));
             return true; // Assume SSD
         }
-        
-        string    devicePath = $@"\\.\{pathRoot[..^1]}";
+
+        string devicePath = $@"\\.\{pathRoot[..^1]}";
         nint   hDevice    = CreateFile(devicePath, 0, 3, nint.Zero, 3, 0, nint.Zero);
         if (hDevice == nint.Zero || hDevice == new nint(-1))
         {
-            logger?.LogError(new IOException($"Unable to open drive: {pathRoot}. Error: {Win32Error.GetLastWin32ErrorMessage()}").ToString());
+            logger?.LogError(new IOException($"Unable to open drive: {pathRoot}.", Marshal.GetLastWin32Error()), "Unable to open drive due to an IO related error.");
             return true; // Assume SSD
         }
 
@@ -87,9 +90,9 @@ public static class DriveTypeChecker
         nint queryPtr = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
         try
         {
-            STORAGE_PROPERTY_QUERY* query   = (STORAGE_PROPERTY_QUERY*)queryPtr;
-            query->PropertyId               = 8; // StorageDeviceTrimProperty
-            query->QueryType                = 0;
+            STORAGE_PROPERTY_QUERY* query = (STORAGE_PROPERTY_QUERY*)queryPtr;
+            query->PropertyId = 8; // StorageDeviceTrimProperty
+            query->QueryType  = 0;
 
             // Assign buffer for DEVICE_TRIM_DESCRIPTOR
             nint trimDescPtr = queryPtr + querySize; // Set offset, move forward from query buffer
@@ -109,7 +112,7 @@ public static class DriveTypeChecker
             }
             else
             {
-                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {Win32Error.GetLastWin32ErrorMessage()}").ToString());
+                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {Win32Error.GetLastWin32ErrorMessage()}", Marshal.GetLastWin32Error()), "IO related issue has occurred!");
                 return false; // Assume SSD
             }
         }
@@ -155,7 +158,7 @@ public static class DriveTypeChecker
             }
             else
             {
-                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {Win32Error.GetLastWin32ErrorMessage()}").ToString());
+                logger?.LogError(new IOException($"DeviceIoControl failed. Error: {Win32Error.GetLastWin32ErrorMessage()}", Marshal.GetLastWin32Error()), "IO related issue has occurred!");
                 return true; // Assume SSD
             }
         }
