@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+// ReSharper disable IdentifierTypo
 
 namespace Hi3Helper.Win32.Native.LibraryImport
 {
@@ -6,7 +7,7 @@ namespace Hi3Helper.Win32.Native.LibraryImport
     {
         [LibraryImport("ntdll.dll", EntryPoint = "NtQuerySystemInformation", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public unsafe static partial uint NtQuerySystemInformation(int SystemInformationClass, byte* SystemInformation, uint SystemInformationLength, out uint ReturnLength);
+        public static unsafe partial uint NtQuerySystemInformation(int systemInformationClass, byte* systemInformation, uint systemInformationLength, out uint returnLength);
 
         [LibraryImport("kernel32.dll", EntryPoint = "OpenProcess", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]

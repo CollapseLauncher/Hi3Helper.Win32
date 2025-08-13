@@ -1,4 +1,9 @@
-﻿namespace Hi3Helper.Win32.Native.Enums
+﻿// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable CommentTypo
+#pragma warning disable CA1069
+namespace Hi3Helper.Win32.Native.Enums
 {
     public enum CLSCTX : uint
     {
@@ -83,6 +88,6 @@
         /// </summary>
         CLSCTX_PS_DLL = 0x80000000,
         CLSCTX_ALL = 0x00000017,
-        CLSCTX_SERVER = 0x00000015,
+        CLSCTX_SERVER = 0x00000015
     }
 }

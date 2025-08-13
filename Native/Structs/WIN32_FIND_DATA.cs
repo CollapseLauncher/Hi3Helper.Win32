@@ -45,7 +45,7 @@ namespace Hi3Helper.Win32.Native.Structs
             }
             set
             {
-                nFileSizeLow = (uint)(value & 0xFFFFFFFF);
+                nFileSizeLow  = (uint)(value & 0xFFFFFFFF);
                 nFileSizeHigh = (uint)((value >> 32) & 0xFFFFFFFF);
             }
         }

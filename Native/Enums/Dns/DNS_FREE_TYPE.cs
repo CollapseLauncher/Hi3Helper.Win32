@@ -9,8 +9,8 @@ namespace Hi3Helper.Win32.Native.Enums.Dns
     /// </summary>
     public enum DNS_FREE_TYPE
     {
-        DnsFreeFlat = 0,
-        DnsFreeRecordList = 1,
+        DnsFreeFlat                = 0,
+        DnsFreeRecordList          = 1,
         DnsFreeParsedMessageFields = 2
     }
 }

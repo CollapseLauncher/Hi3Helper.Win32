@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Windows.UI.Notifications;
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {

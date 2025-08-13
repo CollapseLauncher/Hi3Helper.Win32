@@ -1,5 +1,9 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
 using System.Runtime.InteropServices;
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 namespace Hi3Helper.Win32.Native.Structs
 {
@@ -14,6 +18,6 @@ namespace Hi3Helper.Win32.Native.Structs
         public CLSCTX dwClassContext;    // DWORD
         public uint locale;              // LCID (equivalent to uint in .NET)
         public nint pServerInfo;         // COSERVERINFO*, use IntPtr for pointer to unmanaged struct
-        public nint hwnd;                // HWND, use IntPtr to represent window handles
+        public nint windowHandle;        // windowHandle, use IntPtr to represent window handles
     }
 }

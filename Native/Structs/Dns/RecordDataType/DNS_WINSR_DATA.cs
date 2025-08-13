@@ -12,9 +12,9 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct DNS_WINSR_DATA
     {
-        public uint dwMappingFlag;
-        public uint dwLookupTimeout;
-        public uint dwCacheTimeout;
+        public uint  dwMappingFlag;
+        public uint  dwLookupTimeout;
+        public uint  dwCacheTimeout;
         public char* pNameResultDomain;
 
         public ReadOnlySpan<char> GetNameResultDomain() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pNameResultDomain);

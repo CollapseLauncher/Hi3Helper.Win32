@@ -1,4 +1,8 @@
-﻿namespace Hi3Helper.Win32.Native.Enums
+﻿// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+// ReSharper disable IdentifierTypo
+
+namespace Hi3Helper.Win32.Native.Enums
 {
     public enum FileFuncFlags : uint
     {

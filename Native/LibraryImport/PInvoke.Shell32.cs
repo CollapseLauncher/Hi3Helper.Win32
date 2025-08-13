@@ -1,5 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Hi3Helper.Win32.Native.Structs;
+// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
 
 namespace Hi3Helper.Win32.Native.LibraryImport
 {
@@ -8,20 +10,19 @@ namespace Hi3Helper.Win32.Native.LibraryImport
     {
         [LibraryImport("shell32.dll", EntryPoint = "ExtractIconExW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static partial uint ExtractIconEx(string lpszFile, int nIconIndex, nint[]? phiconLarge, nint[]? phiconSmall, uint nIcons);
+        public static partial uint ExtractIconEx(string lpszFile, int nIconIndex, nint phiconLarge, nint phiconSmall, uint nIcons);
 
         [LibraryImport("shell32.dll", EntryPoint = "SHFileOperationW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-        public static partial int SHFileOperation(nint fileOp);
-
+        public static partial int SHFileOperation(in SHFILEOPSTRUCTW fileOp);
 
         [LibraryImport("shell32", EntryPoint = "SHGetFileInfoW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         public static partial nint SHGetFileInfo(
             string pszPath,
-            int dwFileAttributes,
-            nint psfi,
-            uint cbFileInfo,
-            uint uFlags);
-        
+            int    dwFileAttributes,
+            nint   psfi,
+            uint   cbFileInfo,
+            uint   uFlags);
+
         [LibraryImport("shell32.dll", SetLastError = true, EntryPoint = "SetCurrentProcessExplicitAppUserModelID", StringMarshalling = StringMarshalling.Utf16)]
         public static partial HResult SetProcessAumid(string appUserModelId);
 

@@ -1,8 +1,8 @@
-﻿using Hi3Helper.Win32.Native.ClassIds;
+﻿using Hi3Helper.Win32.ManagedTools;
+using Hi3Helper.Win32.Native.ClassIds;
 using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
-using Hi3Helper.Win32.Native.ManagedTools;
 using Hi3Helper.Win32.ShellLinkCOM;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -14,6 +14,7 @@ using Windows.UI.Notifications;
 // ReSharper disable StringLiteralTypo
 // ReSharper disable RedundantStringInterpolation
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
@@ -64,13 +65,13 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
         {
             bool isFullPath = Path.IsPathFullyQualified(shortcutPath);
 
-            currentInstance.Logger?.LogInformation($"[DesktopNotificationManagerCompat::CreateAumidShortcut] Registering AumId for application name: {aumid} with application id: {applicationId} (Is as elevated user?: {asElevatedUser})");
-            currentInstance.Logger?.LogInformation($"[DesktopNotificationManagerCompat::CreateAumidShortcut] Using executable path: {executablePath}");
+            currentInstance.Logger?.LogInformation("[DesktopNotificationManagerCompat::CreateAumidShortcut] Registering AumId for application name: {aumid} with application id: {applicationId} (Is as elevated user?: {asElevatedUser})", aumid, applicationId, asElevatedUser);
+            currentInstance.Logger?.LogInformation("[DesktopNotificationManagerCompat::CreateAumidShortcut] Using executable path: {executablePath}", executablePath);
 
             // If the shortcut path is not fully qualified, then assign based on elevate state
             if (!isFullPath)
             {
-                currentInstance.Logger?.LogWarning($"[DesktopNotificationManagerCompat::CreateAumidShortcut] Shortcut path is not fully qualified: {shortcutPath}");
+                currentInstance.Logger?.LogWarning("[DesktopNotificationManagerCompat::CreateAumidShortcut] Shortcut path is not fully qualified: {shortcutPath}", shortcutPath);
                 string applicationDirPath = Environment.GetFolderPath(asElevatedUser ?
                     Environment.SpecialFolder.CommonApplicationData :
                     Environment.SpecialFolder.ApplicationData);
@@ -79,7 +80,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
                 shortcutPath = Path.Combine(startMenuProgramPath, shortcutPath);
             }
 
-            currentInstance.Logger?.LogInformation($"[DesktopNotificationManagerCompat::CreateAumidShortcut] Shortcut will be written to: {shortcutPath}");
+            currentInstance.Logger?.LogInformation("[DesktopNotificationManagerCompat::CreateAumidShortcut] Shortcut will be written to: {shortcutPath}", shortcutPath);
             string executableDirPath = Path.GetDirectoryName(executablePath) ?? "";
             string? temporaryDirectoryPath = Path.GetDirectoryName(shortcutPath);
 
@@ -122,7 +123,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
                 }
                 catch (Exception ex)
                 {
-                    currentInstance.Logger?.LogError($"[DesktopNotificationManagerCompat::CreateAumidShortcut] An error has occured while loading existing shortcut: {shortcutPath}\r\n{ex}");
+                    currentInstance.Logger?.LogError(ex, "[DesktopNotificationManagerCompat::CreateAumidShortcut] An error has occured while loading existing shortcut: {shortcutPath}\r\n{ex}", shortcutPath, ex);
                 }
 
                 shellLink?.SetPath(executablePath);
@@ -246,7 +247,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 
             _registeredActivator = true;
 
-            currentInstance.Logger?.LogInformation($"[DesktopNotificationManagerCompat::RegisterActivator] Registered Toast Activator for application id: {applicationId} with CLSCTX: {classContext}");
+            currentInstance.Logger?.LogInformation("[DesktopNotificationManagerCompat::RegisterActivator] Registered Toast Activator for application id: {applicationId} with CLSCTX: {classContext}", applicationId, classContext);
         }
 
         internal static ToastNotifier? CreateToastNotifier(ILogger? logger, bool throwOnFault)
@@ -272,7 +273,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
         }
 
         /// <summary>
-        /// Gets the <see cref="DesktopNotificationHistoryCompat"/> object. You must have called <see cref="RegisterActivator{T}(T, Guid, bool)"/> first (and also <see cref="RegisterAumidAndComServer{T}(T, string, string, string, Guid, bool)"/> if you're a classic Win32 app), or this will throw an exception.
+        /// Gets the <see cref="DesktopNotificationHistoryCompat"/> object. You must have called <see cref="RegisterActivator{T}"/> first (and also <see cref="RegisterAumidAndComServer{T}"/> if you're a classic Win32 app), or this will throw an exception.
         /// </summary>
         public static DesktopNotificationHistoryCompat History
         {

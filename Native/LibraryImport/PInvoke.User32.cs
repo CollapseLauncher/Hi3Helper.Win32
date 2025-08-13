@@ -1,17 +1,20 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+#pragma warning disable CA1401
 
 namespace Hi3Helper.Win32.Native.LibraryImport
 {
-    public delegate bool EnumWindowsProc(nint hWnd, nint lParam);
+    public delegate bool EnumWindowsProc(nint windowHandle, nint lParam);
 
     public static partial class PInvoke
     {
         [LibraryImport("user32.dll", EntryPoint = "ShowWindow")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool ShowWindow(nint hWnd, int nCmdShow);
+        public static partial bool ShowWindow(nint windowHandle, int nCmdShow);
 
         [LibraryImport("user32.dll", EntryPoint = "GetSystemMetrics", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -20,21 +23,21 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("user32.dll", EntryPoint = "ShowWindowAsync")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool ShowWindowAsync(nint hWnd, HandleEnum nCmdShow);
+        public static partial bool ShowWindowAsync(nint windowHandle, HandleEnum nCmdShow);
 
         [LibraryImport("user32.dll", EntryPoint = "SetWindowPos", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X, int Y, int cx, int cy, SetWindowPosFlags uFlags);
+        public static partial bool SetWindowPos(nint windowHandle, nint windowHandleInsertAfter, int x, int y, int cx, int cy, SetWindowPosFlags uFlags);
 
         [LibraryImport("user32.dll", EntryPoint = "SendMessageW", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static partial nint SendMessage(nint hWnd, uint msg, nuint wParam, nint lParam);
+        public static partial nint SendMessage(nint windowHandle, uint msg, nuint wParam, nint lParam);
 
         [LibraryImport("user32.dll", EntryPoint = "OpenClipboard", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool OpenClipboard(nint hWndNewOwner);
+        public static partial bool OpenClipboard(nint windowHandleNewOwner);
 
         [LibraryImport("user32.dll", EntryPoint = "CloseClipboard", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -53,12 +56,12 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("user32.dll", EntryPoint = "IsWindowVisible")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool IsWindowVisible(nint hWnd);
+        public static partial bool IsWindowVisible(nint windowHandle);
 
         [LibraryImport("user32.dll", EntryPoint = "SetForegroundWindow")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool SetForegroundWindow(nint hWnd);
+        public static partial bool SetForegroundWindow(nint windowHandle);
 
         [LibraryImport("user32.dll", EntryPoint = "GetForegroundWindow")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -66,39 +69,32 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static partial nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
+        public static partial nint SetWindowLongPtr(nint windowHandle, int nIndex, nint dwNewLong);
 
         [LibraryImport("user32.dll", EntryPoint = "FindWindowExW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static partial nint FindWindowEx(nint hwndParent, nint hwndChildAfter, string lpszClass, string lpszWindow);
+        public static partial nint FindWindowEx(nint windowHandleParent, nint windowHandleChildAfter, string lpszClass, string lpszWindow);
 
         [LibraryImport("user32.dll", EntryPoint = "DestroyWindow", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool DestroyWindow(nint hwnd);
+        public static partial bool DestroyWindow(nint windowHandle);
 
         [LibraryImport("user32.dll", EntryPoint = "CallWindowProcW", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static partial nint CallWindowProc(nint lpPrevWndFunc, nint hWnd, uint Msg, nuint wParam, nint lParam);
-
-        public const int ENUM_CURRENT_SETTINGS = -1;
-        public const int DMDO_DEFAULT = 0;
-        public const int DMDO_90 = 1;
-        public const int DMDO_180 = 2;
-        public const int DMDO_270 = 3;
+        public static partial nint CallWindowProc(nint lpPrevWndFunc, nint windowHandle, uint msg, nuint wParam, nint lParam);
 
         [LibraryImport("user32.dll", EntryPoint = "EnumDisplaySettingsW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool EnumDisplaySettings(
-            [MarshalAs(UnmanagedType.LPTStr)]
-            string? lpszDeviceName,  // display device
-            int iModeNum,         // graphics mode
-            nint lpDevMode       // graphics mode settings
+            [MarshalAs(UnmanagedType.LPTStr)] string? lpszDeviceName, // display device
+            int                                       iModeNum,       // graphics mode
+            nint                                      lpDevMode       // graphics mode settings
             );
 
         [LibraryImport("user32.dll", EntryPoint = "ChangeDisplaySettingsW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         public static partial int ChangeDisplaySettings(
-            nint lpDevMode,       // graphics mode settings
+            nint lpDevMode, // graphics mode settings
             uint dwflags);
 
         [LibraryImport("user32.dll", EntryPoint = "DestroyIcon", SetLastError = true)]
@@ -106,38 +102,38 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         public static partial bool DestroyIcon(nint hIcon);
 
         [LibraryImport("user32.dll", EntryPoint = "GetWindowLongW", SetLastError = true)]
-        public static partial WS_STYLE GetWindowLong(nint hWnd, GWL_INDEX nIndex);
+        public static partial WS_STYLE GetWindowLong(nint windowHandle, GWL_INDEX nIndex);
 
         [LibraryImport("user32.dll", EntryPoint = "SetWindowLongW", SetLastError = true)]
-        public static partial int SetWindowLong(nint hWnd, GWL_INDEX nIndex, WS_STYLE dwNewLong);
+        public static partial int SetWindowLong(nint windowHandle, GWL_INDEX nIndex, WS_STYLE dwNewLong);
 
         [LibraryImport("user32.dll", EntryPoint = "GetWindowRect", SetLastError = true)]
         [return : MarshalAs(UnmanagedType.Bool)]
-        public static unsafe partial bool GetWindowRect(nint hwnd, WindowRect* rectangle);
+        public static unsafe partial bool GetWindowRect(nint windowHandle, WindowRect* rectangle);
 
         [LibraryImport("user32.dll", EntryPoint = "SetWindowPos", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool SetWindowPos(nint hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, SWP_FLAGS wFlags);
+        public static partial bool SetWindowPos(nint windowHandle, int windowHandleInsertAfter, int x, int y, int cx, int cy, SWP_FLAGS wFlags);
         
         [LibraryImport("user32.dll", EntryPoint = "EnumWindows", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool EnumWindows(EnumWindowsProc lpEnumFunc, nint lParam);
         
         [LibraryImport("user32.dll", EntryPoint = "GetWindowThreadProcessId", SetLastError = true)]
-        public static unsafe partial uint GetWindowThreadProcessId(nint hWnd, int* lpdwProcessId);
+        public static unsafe partial uint GetWindowThreadProcessId(nint windowHandle, int* lpdwProcessId);
 
         [LibraryImport("user32.dll", EntryPoint = "GetWindow", SetLastError = true)]
-        public static partial nint GetWindow(nint hWnd, GetWindowType uCmd);
+        public static partial nint GetWindow(nint windowHandle, GetWindowType uCmd);
 
         [LibraryImport("user32.dll", EntryPoint = "MessageBoxW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-        public static partial MessageBoxResult MessageBox(nint hWnd, string lpContent, string? lpTitle, MessageBoxFlags uType);
+        public static partial MessageBoxResult MessageBox(nint windowHandle, string lpContent, string? lpTitle, MessageBoxFlags uType);
         
         [LibraryImport("user32.dll", EntryPoint = "ShutdownBlockReasonCreate", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool ShutdownBlockReasonCreate(nint hWnd, [MarshalAs(UnmanagedType.LPWStr)] string pwszReason);
+        public static partial bool ShutdownBlockReasonCreate(nint windowHandle, [MarshalAs(UnmanagedType.LPWStr)] string pwszReason);
         
         [LibraryImport("user32.dll", EntryPoint = "ShutdownBlockReasonDestroy", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool ShutdownBlockReasonDestroy(nint hWnd);
+        public static partial bool ShutdownBlockReasonDestroy(nint windowHandle);
         }
 }

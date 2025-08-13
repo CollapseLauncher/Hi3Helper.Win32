@@ -1,12 +1,22 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
+// ReSharper disable UnusedMember.Global
+// ReSharper disable IdentifierTypo
+#pragma warning disable CA1401
 
 namespace Hi3Helper.Win32.Native.LibraryImport
 {
     public delegate bool ConsoleControlHandler(uint handle);
     public static partial class PInvoke
     {
+        public const uint FormatMessageFromHmodule    = 0x800;
+        public const uint FormatMessageAllocateBuffer = 0x100;
+        public const uint FormatMessageIgnoreInserts  = 0x200;
+        public const uint FormatMessageFromSystem     = 0x1000;
+
+        public const uint FormatMessageFlags = FormatMessageAllocateBuffer | FormatMessageIgnoreInserts | FormatMessageFromSystem;
+
         [LibraryImport("kernel32.dll", EntryPoint = "GetConsoleMode", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -79,12 +89,6 @@ namespace Hi3Helper.Win32.Native.LibraryImport
             string lpExistingFileName,
             nint lpSecurityAttributes
         );
-
-        public const uint FORMAT_MESSAGE_FROM_HMODULE = 0x800;
-        public const uint FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x100;
-        public const uint FORMAT_MESSAGE_IGNORE_INSERTS = 0x200;
-        public const uint FORMAT_MESSAGE_FROM_SYSTEM = 0x1000;
-        public const uint FORMAT_MESSAGE_FLAGS = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM;
 
         [LibraryImport("kernel32.dll", EntryPoint = "FormatMessageW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         public static partial int FormatMessage(

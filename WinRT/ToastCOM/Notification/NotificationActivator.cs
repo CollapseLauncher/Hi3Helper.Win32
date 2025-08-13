@@ -29,6 +29,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             {
                 PInvoke.CoRevokeClassObject(CurrentRegisteredClass).ThrowOnFailure();
             }
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

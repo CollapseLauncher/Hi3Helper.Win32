@@ -10,7 +10,7 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     [StructLayout(LayoutKind.Sequential)]
     public struct DNS_NULL_DATA
     {
-        public uint dwByteCount;
-        public IntPtr Data;           // BYTE  Data[1];
+        public uint   dwByteCount;
+        public IntPtr Data; // BYTE  Data[1];
     }
 }

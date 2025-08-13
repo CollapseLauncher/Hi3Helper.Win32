@@ -11,8 +11,8 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     [StructLayout(LayoutKind.Sequential)]
     public struct DNS_WKS_DATA
     {
-        public uint IpAddress;      // IP4_ADDRESS IpAddress;
-        public byte chProtocol;     // UCHAR       chProtocol;
-        public IntPtr BitMask;        // BYTE    BitMask[1];
+        public uint   IpAddress;  // IP4_ADDRESS IpAddress;
+        public byte   chProtocol; // UCHAR       chProtocol;
+        public IntPtr BitMask;    // BYTE        BitMask[1];
     }
 }

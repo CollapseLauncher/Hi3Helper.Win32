@@ -11,10 +11,10 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     public struct DNS_DS_DATA
     {
         public ushort wKeyTag;
-        public byte chAlgorithm;
-        public byte chDigestType;
+        public byte   chAlgorithm;
+        public byte   chDigestType;
         public ushort wDigestLength;
         public ushort wPad;
-        public IntPtr Digest;         // BYTE Digest[1];
+        public IntPtr Digest; // BYTE Digest[1];
     }
 }

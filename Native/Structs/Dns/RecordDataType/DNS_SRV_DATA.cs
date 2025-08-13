@@ -11,7 +11,7 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct DNS_SRV_DATA
     {
-        public char* pNameTarget;
+        public char*  pNameTarget;
         public ushort uPriority;
         public ushort wWeight;
         public ushort wPort;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
@@ -70,8 +71,8 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
                 return new Uri(uncNormalized, UriKind.Absolute);
             }
 
-        StartParsing:
-            // Try create the url
+            StartParsing:
+            // Try to create the url
             if (Uri.TryCreate(rawUrlString, UriKind.Absolute, out Uri? appLogoAsUri))
             {
                 string absoluteUri = appLogoAsUri.AbsoluteUri;
@@ -88,7 +89,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
                 return appLogoAsUri;
             }
 
-            // If it fails to create the string, try get the path from relative
+            // If it fails to create the string, try to get the path from relative
             // and start parsing
             rawUrlString = Path.GetFullPath(rawUrlString);
             goto StartParsing;
@@ -96,10 +97,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 
         internal static void AddAttribute(this XmlNode? node, XmlDocument rootXml, string name, string value)
         {
-            if (node == null)
-                return;
-
-            XmlAttribute? attribute = node.Attributes?.Append(rootXml.CreateAttribute(name));
+            XmlAttribute? attribute = node?.Attributes?.Append(rootXml.CreateAttribute(name));
             if (attribute == null)
                 return;
 

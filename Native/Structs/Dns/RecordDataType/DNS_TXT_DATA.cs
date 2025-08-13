@@ -11,7 +11,7 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct DNS_TXT_DATA
     {
-        public uint dwStringCount;
+        public uint  dwStringCount;
         public char* pStringArray;
 
         public ReadOnlySpan<char> GetStringArray() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pStringArray);

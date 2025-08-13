@@ -11,14 +11,14 @@ namespace Hi3Helper.Win32.ShellLinkCOM
     {
         public short variantType;
         public short Reserved1, Reserved2, Reserved3;
-        public nint pointerValue;
+        public nint  pointerValue;
 
         public static PropVariant FromString(string str)
         {
             PropVariant pv = new()
             {
                 variantType = 31,  // VT_LPWSTR
-                pointerValue = Marshal.StringToCoTaskMemUni(str),
+                pointerValue = Marshal.StringToCoTaskMemUni(str)
             };
 
             return pv;
@@ -30,7 +30,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             PropVariant pv = new()
             {
                 variantType = 72,  // VT_CLSID
-                pointerValue = Marshal.AllocCoTaskMem(bytes.Length),
+                pointerValue = Marshal.AllocCoTaskMem(bytes.Length)
             };
             Marshal.Copy(bytes, 0, pv.pointerValue, bytes.Length);
 
