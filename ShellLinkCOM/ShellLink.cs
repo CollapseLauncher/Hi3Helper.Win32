@@ -161,7 +161,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         [field: AllowNull, MaybeNull]
         public unsafe string Target
         {
-            get => field ??= GetStringAndW32FindDataFromIMethod(260, (ptr, fd, len) => _linkW?.GetPath(ptr, len, fd, (uint)EShellLinkGP.SLGP_UNCPRIORITY));
+            get => field ??= GetStringFromIMethod(260, (ptr, len) => _linkW?.GetPath(ptr, len, nint.Zero, EShellLinkGP.SLGP_UNCPRIORITY));
             set => _linkW?.SetPath(field = value);
         }
 
@@ -224,50 +224,15 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             set => _linkW?.SetHotkey(value);
         }
 
-        private static unsafe string GetStringAndW32FindDataFromIMethod(int length, ToDelegateWithW32FindDataInvoke toInvokeDelegate)
-        {
-            int    sizeOfFindData      = sizeof(Win32FindDataW);
-            byte[] win32FindDataBuffer = new byte[sizeOfFindData];
-            char[] buffer              = ArrayPool<char>.Shared.Rent(length);
-            try
-            {
-                fixed (char* bufferPtr = &buffer[0])
-                    fixed (void* findDataPtr = &win32FindDataBuffer[0])
-                    {
-                        nint findDataSafe = (nint)findDataPtr;
-                        toInvokeDelegate(bufferPtr, findDataSafe, length);
-
-                        return GetStringFromNullTerminatedPtr(bufferPtr);
-                    }
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.Return(buffer);
-            }
-        }
-
         private static unsafe string GetStringFromIMethod(int length, ToDelegateInvoke toInvokeDelegate)
         {
-            char[] buffer = ArrayPool<char>.Shared.Rent(length);
-            try
+            Span<char> buffer = stackalloc char[length];
+            fixed (char* bufferP = &MemoryMarshal.GetReference(buffer))
             {
-                fixed (char* bufferPtr = &buffer[0])
-                {
-                    toInvokeDelegate(bufferPtr, length);
-                    return GetStringFromNullTerminatedPtr(bufferPtr);
-                }
+                toInvokeDelegate(bufferP, length);
+                ReadOnlySpan<char> bufferSliced = MemoryMarshal.CreateReadOnlySpanFromNullTerminated(bufferP);
+                return bufferSliced.IsEmpty ? string.Empty : new string(bufferSliced);
             }
-            finally
-            {
-                ArrayPool<char>.Shared.Return(buffer);
-            }
-        }
-
-        private static unsafe string GetStringFromNullTerminatedPtr(char* bufferPtr)
-        {
-            ReadOnlySpan<char> returnString = MemoryMarshal.CreateReadOnlySpanFromNullTerminated(bufferPtr);
-            string outString = returnString.ToString();
-            return outString;
         }
 
         /// <summary>

@@ -7,7 +7,7 @@
 
 namespace Hi3Helper.Win32.ShellLinkCOM
 {
-    internal enum EShellLinkGP : uint
+    public enum EShellLinkGP : uint
     {
         SLGP_SHORTPATH   = 1,
         SLGP_UNCPRIORITY = 2

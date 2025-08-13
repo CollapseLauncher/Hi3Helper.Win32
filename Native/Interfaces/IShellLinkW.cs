@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.ClassIds;
+using Hi3Helper.Win32.ShellLinkCOM;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable PartialTypeWithSinglePart
@@ -16,10 +17,10 @@ namespace Hi3Helper.Win32.Native.Interfaces
         /// Retrieves the path and filename of a shell link object
         /// </summary>
         unsafe void GetPath(
-            char* pszFile,
-            int   cchMaxPath,
-            nint  pfd,
-            uint  fFlags);
+            char*        pszFile,
+            int          cchMaxPath,
+            nint         pfd,
+            EShellLinkGP fFlags);
 
         /// <summary>
         /// Retrieves the list of shell link item identifiers
