@@ -14,10 +14,10 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     {
         public ushort wOrder;
         public ushort wPreference;
-        public char* pFlags;
-        public char* pService;
-        public char* pRegularExpression;
-        public char* pReplacement;
+        public char*  pFlags;
+        public char*  pService;
+        public char*  pRegularExpression;
+        public char*  pReplacement;
 
         public ReadOnlySpan<char> GetFlags() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pFlags);
         public ReadOnlySpan<char> GetService() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pService);

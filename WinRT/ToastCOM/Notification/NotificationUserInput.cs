@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -25,7 +26,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             }
 
 #if DEBUG
-            logger?.LogDebug($"[NotificationUserInput::Ctor] Getting input data from address: 0x{(nint)dataPtr:x8} with data count: {dataCount}");
+            logger?.LogDebug("[NotificationUserInput::Ctor] Getting input data from address: {} with data count: {dataCount}", (nint)dataPtr, dataCount);
 #endif
 
             _data = new nint[dataCount];
@@ -144,7 +145,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             return false;
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }

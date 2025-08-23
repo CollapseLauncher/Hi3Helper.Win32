@@ -13,6 +13,6 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
         public uint dwLookupTimeout;
         public uint dwCacheTimeout;
         public uint cWinsServerCount;
-        public uint WinsServers;    // IP4_ADDRESS WinsServers[1];
+        public uint WinsServers; // IP4_ADDRESS WinsServers[1];
     }
 }

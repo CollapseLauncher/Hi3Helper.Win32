@@ -4,7 +4,7 @@ using System.Buffers;
 using System.Runtime.InteropServices;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 
-namespace Hi3Helper.Win32.Native.ManagedTools
+namespace Hi3Helper.Win32.ManagedTools
 {
     public static class Win32Error
     {
@@ -21,20 +21,20 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
         public static string GetWin32ErrorMessage(int errCode)
         {
-            const FORMAT_MESSAGE FormatMessageFlag = FORMAT_MESSAGE.FROM_SYSTEM | FORMAT_MESSAGE.IGNORE_INSERTS;
-            const int            BufferSize        = 256;
+            const FORMAT_MESSAGE formatMessageFlag = FORMAT_MESSAGE.FROM_SYSTEM | FORMAT_MESSAGE.IGNORE_INSERTS;
+            const int            bufferSize        = 256;
 
             // Set buffer length to 256 chars (512 KB)
-            char[] buffer = ArrayPool<char>.Shared.Rent(BufferSize);
+            char[] buffer = ArrayPool<char>.Shared.Rent(bufferSize);
             try
             {
                 // Get the message
-                int messageSize = FormatMessage(FormatMessageFlag,
+                int messageSize = FormatMessage(formatMessageFlag,
                                                 nint.Zero,
                                                 errCode,
                                                 0,
                                                 buffer,
-                                                BufferSize,
+                                                bufferSize,
                                                 nint.Zero);
 
                 // Return message string

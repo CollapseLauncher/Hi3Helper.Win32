@@ -5,7 +5,7 @@ namespace Hi3Helper.Win32.Native.Enums
     [Flags]
     public enum RegChangeNotifyFilter
     {
-        /// <summary>Notify the caller if a subkey is added or deleted.</summary>
+        /// <summary>Notify the caller if a sub-key is added or deleted.</summary>
         Key = 1,
         /// <summary>Notify the caller of changes to the attributes of the key,
         /// such as the security descriptor information.</summary>
@@ -15,6 +15,6 @@ namespace Hi3Helper.Win32.Native.Enums
         Value = 4,
         /// <summary>Notify the caller of changes to the security descriptor
         /// of the key.</summary>
-        Security = 8,
+        Security = 8
     }
 }

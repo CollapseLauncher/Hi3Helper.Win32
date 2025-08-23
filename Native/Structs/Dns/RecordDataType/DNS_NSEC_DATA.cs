@@ -12,10 +12,10 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct DNS_NSEC_DATA
     {
-        public char* pNextDomainName;
+        public char*  pNextDomainName;
         public ushort wTypeBitMapsLength;
         public ushort wPad;
-        public IntPtr TypeBitMaps;    // BYTE  TypeBitMaps[1];
+        public IntPtr TypeBitMaps; // BYTE  TypeBitMaps[1];
 
         public ReadOnlySpan<char> GetNextDomainName() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pNextDomainName);
 

@@ -1,4 +1,5 @@
-﻿namespace Hi3Helper.Win32.WinRT.ToastCOM
+﻿// ReSharper disable UnusedMember.Global
+namespace Hi3Helper.Win32.WinRT.ToastCOM
 {
     public enum ToastActivationType
     {

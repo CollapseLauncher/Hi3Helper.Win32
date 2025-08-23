@@ -8,6 +8,8 @@ using DomXmlDocument = Windows.Data.Xml.Dom.XmlDocument;
 using DomXmlElement = Windows.Data.Xml.Dom.XmlElement;
 // ReSharper disable PartialTypeWithSinglePart
 // ReSharper disable UnusedMember.Global
+// ReSharper disable BadControlBracesIndent
+// ReSharper disable VariableCanBeNotNullable
 
 namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
@@ -39,7 +41,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
         protected override void OnActivated(string arguments, NotificationUserInput? userInput, string appUserModelId)
         {
 #if DEBUG
-            Logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking ToastCallback for application name: {appUserModelId} with argument: {arguments}");
+            Logger?.LogDebug("[NotificationServiceSub::OnActivated] Invoking ToastCallback for application name: {appUserModelId} with argument: {arguments}", appUserModelId, arguments);
 #endif
             Dictionary<string, string?>? inputDataDictionary = null;
             if (userInput is { Count: > 0 })
@@ -48,7 +50,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
                 foreach (KeyValuePair<string?, string?> data in userInput)
                 {
 #if DEBUG
-                    Logger?.LogDebug($"[NotificationServiceSub::OnActivated] Invoking additional data to ToastCallback with key: {data.Key} and data: {data.Value}");
+                    Logger?.LogDebug("[NotificationServiceSub::OnActivated] Invoking additional data to ToastCallback with key: {data.Key} and data: {data.Value}", data.Key, data.Value);
 #endif
                     inputDataDictionary.TryAdd(data.Key ?? "", data.Value);
                 }
@@ -65,7 +67,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             string xmlDocumentString = xmlDocument.OuterXml;
 
 #if DEBUG
-            Logger?.LogDebug($"[NotificationServiceSub::ShowNotificationToast] Showing toast using this XML:\r\n{xmlDocumentString}");
+            Logger?.LogDebug("[NotificationServiceSub::ShowNotificationToast] Showing toast using this XML:\r\n{xmlDocumentString}", xmlDocumentString);
 #endif
 
             DomXmlDocument domXmlDocument = new();
@@ -87,7 +89,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             )
             => DesktopNotificationManagerCompat.CreateToastNotifier(Logger, throwOnFault);
 
-        protected void AddInput(DomXmlDocument xml, params ToastAction[] paras)
+        protected static void AddInput(DomXmlDocument xml, params ToastAction[] paras)
         {
             DomXmlElement actions = GetAction(xml);
 
@@ -101,7 +103,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             }
         }
 
-        private DomXmlElement GetAction(DomXmlDocument xml)
+        private static DomXmlElement GetAction(DomXmlDocument xml)
         {
             DomXmlElement? actions;
             if (xml.GetElementsByTagName("actions").Count != 0)

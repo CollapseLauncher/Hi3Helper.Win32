@@ -3,6 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable IdentifierTypo
 
 namespace Hi3Helper.Win32.Native.Interfaces
 {
@@ -15,24 +16,34 @@ namespace Hi3Helper.Win32.Native.Interfaces
         [PreserveSig]
         void GetClassID(out Guid pClassID);
 
-        //[helpstring("Checks for changes since last file write")]      
+        /// <summary>
+        /// Checks for changes since last file write
+        /// </summary>
         void IsDirty();
 
-        //[helpstring("Opens the specified file and initializes the object from its contents")]      
+        /// <summary>
+        /// Opens the specified file and initializes the object from its contents
+        /// </summary>
         void Load(
             [MarshalAs(UnmanagedType.LPWStr)] string pszFileName,
             uint dwMode);
 
-        //[helpstring("Saves the object into the specified file")]      
+        /// <summary>
+        /// Saves the object into the specified file
+        /// </summary>
         void Save(
             [MarshalAs(UnmanagedType.LPWStr)] string pszFileName,
             [MarshalAs(UnmanagedType.Bool)] bool fRemember);
 
-        //[helpstring("Notifies the object that save is completed")]      
+        /// <summary>
+        /// Notifies the object that save is completed
+        /// </summary>
         void SaveCompleted(
             [MarshalAs(UnmanagedType.LPWStr)] string pszFileName);
 
-        //[helpstring("Gets the current name of the file associated with the object")]      
+        /// <summary>
+        /// Gets the current name of the file associated with the object
+        /// </summary>
         void GetCurFile(
             [MarshalAs(UnmanagedType.LPWStr)] out string ppszFileName);
     }

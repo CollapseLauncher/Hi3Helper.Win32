@@ -1,9 +1,11 @@
 using System;
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.Native.Enums
 {
     [Flags]
-    enum MiniDumpType
+    public enum MiniDumpType
     {
         Normal                         = 0x00000000, // Basic dump with limited information
         WithDataSegs                   = 0x00000080, // Includes global variables

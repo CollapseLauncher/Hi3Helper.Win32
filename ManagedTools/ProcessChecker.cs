@@ -9,8 +9,9 @@ using System.IO;
 using System.Numerics;
 using System.Runtime.InteropServices;
 // ReSharper disable RedundantUnsafeContext
+// ReSharper disable UnusedMember.Global
 
-namespace Hi3Helper.Win32.Native.ManagedTools
+namespace Hi3Helper.Win32.ManagedTools
 {
     public static class ProcessChecker
     {
@@ -28,16 +29,16 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
         public static unsafe bool IsProcessExist(int processId)
         {
-            // Get the handler and return true if procHandler is not null
+            // Get the handler
             nint procHandler = PInvoke.OpenProcess(QueryLimitedInformation, false, processId);
-            if (procHandler != nint.Zero)
+            if (procHandler == nint.Zero)
             {
-                PInvoke.CloseHandle(procHandler);
-                return true;
+                return false;
             }
 
-            // Otherwise, return false
-            return false;
+            // Return true if procHandler is not null
+            PInvoke.CloseHandle(procHandler);
+            return true;
         }
 
         public static unsafe bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", ILogger? logger = null)
@@ -89,7 +90,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                     {
                         // Round up length
                         _dynamicNtQueryChangedBufferLen = (int)BitOperations.RoundUpToPowerOf2(length);
-                        logger?.LogWarning($"Buffer requested is insufficient! Requested: {length} > Capacity: {ntQueryCachedBuffer.Length}, Resizing the buffer...");
+                        logger?.LogWarning("Buffer requested is insufficient! Requested: {length} > Capacity: {bufLen}, Resizing the buffer...", length, ntQueryCachedBuffer.Length);
                         isReallocate = true;
                         goto StartOver;
                     }
@@ -97,7 +98,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                     // If other error has occurred, then return false as failed.
                     if (hNtQuerySystemInformationResult != 0)
                     {
-                        logger?.LogError($"Error happened while operating NtQuerySystemInformation(): {Win32Error.GetLastWin32ErrorMessage()}");
+                        logger?.LogError("Error happened while operating NtQuerySystemInformation(): {ex}", Win32Error.GetLastWin32ErrorMessage());
                         return false;
                     }
 
@@ -125,7 +126,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                         // Move the offset of the current pointer and get the processId value
                         processId = *(int*)(curPosPtr + 56 + sizeOfUnicodeString + 8);
 
-                        // Try find the window id and assign it to windowHandle
+                        // Try to find the window id and assign it to windowHandle
                         windowHandle = MainWindowFinder.FindMainWindow(processId);
 
                         // If the origin path argument is null, then return as true.
@@ -139,7 +140,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                         if (processHandle == InvalidHandleValue
                          || processHandle == nint.Zero)
                         {
-                            logger?.LogError($"Error happened while operating OpenProcess(): {Win32Error.GetLastWin32ErrorMessage()}");
+                            logger?.LogError("Error happened while operating OpenProcess(): {ex}", Win32Error.GetLastWin32ErrorMessage());
                             return false;
                         }
 
@@ -220,14 +221,14 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             // If failed, then log the Win32 error and return null.
             if (processHandle == nint.Zero)
             {
-                logger?.LogError($"Error happened while operating OpenProcess(): {Win32Error.GetLastWin32ErrorMessage()}");
+                logger?.LogError("Error happened while operating OpenProcess(): {ex}", Win32Error.GetLastWin32ErrorMessage());
                 return null;
             }
 
             // Try rent the new buffer to get the command line
-            int bufferProcessCmdLen = 1 << 10;
-            int bufferProcessCmdLenReturn = bufferProcessCmdLen;
-            char[] bufferProcessCmd = ArrayPool<char>.Shared.Rent(bufferProcessCmdLen);
+            const int bufferProcessCmdLen       = 1 << 10;
+            int       bufferProcessCmdLenReturn = bufferProcessCmdLen;
+            char[]    bufferProcessCmd          = ArrayPool<char>.Shared.Rent(bufferProcessCmdLen);
 
             try
             {
@@ -239,19 +240,19 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                     // If the query is unsuccessful, then log the Win32 error and return false.
                     if (!hQueryFullProcessImageNameResult)
                     {
-                        logger?.LogError($"Error happened while operating QueryFullProcessImageName(): {Win32Error.GetLastWin32ErrorMessage()}");
+                        logger?.LogError("Error happened while operating QueryFullProcessImageName(): {ex}", Win32Error.GetLastWin32ErrorMessage());
                         return null;
                     }
 
-                    // If the requested return length is more than capacity (-2 for null terminator), then return false.
-                    if (bufferProcessCmdLenReturn > bufferProcessCmdLen - 2)
+                    if (bufferProcessCmdLenReturn <= bufferProcessCmdLen - 2)
                     {
-                        logger?.LogError($"The process command line length is more than requested length: {bufferProcessCmdLen - 2} < return {bufferProcessCmdLenReturn}");
-                        return null;
+                        // Return string
+                        return new string(bufferProcessCmdPtr, 0, bufferProcessCmdLenReturn);
                     }
 
-                    // Return string
-                    return new string(bufferProcessCmdPtr, 0, bufferProcessCmdLenReturn);
+                    // If the requested return length is more than capacity (-2 for null terminator), then return null.
+                    logger?.LogError("The process command line length is more than requested length: {len1} < return {len2}", bufferProcessCmdLen - 2, bufferProcessCmdLenReturn);
+                    return null;
                 }
             }
             finally
@@ -284,7 +285,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             if (instanceCount > 1)
             {
                 int curPId = Environment.ProcessId;
-                logger?.LogTrace($"Detected {instanceCount} instances! Current PID: {curPId}");
+                logger?.LogTrace("Detected {count} instances! Current PID: {curPId}", instanceCount, curPId);
                 logger?.LogTrace("Enumerating instances...");
                 foreach (var p in instanceProc)
                 {
@@ -298,7 +299,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                         
                         if (p.MainWindowHandle == nint.Zero)
                         {
-                            logger?.LogTrace($"Process {p.Id} does not have a window, stopping...");
+                            logger?.LogTrace("Process {PID} does not have a window, stopping...", p.Id);
                             try
                             {
                                 if (!p.CloseMainWindow()) // Try to gracefully kill
@@ -306,40 +307,43 @@ namespace Hi3Helper.Win32.Native.ManagedTools
                             }
                             catch (Exception ex)
                             {
-                                logger?.LogError(ex, $"Error closing window for PID {p.Id}");
+                                logger?.LogError(ex, "Error closing window for PID {PID}", p.Id);
                             }
                             continue;
                         }
 
-                        logger?.LogTrace($"Name: {p.ProcessName}");
-                        logger?.LogTrace($"MainModule: {p.MainModule?.FileName}");
-                        logger?.LogTrace($"PID: {p.Id}");
+                        logger?.LogTrace("Name: {pName}",             p.ProcessName);
+                        logger?.LogTrace("MainModule: {pModuleName}", p.MainModule?.FileName);
+                        logger?.LogTrace("PID: {PID}",                p.Id);
 
                         finalInstanceCount++;
                     }
                     catch (Exception ex)
                     {
-                        logger?.LogError("Failed when trying to fetch an instance information! " +
-                                     $"InstanceCount is not incremented.\r\n{ex}");
+                        logger?.LogError(ex, "Failed when trying to fetch an instance information! InstanceCount is not incremented");
                         throw;
                     }
                     finally
                     {
-                        p.Dispose();
+                        p?.Dispose();
                     }
                 }
 
-                logger?.LogTrace($"Multiple instances found! This is instance #{finalInstanceCount}");
+                logger?.LogTrace("Multiple instances found! This is instance #{instanceCount}", finalInstanceCount);
             }
             else finalInstanceCount = 1;
 
             return finalInstanceCount;
         }
 
-        public static bool TryGetProcessIdWithActiveWindow(string processName,              out int processId,                 out nint windowHandle,
-                                                           string checkFromOriginPath = "", bool    useStartsWithMatch = true, ILogger? logger       = null)
+        public static bool TryGetProcessIdWithActiveWindow(string   processName,
+                                                           out int  processId,
+                                                           out nint windowHandle,
+                                                           string   checkFromOriginPath = "",
+                                                           bool     useStartsWithMatch  = true,
+                                                           ILogger? logger              = null)
         {
-            // Try get the process id and window handle
+            // Try to get the process id and window handle
             if (!IsProcessExist(processName, out processId, out windowHandle, checkFromOriginPath, useStartsWithMatch, logger))
             {
                 return false;
@@ -349,19 +353,21 @@ namespace Hi3Helper.Win32.Native.ManagedTools
             return windowHandle != nint.Zero;
         }
 
-        public static bool TrySetProcessPriority(string   processName,              PriorityClass priority,
-                                                 string   checkFromOriginPath = "", bool          useStartsWithMatch = true,
-                                                 ILogger? logger              = null)
+        public static bool TrySetProcessPriority(string        processName,
+                                                 PriorityClass priority,
+                                                 string        checkFromOriginPath = "",
+                                                 bool          useStartsWithMatch  = true,
+                                                 ILogger?      logger              = null)
         {
-            // Try get the process id
-            if (!IsProcessExist(processName, out int processId, out _, checkFromOriginPath, useStartsWithMatch, logger))
+            // Try to get the process id
+            if (IsProcessExist(processName, out int processId, out _, checkFromOriginPath, useStartsWithMatch, logger))
             {
-                logger?.LogError("Cannot find process for such name: {} at: {}", processName, string.IsNullOrEmpty(checkFromOriginPath) ? "[default]" : checkFromOriginPath);
-                return false;
+                // Try set the process priority
+                return TrySetProcessPriority(processId, priority, logger);
             }
 
-            // Try set the process priority
-            return TrySetProcessPriority(processId, priority, logger);
+            logger?.LogError("Cannot find process for such name: {} at: {}", processName, string.IsNullOrEmpty(checkFromOriginPath) ? "[default]" : checkFromOriginPath);
+            return false;
         }
 
         public static bool TrySetProcessPriority(int processId, PriorityClass priority, ILogger? logger = null)
@@ -398,7 +404,7 @@ namespace Hi3Helper.Win32.Native.ManagedTools
 
             void PrintErrMessage(string message)
             {
-                logger?.LogError("{} for ProccessId: {} to Priority: {}", message, processId, priority);
+                logger?.LogError("{} for ProcessId: {} to Priority: {}", message, processId, priority);
                 logger?.LogError("Error: {}", Win32Error.GetLastWin32ErrorMessage());
             }
         }

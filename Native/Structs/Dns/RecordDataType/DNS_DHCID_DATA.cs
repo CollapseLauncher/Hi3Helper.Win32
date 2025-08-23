@@ -12,7 +12,7 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     [StructLayout(LayoutKind.Sequential)]
     public struct DNS_DHCID_DATA
     {
-        public uint dwByteCount;
-        public IntPtr DHCID;          // BYTE  DHCID[1];
+        public uint   dwByteCount;
+        public IntPtr DHCID; // BYTE  DHCID[1];
     }
 }

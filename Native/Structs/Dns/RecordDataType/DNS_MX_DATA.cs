@@ -11,7 +11,7 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct DNS_MX_DATA
     {
-        public char* pNameExchange;
+        public char*  pNameExchange;
         public ushort wPreference;
         public ushort Pad;
 

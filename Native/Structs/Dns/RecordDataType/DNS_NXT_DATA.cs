@@ -10,8 +10,8 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     [StructLayout(LayoutKind.Sequential)]
     public struct DNS_NXT_DATA
     {
-        public IntPtr pNameNext;    // string
+        public IntPtr pNameNext; // string
         public ushort wNumTypes;
-        public IntPtr wTypes;       // WORD  wTypes[1];
+        public IntPtr wTypes;    // WORD  wTypes[1];
     }
 }

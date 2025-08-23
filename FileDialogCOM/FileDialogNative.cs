@@ -1,11 +1,14 @@
+using Hi3Helper.Win32.ManagedTools;
 using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.ManagedTools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Threading.Tasks;
+
 // ReSharper disable ForCanBeConvertedToForeach
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.FileDialogCOM
 {
@@ -26,102 +29,121 @@ namespace Hi3Helper.Win32.FileDialogCOM
         private static nint _parentHandler = nint.Zero;
         public static void InitHandlerPointer(nint handle) => _parentHandler = handle;
 
-        public static async ValueTask<string> GetFilePicker(Dictionary<string, string>? fileTypeFilter = null, string? title = null) =>
+        public static async Task<string> GetFilePicker(Dictionary<string, string>? fileTypeFilter = null, string? title = null) =>
             (string)await GetPickerOpenTask<string>(string.Empty, fileTypeFilter, title);
 
-        public static async ValueTask<string[]> GetMultiFilePicker(Dictionary<string, string>? fileTypeFilter = null, string? title = null) =>
+        public static async Task<string[]> GetMultiFilePicker(Dictionary<string, string>? fileTypeFilter = null, string? title = null) =>
             (string[])await GetPickerOpenTask<string[]>(Array.Empty<string>(), fileTypeFilter, title, true);
 
-        public static async ValueTask<string> GetFolderPicker(string? title = null) =>
+        public static async Task<string> GetFolderPicker(string? title = null) =>
             (string)await GetPickerOpenTask<string>(string.Empty, null, title, false, true);
 
-        public static async ValueTask<string[]> GetMultiFolderPicker(string? title = null) =>
+        public static async Task<string[]> GetMultiFolderPicker(string? title = null) =>
             (string[])await GetPickerOpenTask<string[]>(Array.Empty<string>(), null, title, true, true);
 
-        public static async ValueTask<string> GetFileSavePicker(Dictionary<string, string>? fileTypeFilter = null, string? title = null) =>
+        public static async Task<string> GetFileSavePicker(Dictionary<string, string>? fileTypeFilter = null, string? title = null) =>
             await GetPickerSaveTask<string>(string.Empty, fileTypeFilter, title);
 
-        private static ValueTask<object> GetPickerOpenTask<T>(object defaultValue, Dictionary<string, string>? fileTypeFilter = null,
+        private static Task<object> GetPickerOpenTask<T>(object defaultValue, Dictionary<string, string>? fileTypeFilter = null,
             string? title = null, bool isMultiple = false, bool isFolder = false)
         {
-            ComMarshal.CreateInstance(
-                new Guid(CLSIDGuid.FileOpenDialog),
-                nint.Zero,
-                CLSCTX.CLSCTX_INPROC_SERVER,
-                out IFileOpenDialog? dialog).ThrowOnFailure();
+            return Task.Factory.StartNew(Impl);
 
-            nint titlePtr = nint.Zero;
-
-            try
+            object Impl()
             {
-                if (title != null) dialog!.SetTitle(titlePtr = UnicodeStringToComPtr(title));
-                SetFileTypeFilter(dialog, fileTypeFilter);
-
-                FOS mode = isMultiple ? FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT | FOS.FOS_ALLOWMULTISELECT :
-                                        FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT;
-
-                if (isFolder) mode |= FOS.FOS_PICKFOLDERS;
-
-                dialog!.SetOptions(mode);
-                if (dialog.Show(_parentHandler) < 0) return new ValueTask<object>(defaultValue);
-
-                if (isMultiple)
+                ComMarshal.CreateInstance(new Guid(CLSIDGuid.FileOpenDialog),
+                                          nint.Zero,
+                                          CLSCTX.CLSCTX_INPROC_SERVER,
+                                          out IFileOpenDialog? dialog).ThrowOnFailure();
+                try
                 {
-                    dialog.GetResults(out IShellItemArray? resShell);
-                    return new ValueTask<object>(GetIShellItemArray(resShell));
+                    if (title != null) dialog!.SetTitle(GetStringPointer(title));
+                    COMDLG_FILTERSPEC[] filterArray = SetFileTypeFilter(fileTypeFilter);
+                    if (filterArray.Length > 0)
+                    {
+                        dialog?.SetFileTypes((uint)filterArray.Length, Marshal.UnsafeAddrOfPinnedArrayElement(filterArray, 0));
+                    }
+
+                    FOS mode = isMultiple ?
+                        FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT | FOS.FOS_ALLOWMULTISELECT :
+                        FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT;
+
+                    if (isFolder)
+                    {
+                        mode |= FOS.FOS_PICKFOLDERS;
+                    }
+
+                    dialog!.SetOptions(mode);
+                    if (dialog.Show(_parentHandler) < 0)
+                    {
+                        return defaultValue;
+                    }
+
+                    if (isMultiple)
+                    {
+                        dialog.GetResults(out IShellItemArray resShell);
+                        return GetIShellItemArray(resShell);
+                    }
+                    else
+                    {
+                        dialog.GetResult(out IShellItem resShell);
+                        resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
+                        return ComPtrToUnicodeString(resultPtr) ?? "";
+                    }
                 }
-                else
+                finally
                 {
-                    dialog.GetResult(out IShellItem? resShell);
+                    // Free the COM instance
+                    ComMarshal.FreeInstance(dialog);
+                }
+            }
+        }
+
+        private static Task<string> GetPickerSaveTask<T>(string defaultValue, Dictionary<string, string>? fileTypeFilter = null, string? title = null)
+        {
+            return Task.Factory.StartNew(Impl);
+
+            string Impl()
+            {
+                ComMarshal.CreateInstance(new Guid(CLSIDGuid.FileSaveDialog),
+                                          nint.Zero,
+                                          CLSCTX.CLSCTX_INPROC_SERVER,
+                                          out IFileSaveDialog? dialog).ThrowOnFailure();
+
+                try
+                {
+                    if (title != null) dialog!.SetTitle(GetStringPointer(title));
+                    COMDLG_FILTERSPEC[] filterArray = SetFileTypeFilter(fileTypeFilter);
+                    if (filterArray.Length > 0)
+                    {
+                        dialog?.SetFileTypes((uint)filterArray.Length, Marshal.UnsafeAddrOfPinnedArrayElement(filterArray, 0));
+                    }
+
+                    const FOS mode = FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT;
+
+                    dialog!.SetOptions(mode);
+                    if (dialog.Show(_parentHandler) < 0)
+                    {
+                        return defaultValue;
+                    }
+
+                    dialog.GetResult(out IShellItem resShell);
                     resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
-                    return new ValueTask<object>(ComPtrToUnicodeString(resultPtr) ?? "");
+                    return ComPtrToUnicodeString(resultPtr) ?? "";
+                }
+                finally
+                {
+                    // Free the COM instance
+                    ComMarshal.FreeInstance(dialog);
                 }
             }
-            finally
-            {
-                if (titlePtr != nint.Zero) Marshal.FreeCoTaskMem(titlePtr);
-                // Free the COM instance
-                ComMarshal.FreeInstance(dialog);
-            }
         }
 
-        private static ValueTask<string> GetPickerSaveTask<T>(string defaultValue, Dictionary<string, string>? fileTypeFilter = null, string? title = null)
-        {
-            ComMarshal.CreateInstance(
-                new Guid(CLSIDGuid.FileSaveDialog),
-                nint.Zero,
-                CLSCTX.CLSCTX_INPROC_SERVER,
-                out IFileSaveDialog? dialog).ThrowOnFailure();
-
-            nint titlePtr = nint.Zero;
-
-            try
-            {
-                if (title != null) dialog!.SetTitle(titlePtr = UnicodeStringToComPtr(title));
-                SetFileTypeFilter(dialog, fileTypeFilter);
-
-                const FOS mode = FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT;
-
-                dialog!.SetOptions(mode);
-                if (dialog.Show(_parentHandler) < 0) return new ValueTask<string>(defaultValue);
-
-                dialog.GetResult(out IShellItem? resShell);
-                resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
-                return new ValueTask<string>(ComPtrToUnicodeString(resultPtr) ?? "");
-            }
-            finally
-            {
-                if (titlePtr != nint.Zero) Marshal.FreeCoTaskMem(titlePtr);
-                // Free the COM instance
-                ComMarshal.FreeInstance(dialog);
-            }
-        }
-
-        private static void SetFileTypeFilter(IFileOpenDialog? dialog, Dictionary<string, string>? fileTypeFilter)
+        private static COMDLG_FILTERSPEC[] SetFileTypeFilter(Dictionary<string, string>? fileTypeFilter)
         {
             if (fileTypeFilter == null)
             {
-                return;
+                return [];
             }
 
             int                 len   = fileTypeFilter.Count;
@@ -131,57 +153,21 @@ namespace Hi3Helper.Win32.FileDialogCOM
             {
                 array[i++] = new COMDLG_FILTERSPEC
                 {
-                    pszName = UnicodeStringToComPtr(entry.Key),
-                    pszSpec = UnicodeStringToComPtr(entry.Value)
+                    pszName = GetStringPointer(entry.Key),
+                    pszSpec = GetStringPointer(entry.Value)
                 };
             }
 
-            nint structPtr = ArrayToHGlobalPtr(array);
-            dialog?.SetFileTypes((uint)len, structPtr);
-            Marshal.FreeHGlobal(structPtr);
+            return array;
         }
 
-        private static void SetFileTypeFilter(IFileSaveDialog? dialog, Dictionary<string, string>? fileTypeFilter)
+        private static unsafe nint GetStringPointer(string str)
         {
-            if (fileTypeFilter == null)
+            fixed (void* ptr = &Utf16StringMarshaller.GetPinnableReference(str))
             {
-                return;
+                return (nint)ptr;
             }
-
-            int                 len   = fileTypeFilter.Count;
-            int                 i     = 0;
-            COMDLG_FILTERSPEC[] array = new COMDLG_FILTERSPEC[len];
-            foreach (KeyValuePair<string, string> entry in fileTypeFilter)
-            {
-                array[i++] = new COMDLG_FILTERSPEC
-                {
-                    pszName = UnicodeStringToComPtr(entry.Key),
-                    pszSpec = UnicodeStringToComPtr(entry.Value)
-                };
-            }
-
-            nint structPtr = ArrayToHGlobalPtr(array);
-            dialog?.SetFileTypes((uint)len, structPtr);
-            Marshal.FreeHGlobal(structPtr);
         }
-
-        private static unsafe nint ArrayToHGlobalPtr<T>(T[] array)
-            where T : unmanaged
-        {
-            int  bufferSize = sizeof(T) * array.Length;
-            nint structPtr  = Marshal.AllocHGlobal(bufferSize);
-            fixed (void* arrayPtr = &MemoryMarshal.GetArrayDataReference(array))
-            {
-                Buffer.MemoryCopy(arrayPtr,
-                                  (void*)structPtr,
-                                  bufferSize,
-                                  bufferSize);
-            }
-
-            return structPtr;
-        }
-
-        private static nint UnicodeStringToComPtr(string str) => Marshal.StringToCoTaskMemUni(str);
 
         private static string? ComPtrToUnicodeString(nint ptr)
         {

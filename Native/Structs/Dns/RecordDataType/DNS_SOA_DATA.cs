@@ -13,11 +13,11 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     {
         public char* pNamePrimaryServer;
         public char* pNameAdministrator;
-        public uint dwSerialNo;
-        public uint dwRefresh;
-        public uint dwRetry;
-        public uint dwExpire;
-        public uint dwDefaultTtl;
+        public uint  dwSerialNo;
+        public uint  dwRefresh;
+        public uint  dwRetry;
+        public uint  dwExpire;
+        public uint  dwDefaultTtl;
 
         public ReadOnlySpan<char> GetNamePrimaryServer() => MemoryMarshal.CreateReadOnlySpanFromNullTerminated(pNamePrimaryServer);
 

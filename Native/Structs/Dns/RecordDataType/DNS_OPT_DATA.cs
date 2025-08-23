@@ -12,6 +12,6 @@ namespace Hi3Helper.Win32.Native.Structs.Dns.RecordDataType
     {
         public ushort wDataLength;
         public ushort wPad;
-        public IntPtr Data;           // BYTE Data[1];
+        public IntPtr Data; // BYTE Data[1];
     }
 }

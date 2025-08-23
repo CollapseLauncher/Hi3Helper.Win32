@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.ManagedTools
 {
@@ -22,16 +23,16 @@ namespace Hi3Helper.Win32.ManagedTools
         /// <param name="logger">Logger, set null to ignore logging</param>
         /// <returns>True if debug file is created successfully</returns>
         public static async Task<bool> CreateMiniDumpAsync(
-            string  filePath,
-            Process processToDump,
+            string   filePath,
+            Process  processToDump,
             bool     includeFullMemory = false,
-            ILogger? logger = null)
+            ILogger? logger            = null)
         {
             try
             {
                 _logger ??= logger;
 
-                var dumpType = MiniDumpType.Normal;
+                MiniDumpType dumpType = MiniDumpType.Normal;
 
                 if (includeFullMemory)
                 {
@@ -48,21 +49,21 @@ namespace Hi3Helper.Win32.ManagedTools
                                 MiniDumpType.WithIndirectlyReferencedMemory;
                 }
 
-                await using var fs =
+                await using FileStream fs =
                     new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-                var result = MiniDumpWriteDump(
-                                               processToDump.Handle,
-                                               processToDump.Id,
-                                               fs.SafeFileHandle,
-                                               (int)dumpType,
-                                               IntPtr.Zero,
-                                               IntPtr.Zero,
-                                               IntPtr.Zero);
+                bool result = MiniDumpWriteDump(
+                                                processToDump.Handle,
+                                                processToDump.Id,
+                                                fs.SafeFileHandle,
+                                                (int)dumpType,
+                                                IntPtr.Zero,
+                                                IntPtr.Zero,
+                                                IntPtr.Zero);
 
                 if (!result)
                 {
-                    var err = Marshal.GetLastWin32Error();
-                    _logger?.LogError($"[MiniDump::CreateMiniDumpAsync()] Failed to create minidump! Error: {err}");
+                    int err = Marshal.GetLastWin32Error();
+                    _logger?.LogError("[MiniDump::CreateMiniDumpAsync()] Failed to create minidump! Error: {err}", err);
                     return false;
                 }
 
@@ -77,7 +78,7 @@ namespace Hi3Helper.Win32.ManagedTools
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"[MiniDump::CreateMiniDumpAsync()] Failed to create minidump!\r\n{ex}");
+                _logger?.LogError(ex, "[MiniDump::CreateMiniDumpAsync()] Failed to create minidump!");
                 return false;
             }
             finally
@@ -91,7 +92,7 @@ namespace Hi3Helper.Win32.ManagedTools
             string   filePath,
             Process  processToDump,
             bool     includeFullMemory = false,
-            ILogger? logger = null) 
+            ILogger? logger            = null)
             => CreateMiniDumpAsync(filePath, processToDump, includeFullMemory, logger).Result;
     }
 }
