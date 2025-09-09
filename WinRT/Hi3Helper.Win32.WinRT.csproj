@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     
     <PropertyGroup>
-        <TargetFramework>net9.0-windows10.0.22621.0</TargetFramework>
+        <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
         <Platforms>x64</Platforms>
         <Configurations>Debug;Release</Configurations>
         <LangVersion>preview</LangVersion>
@@ -31,7 +31,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.9" />
     </ItemGroup>
 
     <ItemGroup>
