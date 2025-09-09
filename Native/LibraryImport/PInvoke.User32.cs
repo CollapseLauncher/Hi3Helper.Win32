@@ -135,5 +135,5 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("user32.dll", EntryPoint = "ShutdownBlockReasonDestroy", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool ShutdownBlockReasonDestroy(nint windowHandle);
-        }
+    }
 }

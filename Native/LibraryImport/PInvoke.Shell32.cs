@@ -15,7 +15,7 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("shell32.dll", EntryPoint = "SHFileOperationW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         public static partial int SHFileOperation(in SHFILEOPSTRUCTW fileOp);
 
-        [LibraryImport("shell32", EntryPoint = "SHGetFileInfoW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        [LibraryImport("shell32.dll", EntryPoint = "SHGetFileInfoW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         public static partial nint SHGetFileInfo(
             string pszPath,
             int    dwFileAttributes,
