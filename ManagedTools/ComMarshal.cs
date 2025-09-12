@@ -24,7 +24,7 @@ namespace Hi3Helper.Win32.ManagedTools
         /// Try to create COM Object based on its Class Factory ID and its Class Identifier ID (IID).
         /// This method utilizes <see cref="StrategyBasedComWrappers"/> to create the COM Object.
         /// </summary>
-        /// <param name="classFactoryId">The <see cref="Guid"/> of the Class Factory used to create correspond COM Object based on its <paramref name="comObjIid"/>.</param>
+        /// <param name="classFactoryId">The <see cref="Guid"/> of the Class Factory used to create correspond COM Object based on Class Identifier ID (IID) passed from <paramref name="comObjIid"/>.</param>
         /// <param name="pIUnknownController">The pointer of external IUnknown implementation used to manage the creation of the COM Object. It must be set to <see cref="nint.Zero"/> if you want to use the default IUnknown.</param>
         /// <param name="classContext">
         /// Context in which the code that manages the newly created object will run.<br/>
@@ -82,7 +82,7 @@ namespace Hi3Helper.Win32.ManagedTools
         /// Try to create COM Object based on its Class Factory ID and its Class Identifier ID (IID).
         /// This method utilizes <see cref="StrategyBasedComWrappers"/> to create the COM Object.
         /// </summary>
-        /// <param name="classFactoryId">The <see cref="Guid"/> of the Class Factory used to create correspond COM Object based on its <paramref name="comObjIid"/>.</param>
+        /// <param name="classFactoryId">The <see cref="Guid"/> of the Class Factory used to create correspond COM Object based on Class Identifier ID (IID) passed from <paramref name="comObjIid"/>.</param>
         /// <param name="classContext">
         /// Context in which the code that manages the newly created object will run.<br/>
         /// See more here: <see href="https://learn.microsoft.com/en-us/windows/win32/api/wtypesbase/ne-wtypesbase-clsctx"/>
@@ -111,7 +111,7 @@ namespace Hi3Helper.Win32.ManagedTools
         /// Try to create COM Object based on its Class Factory ID and its Class Identifier ID (IID).
         /// This method utilizes <see cref="StrategyBasedComWrappers"/> to create the COM Object.
         /// </summary>
-        /// <param name="classFactoryId">The <see cref="Guid"/> of the Class Factory used to create correspond COM Object based on its <paramref name="comObjIid"/>.</param>
+        /// <param name="classFactoryId">The <see cref="Guid"/> of the Class Factory used to create correspond COM Object based on its Class Identifier ID (IID).</param>
         /// <param name="classContext">
         /// Context in which the code that manages the newly created object will run.<br/>
         /// See more here: <see href="https://learn.microsoft.com/en-us/windows/win32/api/wtypesbase/ne-wtypesbase-clsctx"/>
