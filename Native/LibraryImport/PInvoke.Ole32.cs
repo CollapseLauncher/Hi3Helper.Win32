@@ -14,7 +14,7 @@ namespace Hi3Helper.Win32.Native.LibraryImport
     {
         [LibraryImport("ole32.dll", EntryPoint = "CoCreateInstance")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static unsafe partial HResult CoCreateInstance(in Guid rclsid, nint pUnkOuter, CLSCTX dwClsContext, in Guid riid, out void* ppObj);
+        public static unsafe partial HResult CoCreateInstance(in Guid rclsid, nint pUnkOuter, CLSCTX dwClsContext, in Guid riid, out nint ppObj);
 
         /// <summary>
         /// Called to properly clean up the memory referenced by a PropVariant instance.

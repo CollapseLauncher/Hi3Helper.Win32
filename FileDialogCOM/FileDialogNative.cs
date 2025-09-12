@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using System.Threading;
 using System.Threading.Tasks;
 
 // ReSharper disable ForCanBeConvertedToForeach
@@ -26,7 +27,9 @@ namespace Hi3Helper.Win32.FileDialogCOM
     [SuppressMessage("ReSharper", "UnusedTypeParameter")]
     public static class FileDialogNative
     {
-        private static nint _parentHandler = nint.Zero;
+        private static nint          _parentHandler = nint.Zero;
+        private static SemaphoreSlim _semaphore     = new(1, 1);
+
         public static void InitHandlerPointer(nint handle) => _parentHandler = handle;
 
         public static async Task<string> GetFilePicker(Dictionary<string, string>? fileTypeFilter = null, string? title = null) =>
@@ -44,57 +47,68 @@ namespace Hi3Helper.Win32.FileDialogCOM
         public static async Task<string> GetFileSavePicker(Dictionary<string, string>? fileTypeFilter = null, string? title = null) =>
             await GetPickerSaveTask<string>(string.Empty, fileTypeFilter, title);
 
-        private static Task<object> GetPickerOpenTask<T>(object defaultValue, Dictionary<string, string>? fileTypeFilter = null,
+        private static IFileOpenDialog? _sharedFileOpenDialog;
+        private static IFileSaveDialog? _sharedFileSaveDialog;
+
+        private static async Task<object> GetPickerOpenTask<T>(object defaultValue, Dictionary<string, string>? fileTypeFilter = null,
             string? title = null, bool isMultiple = false, bool isFolder = false)
         {
-            return Task.Factory.StartNew(Impl);
+            await _semaphore.WaitAsync();
+            try
+            {
+                return await Task.Factory.StartNew(Impl);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
 
             object Impl()
             {
-                ComMarshal.CreateInstance(new Guid(CLSIDGuid.FileOpenDialog),
-                                          nint.Zero,
-                                          CLSCTX.CLSCTX_INPROC_SERVER,
-                                          out IFileOpenDialog? dialog).ThrowOnFailure();
-                try
+                if (_sharedFileOpenDialog == null)
                 {
-                    if (title != null) dialog!.SetTitle(GetStringPointer(title));
-                    COMDLG_FILTERSPEC[] filterArray = SetFileTypeFilter(fileTypeFilter);
-                    if (filterArray.Length > 0)
+                    if (!ComMarshal<IFileOpenDialog>.TryCreateComObject(new Guid(CLSIDGuid.FileOpenDialog),
+                                                                       CLSCTX.CLSCTX_INPROC_SERVER,
+                                                                       out _sharedFileOpenDialog,
+                                                                       out Exception? exception))
                     {
-                        dialog?.SetFileTypes((uint)filterArray.Length, Marshal.UnsafeAddrOfPinnedArrayElement(filterArray, 0));
-                    }
-
-                    FOS mode = isMultiple ?
-                        FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT | FOS.FOS_ALLOWMULTISELECT :
-                        FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT;
-
-                    if (isFolder)
-                    {
-                        mode |= FOS.FOS_PICKFOLDERS;
-                    }
-
-                    dialog!.SetOptions(mode);
-                    if (dialog.Show(_parentHandler) < 0)
-                    {
-                        return defaultValue;
-                    }
-
-                    if (isMultiple)
-                    {
-                        dialog.GetResults(out IShellItemArray resShell);
-                        return GetIShellItemArray(resShell);
-                    }
-                    else
-                    {
-                        dialog.GetResult(out IShellItem resShell);
-                        resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
-                        return ComPtrToUnicodeString(resultPtr) ?? "";
+                        throw exception;
                     }
                 }
-                finally
+
+                if (title != null) _sharedFileOpenDialog.SetTitle(GetStringPointer(title));
+                COMDLG_FILTERSPEC[] filterArray = SetFileTypeFilter(fileTypeFilter);
+                if (filterArray.Length > 0)
                 {
-                    // Free the COM instance
-                    ComMarshal.FreeInstance(dialog);
+                    _sharedFileOpenDialog.SetFileTypes((uint)filterArray.Length,
+                                                        Marshal.UnsafeAddrOfPinnedArrayElement(filterArray, 0));
+                }
+
+                FOS mode = isMultiple
+                    ? FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT | FOS.FOS_ALLOWMULTISELECT
+                    : FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT;
+
+                if (isFolder)
+                {
+                    mode |= FOS.FOS_PICKFOLDERS;
+                }
+
+                _sharedFileOpenDialog.SetOptions(mode);
+                if (_sharedFileOpenDialog.Show(_parentHandler) < 0)
+                {
+                    return defaultValue;
+                }
+
+                if (isMultiple)
+                {
+                    _sharedFileOpenDialog.GetResults(out IShellItemArray resShell);
+                    return GetIShellItemArray(resShell);
+                }
+                else
+                {
+                    _sharedFileOpenDialog.GetResult(out IShellItem resShell);
+                    resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
+                    return ComPtrToUnicodeString(resultPtr) ?? "";
                 }
             }
         }
@@ -105,37 +119,36 @@ namespace Hi3Helper.Win32.FileDialogCOM
 
             string Impl()
             {
-                ComMarshal.CreateInstance(new Guid(CLSIDGuid.FileSaveDialog),
-                                          nint.Zero,
-                                          CLSCTX.CLSCTX_INPROC_SERVER,
-                                          out IFileSaveDialog? dialog).ThrowOnFailure();
-
-                try
+                if (_sharedFileSaveDialog == null)
                 {
-                    if (title != null) dialog!.SetTitle(GetStringPointer(title));
-                    COMDLG_FILTERSPEC[] filterArray = SetFileTypeFilter(fileTypeFilter);
-                    if (filterArray.Length > 0)
+                    if (!ComMarshal<IFileSaveDialog>.TryCreateComObject(new Guid(CLSIDGuid.FileOpenDialog),
+                                                                        CLSCTX.CLSCTX_INPROC_SERVER,
+                                                                        out _sharedFileSaveDialog,
+                                                                        out Exception? exception))
                     {
-                        dialog?.SetFileTypes((uint)filterArray.Length, Marshal.UnsafeAddrOfPinnedArrayElement(filterArray, 0));
+                        throw exception;
                     }
-
-                    const FOS mode = FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT;
-
-                    dialog!.SetOptions(mode);
-                    if (dialog.Show(_parentHandler) < 0)
-                    {
-                        return defaultValue;
-                    }
-
-                    dialog.GetResult(out IShellItem resShell);
-                    resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
-                    return ComPtrToUnicodeString(resultPtr) ?? "";
                 }
-                finally
+
+                if (title != null) _sharedFileSaveDialog.SetTitle(GetStringPointer(title));
+                COMDLG_FILTERSPEC[] filterArray = SetFileTypeFilter(fileTypeFilter);
+                if (filterArray.Length > 0)
                 {
-                    // Free the COM instance
-                    ComMarshal.FreeInstance(dialog);
+                    _sharedFileSaveDialog.SetFileTypes((uint)filterArray.Length,
+                                                       Marshal.UnsafeAddrOfPinnedArrayElement(filterArray, 0));
                 }
+
+                const FOS mode = FOS.FOS_NOREADONLYRETURN | FOS.FOS_DONTADDTORECENT;
+
+                _sharedFileSaveDialog.SetOptions(mode);
+                if (_sharedFileSaveDialog.Show(_parentHandler) < 0)
+                {
+                    return defaultValue;
+                }
+
+                _sharedFileSaveDialog.GetResult(out IShellItem resShell);
+                resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
+                return ComPtrToUnicodeString(resultPtr) ?? "";
             }
         }
 

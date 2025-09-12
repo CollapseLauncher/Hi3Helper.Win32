@@ -39,17 +39,25 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         public ShellLink()
         {
-            ComMarshal.CreateInstance(
-                ShellLinkClsId.ClsId_ShellLink,
-                nint.Zero,
-                CLSCTX.CLSCTX_INPROC_SERVER,
-                out IShellLinkW? shellLink
-                ).ThrowOnFailure();
-
-            _linkW = shellLink;
-            _persistFileW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersistFile>(in ShellLinkClsId.IGuid_IPersistFile);
-            _persistW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersist>(in ShellLinkClsId.IGuid_IPersist);
-            _propertyStoreW = shellLink?.CastComInterfaceAs<IShellLinkW, IPropertyStore>(in ShellLinkClsId.IGuid_IPropertyStore);
+            if (!ComMarshal<IShellLinkW>.TryCreateComObject(ShellLinkClsId.ClsId_ShellLink,
+                                                            CLSCTX.CLSCTX_INPROC_SERVER,
+                                                            out _linkW,
+                                                            out Exception? exception) ||
+                !ComMarshal<IShellLinkW>.TryCastComObjectAs(_linkW,
+                                                            out _persistFileW,
+                                                            out exception,
+                                                            true) ||
+                !ComMarshal<IShellLinkW>.TryCastComObjectAs(_linkW,
+                                                            out _persistW,
+                                                            out exception,
+                                                            true) ||
+                !ComMarshal<IShellLinkW>.TryCastComObjectAs(_linkW,
+                                                            out _propertyStoreW,
+                                                            out exception,
+                                                            true))
+            {
+                throw exception;
+            }
         }
 
         /// <summary>
@@ -69,7 +77,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         /// </summary>
         public void Dispose()
         {
-            ComMarshal.FreeInstance(_linkW);
+            _ = ComMarshal<IShellLinkW>.TryReleaseComObject(_linkW, out _);
             GC.SuppressFinalize(this);
         }
 

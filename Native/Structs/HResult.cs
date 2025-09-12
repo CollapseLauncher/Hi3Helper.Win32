@@ -12,8 +12,8 @@ namespace Hi3Helper.Win32.Native.Structs
         internal HResult(int value) => Value = value;
         public static implicit operator int(HResult value) => value.Value;
         public static implicit operator uint(HResult value) => (uint)value.Value;
-        public static explicit operator HResult(int value) => new(value);
-        public static explicit operator HResult(uint value) => new((int)value);
+        public static implicit operator HResult(int value) => new(value);
+        public static implicit operator HResult(uint value) => new((int)value);
         public static bool operator ==(HResult left, HResult right) => left.Value == right.Value;
         public static bool operator !=(HResult left, HResult right) => !(left == right);
         public bool Equals(HResult other) => Value == other.Value;
