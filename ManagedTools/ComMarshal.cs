@@ -230,7 +230,7 @@ namespace Hi3Helper.Win32.ManagedTools
             ref readonly Guid comObjTargetIid = ref Nullable.GetValueRefOrDefaultRef(in ComMarshal<TObjTarget>.ObjComIid);
             if (!Unsafe.IsNullRef(in comObjTargetIid))
             {
-                return TryCastComObjectAs(comObjSource, in comObjTargetIid, out comObjTarget, out exceptionIfFalse);
+                return TryCastComObjectAs(comObjSource, in comObjTargetIid, out comObjTarget, out exceptionIfFalse, isKeepAliveSource);
             }
 
             exceptionIfFalse = new InvalidCastException($"Type of {typeof(TObjTarget).Name} has no Class Identifier ID (IID)");
