@@ -3,6 +3,7 @@ using Hi3Helper.Win32.Native.ClassIds;
 using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
+using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.ShellLinkCOM;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;

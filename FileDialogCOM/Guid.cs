@@ -10,6 +10,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
         internal const string IFileSaveDialog   = "84BCCD23-5FDE-4CDB-AEA4-AF64B83D78AB";
         internal const string IFileDialogEvents = "973510DB-7D7F-452B-8975-74A85828D354";
         internal const string IShellItem        = "43826D1E-E718-42EE-BC55-A1E261C37BFE";
+        internal const string IShellItemFilter  = "2659B475-EEB8-48B7-8F07-B378810F48CF";
         internal const string IShellItemArray   = "B63EA76D-1F85-456F-A19C-48159EFA858B";
     }
 
