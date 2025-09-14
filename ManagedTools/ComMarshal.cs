@@ -1,5 +1,4 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -278,7 +277,6 @@ namespace Hi3Helper.Win32.ManagedTools
             Unsafe.SkipInit(out comObjResult);
             Unsafe.SkipInit(out exceptionIfFalse);
 
-            GetEnsureCreation:
             // Return null exception if comObjPpv is null
             if (comObjPpv == nint.Zero)
             {
@@ -309,7 +307,7 @@ namespace Hi3Helper.Win32.ManagedTools
 
             // Fail-safe: Back to GetEnsureCreation with null ppv.
             comObjPpv = nint.Zero;
-            goto GetEnsureCreation;
+            return TryCreateComObjectFromReference(comObjPpv, out _, out _);
         }
     }
 }
