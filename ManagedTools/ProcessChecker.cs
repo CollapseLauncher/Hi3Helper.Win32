@@ -158,7 +158,7 @@ namespace Hi3Helper.Win32.ManagedTools
                             char* bufferProcessCmdPtr = (char*)Marshal.UnsafeAddrOfPinnedArrayElement(bufferProcessCmd, 0);
                             {
                                 // Get the command line query of the process
-                                bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, ref bufferProcessCmdLenReturn);
+                                bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, &bufferProcessCmdLenReturn);
                                 // If the query is unsuccessful, then log the Win32 error and return false.
                                 if (!hQueryFullProcessImageNameResult)
                                 {
@@ -237,7 +237,7 @@ namespace Hi3Helper.Win32.ManagedTools
                 char* bufferProcessCmdPtr = (char*)Marshal.UnsafeAddrOfPinnedArrayElement(bufferProcessCmd, 0);
                 {
                     // Get the command line query of the process
-                    bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, ref bufferProcessCmdLenReturn);
+                    bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, &bufferProcessCmdLenReturn);
                     // If the query is unsuccessful, then log the Win32 error and return false.
                     if (!hQueryFullProcessImageNameResult)
                     {
