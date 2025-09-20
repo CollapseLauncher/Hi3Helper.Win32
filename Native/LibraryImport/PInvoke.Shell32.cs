@@ -1,5 +1,6 @@
-﻿using System.Runtime.InteropServices;
-using Hi3Helper.Win32.Native.Structs;
+﻿using Hi3Helper.Win32.Native.Structs;
+using System;
+using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 
@@ -28,5 +29,8 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("shell32.dll", SetLastError = true, EntryPoint = "GetCurrentProcessExplicitAppUserModelID", StringMarshalling = StringMarshalling.Utf16)]
         public static partial HResult GetProcessAumid(out string? appUserModelId);
+
+        [LibraryImport("shell32.dll", EntryPoint = "SHGetKnownFolderPath", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        public static partial int SHGetKnownFolderPath(in Guid rfid, uint dwFlags, nint hToken, out string? ppszPath);
     }
 }
