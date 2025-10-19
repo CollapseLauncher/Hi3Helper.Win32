@@ -3,6 +3,7 @@ using Hi3Helper.Win32.Native.ClassIds;
 using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
+using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.ShellLinkCOM;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -89,12 +90,14 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
                 shortcutPath += ".lnk";
             }
 
-            ComMarshal.CreateInstance(
-                ShellLinkClsId.ClsId_ShellLink,
-                nint.Zero,
-                CLSCTX.CLSCTX_INPROC_SERVER,
-            out IShellLinkW? shellLink
-            ).ThrowOnFailure();
+            if (!ComMarshal<IShellLinkW>.TryCreateComObject(ShellLinkClsId.ClsId_ShellLink,
+                                                            CLSCTX.CLSCTX_INPROC_SERVER,
+                                                            out IShellLinkW? shellLink,
+                                                            out Exception? exception))
+            {
+                currentInstance.Logger?.LogError(exception, $"An error has occurred while trying to create COM Instance of {nameof(IShellLinkW)}");
+                return;
+            }
 
             PropVariant aumId = PropVariant.FromString(aumid);
             PropertyKey aumIdPropkey = new()
@@ -111,35 +114,63 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 
             bool isShortcutExist = File.Exists(shortcutPath);
 
+            IPersistFile?   persistFileW   = null;
+            IPropertyStore? propertyStoreW = null;
+
             try
             {
-                IPersistFile? persistFileW = shellLink?.CastComInterfaceAs<IShellLinkW, IPersistFile>(in ShellLinkClsId.IGuid_IPersistFile);
-                IPropertyStore? propertyStoreW = shellLink?.CastComInterfaceAs<IShellLinkW, IPropertyStore>(in ShellLinkClsId.IGuid_IPropertyStore);
+                if (!ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
+                                                                in ShellLinkClsId.IGuid_IPersistFile,
+                                                                out persistFileW,
+                                                                out exception) ||
+                    !ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
+                                                                in ShellLinkClsId.IGuid_IPropertyStore,
+                                                                out propertyStoreW,
+                                                                out exception))
+                {
+                    currentInstance.Logger?.LogError(exception, $"An error has occurred while trying to cast COM Instance from {nameof(IShellLinkW)} to {nameof(IPersistFile)} or {nameof(IPropertyStore)}");
+                    return;
+                }
 
                 try
                 {
                     if (isShortcutExist)
-                        persistFileW?.Load(shortcutPath, 0);
+                        persistFileW.Load(shortcutPath, 0);
                 }
                 catch (Exception ex)
                 {
                     currentInstance.Logger?.LogError(ex, "[DesktopNotificationManagerCompat::CreateAumidShortcut] An error has occured while loading existing shortcut: {shortcutPath}\r\n{ex}", shortcutPath, ex);
                 }
 
-                shellLink?.SetPath(executablePath);
-                shellLink?.SetWorkingDirectory(executableDirPath);
+                shellLink.SetPath(executablePath);
+                shellLink.SetWorkingDirectory(executableDirPath);
 
-                propertyStoreW?.SetValue(ref aumIdPropkey, ref aumId);
-                propertyStoreW?.SetValue(ref toastIdPropkey, ref toastId);
-                propertyStoreW?.Commit();
+                propertyStoreW.SetValue(ref aumIdPropkey, ref aumId);
+                propertyStoreW.SetValue(ref toastIdPropkey, ref toastId);
+                propertyStoreW.Commit();
 
                 if (!string.IsNullOrEmpty(temporaryDirectoryPath) && !Directory.Exists(temporaryDirectoryPath))
                     Directory.CreateDirectory(temporaryDirectoryPath);
 
-                persistFileW?.Save(shortcutPath, true);
+                persistFileW.Save(shortcutPath, true);
             }
             finally
             {
+                if (!ComMarshal<IShellLinkW>.TryReleaseComObject(shellLink, out exception))
+                {
+                    currentInstance.Logger?.LogError(exception, $"Cannot release COM Object: {nameof(IShellLinkW)}");
+                }
+
+                if (!ComMarshal<IPersistFile>.TryReleaseComObject(persistFileW, out exception))
+                {
+                    currentInstance.Logger?.LogError(exception, $"Cannot release COM Object: {nameof(IPersistFile)}");
+                }
+
+                if (!ComMarshal<IPropertyStore>.TryReleaseComObject(propertyStoreW, out exception))
+                {
+                    currentInstance.Logger?.LogError(exception, $"Cannot release COM Object: {nameof(IPropertyStore)}");
+                }
+
                 aumId.Clear();
                 toastId.Clear();
             }

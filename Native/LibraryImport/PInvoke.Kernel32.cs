@@ -1,5 +1,6 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Structs;
+using System;
 using System.Runtime.InteropServices;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable IdentifierTypo
@@ -170,5 +171,20 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool FindClose(nint hFindFile);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "OpenProcess", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial nint OpenProcess(int dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "QueryFullProcessImageNameW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static unsafe partial bool QueryFullProcessImageName(nint hProcess, int dwFlags, char* lpExeName, int* lpdwSize);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "SetEvent", SetLastError = true)]
+        public static partial int SetEvent(nint hEvent);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "CreateEventW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        public static unsafe partial nint CreateEvent(nint lpEventAttributes, int bManualReset, int bInitialState, string? lpName);
     }
 }

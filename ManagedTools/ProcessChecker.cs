@@ -6,6 +6,7 @@ using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 // ReSharper disable RedundantUnsafeContext
@@ -157,7 +158,7 @@ namespace Hi3Helper.Win32.ManagedTools
                             char* bufferProcessCmdPtr = (char*)Marshal.UnsafeAddrOfPinnedArrayElement(bufferProcessCmd, 0);
                             {
                                 // Get the command line query of the process
-                                bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, ref bufferProcessCmdLenReturn);
+                                bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, &bufferProcessCmdLenReturn);
                                 // If the query is unsuccessful, then log the Win32 error and return false.
                                 if (!hQueryFullProcessImageNameResult)
                                 {
@@ -236,7 +237,7 @@ namespace Hi3Helper.Win32.ManagedTools
                 char* bufferProcessCmdPtr = (char*)Marshal.UnsafeAddrOfPinnedArrayElement(bufferProcessCmd, 0);
                 {
                     // Get the command line query of the process
-                    bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, ref bufferProcessCmdLenReturn);
+                    bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, &bufferProcessCmdLenReturn);
                     // If the query is unsuccessful, then log the Win32 error and return false.
                     if (!hQueryFullProcessImageNameResult)
                     {
@@ -267,19 +268,25 @@ namespace Hi3Helper.Win32.ManagedTools
 
         public static nint GetProcessWindowHandle(string procName) => Process.GetProcessesByName(Path.GetFileNameWithoutExtension(procName), ".")[0].MainWindowHandle;
 
-        public static Process[] GetInstanceProcesses()
+        private static Process[] GetInstanceProcesses()
         {
-            using Process currentProcess = Process.GetCurrentProcess();
-            Process[]     processes      = Process.GetProcessesByName(currentProcess.ProcessName);
+            using var currentProcess = Process.GetCurrentProcess();
+            var       processes      = Process.GetProcessesByName(currentProcess.ProcessName);
+            
+            // Order by start time to get the first instance
+            processes = processes.OrderBy(p => p.StartTime).ToArray();
 
             return processes;
         }
 
+        private static int? _instanceCount;
+
         public static int EnumerateInstances(ILogger? logger = null)
         {
+            if (_instanceCount is not null) return _instanceCount.Value;
+            
             Process[] instanceProc = GetInstanceProcesses();
             int instanceCount = instanceProc.Length;
-
             int finalInstanceCount = 0;
 
             if (instanceCount > 1)
@@ -295,7 +302,14 @@ namespace Hi3Helper.Win32.ManagedTools
                         
                         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                         // Do null check anyway to prevent NullReferenceException
-                        if (p == null || p.HasExited || curPId == p.Id) continue;
+                        if (p == null || p.HasExited) continue;
+
+                        // Skip check on current process
+                        if (p.Id == curPId)
+                        {
+                            finalInstanceCount++;
+                            continue;
+                        }
                         
                         if (p.MainWindowHandle == nint.Zero)
                         {
@@ -333,6 +347,7 @@ namespace Hi3Helper.Win32.ManagedTools
             }
             else finalInstanceCount = 1;
 
+            _instanceCount = finalInstanceCount;
             return finalInstanceCount;
         }
 

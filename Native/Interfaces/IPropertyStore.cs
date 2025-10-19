@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.ClassIds;
+using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.ShellLinkCOM;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;

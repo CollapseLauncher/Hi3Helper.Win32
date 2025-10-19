@@ -12,11 +12,13 @@ namespace Hi3Helper.Win32.TaskbarListCOM
         {
             try
             {
-                ComMarshal.CreateInstance(new Guid(CLSIDGuid.CLSID_TaskbarList),
-                                          0,
-                                          CLSCTX.CLSCTX_INPROC_SERVER,
-                                          out ITaskbarList3? taskbarList).ThrowOnFailure();
-                _taskbarList = taskbarList;
+                if (!ComMarshal<ITaskbarList3>.TryCreateComObject(new Guid(CLSIDGuid.CLSID_TaskbarList),
+                                                                  CLSCTX.CLSCTX_INPROC_SERVER,
+                                                                  out _taskbarList,
+                                                                  out Exception? exception))
+                {
+                    throw exception;
+                }
             }
             catch (Exception)
             {
@@ -24,13 +26,7 @@ namespace Hi3Helper.Win32.TaskbarListCOM
             }
         }
 
-        ~TaskbarList()
-        {
-            if (_taskbarList != null)
-            {
-                ComMarshal.FreeInstance(_taskbarList);
-            }
-        }
+        ~TaskbarList() => ComMarshal<ITaskbarList3>.TryReleaseComObject(_taskbarList, out _);
 
         public int SetProgressState(nint windowHandle, TaskbarState state)
         {

@@ -52,7 +52,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             {
                 ComInterfaceMarshaller<NotificationService>.Free((void*)ppvObject);
             #if DEBUG
-                _instance?.Logger?.LogDebug("[NotificationActivatorClassFactory::CreateInstance] NotificationActivator has been created successfully! (pUnkOuter: 0x{pUnkOuter} riid: {riid} ppvObject: {ppvObject})", pUnkOuter, riid, ppvObject);
+                _instance?.Logger?.LogDebug("[NotificationActivatorClassFactory::CreateComObject] NotificationActivator has been created successfully! (pUnkOuter: 0x{pUnkOuter} riid: {riid} ppvObject: {ppvObject})", pUnkOuter, riid, ppvObject);
             #endif
             }
         }

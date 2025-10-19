@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Threading.Tasks;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable UnusedMember.Global
@@ -12,7 +13,82 @@ namespace Hi3Helper.Win32.ManagedTools
 {
     public static class MiniDump
     {
-        private static ILogger? _logger;
+        /// <summary>
+        /// Try to create a minidump of the specified process.
+        /// </summary>
+        /// <typeparam name="TSafeHandle">A safe handle type of <see cref="SafeHandle"/></typeparam>
+        /// <param name="processToDump">The target instance of <see cref="Process"/> to dump.</param>
+        /// <param name="fileHandle">A pointer to the handle of FILE.</param>
+        /// <param name="error">The exception output if an error occur.</param>
+        /// <param name="includeFullMemory">Whether to include a full memory dump or just a minimal dump.</param>
+        /// <param name="logger">Logger, set null to ignore logging</param>
+        /// <returns>
+        /// This returns <c>true</c> if the dump is created successfully; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool TryCreateMiniDump<TSafeHandle>(
+            Process        processToDump,
+            TSafeHandle    fileHandle,
+            out Exception? error,
+            bool           includeFullMemory = false,
+            ILogger?       logger            = null)
+            where TSafeHandle : SafeHandle
+        {
+            error = null;
+            MiniDumpType dumpType = MiniDumpType.Normal;
+
+            if (includeFullMemory)
+            {
+                dumpType |= MiniDumpType.WithFullMemory |
+                            MiniDumpType.WithHandleData |
+                            MiniDumpType.WithThreadInfo |
+                            MiniDumpType.WithUnloadedModules;
+            }
+            else
+            {
+                dumpType |= MiniDumpType.WithPrivateReadWriteMemory |
+                            MiniDumpType.FilterMemory |
+                            MiniDumpType.WithDataSegs |
+                            MiniDumpType.WithIndirectlyReferencedMemory;
+            }
+
+
+            SafeHandleMarshaller<TSafeHandle>.ManagedToUnmanagedIn marshalIn = new();
+            marshalIn.FromManaged(fileHandle);
+            try
+            {
+                nint hFile = marshalIn.ToUnmanaged();
+
+                logger?.LogTrace("[MiniDump::TryCreateMiniDump()] Writing to handle: {handle}", hFile);
+                bool result = MiniDumpWriteDump(processToDump.Handle,
+                                                processToDump.Id,
+                                                hFile,
+                                                dumpType,
+                                                nint.Zero,
+                                                nint.Zero,
+                                                nint.Zero);
+
+                if (result)
+                {
+                    return true;
+                }
+
+                error = Marshal.GetExceptionForHR(Marshal.GetLastPInvokeError());
+                return false;
+            }
+            catch (Exception ex)
+            {
+                error = ex;
+                return false;
+            }
+            finally
+            {
+                marshalIn.Free();
+                if (error != null)
+                {
+                    logger?.LogError(error, "[MiniDump::TryCreateMiniDump()] Failed to create minidump! Error: {err}", error);
+                }
+            }
+        }
 
         /// <summary>
         /// Create a minidump of the specified process.
@@ -22,69 +98,44 @@ namespace Hi3Helper.Win32.ManagedTools
         /// <param name="includeFullMemory">Whether to include the entire memory file</param>
         /// <param name="logger">Logger, set null to ignore logging</param>
         /// <returns>True if debug file is created successfully</returns>
-        public static async Task<bool> CreateMiniDumpAsync(
+        public static Task<bool> CreateMiniDumpAsync(
             string   filePath,
             Process  processToDump,
             bool     includeFullMemory = false,
             ILogger? logger            = null)
         {
-            try
+            return Task.Factory.StartNew(() =>
             {
-                _logger ??= logger;
+                using FileStream fs = File.Create(filePath);
 
-                MiniDumpType dumpType = MiniDumpType.Normal;
-
-                if (includeFullMemory)
+                try
                 {
-                    dumpType |= MiniDumpType.WithFullMemory |
-                                MiniDumpType.WithHandleData |
-                                MiniDumpType.WithThreadInfo |
-                                MiniDumpType.WithUnloadedModules;
+                    if (!TryCreateMiniDump(processToDump,
+                                           fs.SafeFileHandle,
+                                           out Exception? error,
+                                           includeFullMemory,
+                                           logger)) return error != null ? throw error : false;
+
+                    logger?.LogInformation("""
+                                           [MiniDump::CreateMiniDumpAsync()] Minidump created successfully at {filePath}
+                                           ID: {processToDump.Id}
+                                           Process Name: {processToDump.ProcessName}
+                                           Include Full Memory: {includeFullMemory}
+                                           Dump File Size: {fs.Length} bytes
+                                           """,
+                                           filePath,
+                                           processToDump.Id,
+                                           processToDump.ProcessName,
+                                           includeFullMemory,
+                                           fs.Length);
+                    return true;
                 }
-                else
+                catch (Exception ex)
                 {
-                    dumpType |= MiniDumpType.WithPrivateReadWriteMemory |
-                                MiniDumpType.FilterMemory |
-                                MiniDumpType.WithDataSegs |
-                                MiniDumpType.WithIndirectlyReferencedMemory;
-                }
-
-                await using FileStream fs =
-                    new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-                bool result = MiniDumpWriteDump(
-                                                processToDump.Handle,
-                                                processToDump.Id,
-                                                fs.SafeFileHandle,
-                                                (int)dumpType,
-                                                IntPtr.Zero,
-                                                IntPtr.Zero,
-                                                IntPtr.Zero);
-
-                if (!result)
-                {
-                    int err = Marshal.GetLastWin32Error();
-                    _logger?.LogError("[MiniDump::CreateMiniDumpAsync()] Failed to create minidump! Error: {err}", err);
+                    logger?.LogError(ex, "[MiniDump::CreateMiniDumpAsync()] Failed to create minidump! Error: {ex}", ex);
                     return false;
                 }
-
-                await fs.FlushAsync();
-                _logger?.LogInformation($"[MiniDump::CreateMiniDumpAsync()] Minidump created successfully at {filePath}\r\n" +
-                                        $"Dump Type: {dumpType}\r\n" +
-                                        $"Process ID: {processToDump.Id}\r\n" +
-                                        $"Process Name: {processToDump.ProcessName}\r\n" +
-                                        $"Include Full Memory: {includeFullMemory}" +
-                                        $"Dump File Size: {fs.Length} bytes");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "[MiniDump::CreateMiniDumpAsync()] Failed to create minidump!");
-                return false;
-            }
-            finally
-            {
-                _logger = null;
-            }
+            });
         }
 
         /// <inheritdoc cref="CreateMiniDumpAsync"/>

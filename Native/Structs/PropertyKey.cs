@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 // ReSharper disable IdentifierTypo
 
-namespace Hi3Helper.Win32.ShellLinkCOM
+namespace Hi3Helper.Win32.Native.Structs
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct PropertyKey
