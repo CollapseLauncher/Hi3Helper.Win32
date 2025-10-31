@@ -24,7 +24,7 @@ namespace Hi3Helper.Win32.Native.Structs
         public override string ToString() => string.Format(CultureInfo.InvariantCulture, "0x{0:X8}", Value);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal bool Succeeded => Value >= 0;
+        internal bool Succeeded => Value == 0;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal bool Failed => Value < 0;
