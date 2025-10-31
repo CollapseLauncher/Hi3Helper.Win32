@@ -269,7 +269,7 @@ namespace Hi3Helper.Win32.ManagedTools
             return (exceptionIfFalse = Marshal.GetExceptionForHR(hResult)) == null;
         }
 
-        private static bool TryCreateComObjectFromReference(
+        public static bool TryCreateComObjectFromReference(
             IntPtr          comObjPpv,
             out TObjSource? comObjResult,
             out Exception?  exceptionIfFalse)
