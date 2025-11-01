@@ -6,6 +6,7 @@
 // ReSharper disable UnusedType.Global
 
 using Hi3Helper.Win32.Native.Enums.DXGI;
+// ReSharper disable ConvertToAutoProperty
 
 #pragma warning disable IDE0051
 

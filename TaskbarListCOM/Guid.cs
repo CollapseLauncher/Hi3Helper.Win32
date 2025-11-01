@@ -1,4 +1,5 @@
 // ReSharper disable InconsistentNaming
+// ReSharper disable ClassNeverInstantiated.Global
 namespace Hi3Helper.Win32.TaskbarListCOM
 {
     public class IIDGuid

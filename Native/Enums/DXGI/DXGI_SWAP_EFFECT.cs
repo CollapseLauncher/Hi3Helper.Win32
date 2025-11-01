@@ -12,7 +12,7 @@ namespace Hi3Helper.Win32.Native.Enums.DXGI;
 /// <para>For more info about the flip-model swap chain and optimizing presentation, see <a href="https://docs.microsoft.com/windows/win32/direct3ddxgi/dxgi-1-2-presentation-improvements">Enhancing presentation with the flip model, dirty rectangles, and scrolled areas</a>.</para>
 /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgi/ne-dxgi-dxgi_swap_effect#">Read more on learn.microsoft.com</see>.</para>
 /// </remarks>
-public enum DXGI_SWAP_EFFECT
+public enum DXGI_SWAP_EFFECT : uint
 {
     /// <summary>
     /// <para>Use this flag to specify the bit-block transfer (bitblt) model and to specify that DXGI discard the contents of the back buffer after you call <a href="https://docs.microsoft.com/windows/win32/api/dxgi1_2/nf-dxgi1_2-idxgiswapchain1-present1">IDXGISwapChain1::Present1</a>. This flag is valid for a swap chain with more than one back buffer, although, applications only have read and write access to buffer 0. Use this flag to enable the display driver to select the most efficient presentation technique for the swap chain. <b>Direct3D 12:  </b>This enumeration value is never supported. D3D12 apps must use <b>DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL</b> or <b>DXGI_SWAP_EFFECT_FLIP_DISCARD</b>. <div class="alert"><b>Note</b>  There are differences between full screen exclusive and full screen UWP. If you are porting a Direct3D 11 application to UWP on a Windows PC, be aware that the use of  <b>DXGI_SWAP_EFFECT_DISCARD</b> when creating swap chains does not behave the same way in UWP as it does in Win32, and its use may be detrimental to GPU performance. This is because UWP applications are forced into FLIP swap modes (even if other swap modes are set), because this reduces the computation time used by the memory copies originally done by the older bitblt model. The recommended approach is to manually convert DX11 Discard swap chains to use flip models within UWP,  using <b>DXGI_SWAP_EFFECT_FLIP_DISCARD</b> instead of <b>DXGI_SWAP_EFFECT_DISCARD</b> where possible. Refer to the Example below, and see <a href="https://docs.microsoft.com/windows/win32/direct3ddxgi/for-best-performance--use-dxgi-flip-model">this article</a> for more information.</div> <div> </div></para>
@@ -37,5 +37,5 @@ public enum DXGI_SWAP_EFFECT
     /// <para><div class="alert"><b>Note</b>  Windows Store apps must use <b>DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL</b> or <b>DXGI_SWAP_EFFECT_FLIP_DISCARD</b>. </div> <div> </div></para>
     /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgi/ne-dxgi-dxgi_swap_effect#members">Read more on learn.microsoft.com</see>.</para>
     /// </summary>
-    DXGI_SWAP_EFFECT_FLIP_DISCARD = 4,
+    DXGI_SWAP_EFFECT_FLIP_DISCARD = 4
 }

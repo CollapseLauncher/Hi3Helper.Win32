@@ -3,6 +3,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 // ReSharper disable CommentTypo
+// ReSharper disable GrammarMistakeInComment
 #pragma warning disable IDE0051
 
 namespace Hi3Helper.Win32.Native.Structs.DXGI;
@@ -53,6 +54,7 @@ public struct DXGI_SWAP_CHAIN_DESC
 
     private DXGI_SWAP_CHAIN_FLAG _flags;
 
+    // ReSharper disable once ConvertToAutoProperty
     public DXGI_SWAP_CHAIN_FLAG Flags
     {
         get => _flags;

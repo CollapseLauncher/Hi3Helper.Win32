@@ -6,9 +6,9 @@
 namespace Hi3Helper.Win32.Native.Enums.DXGI;
 
 [Flags]
-public enum DXGI_MODE_SCALING
+public enum DXGI_MODE_SCALING : uint
 {
     DXGI_MODE_SCALING_UNSPECIFIED = 0,
     DXGI_MODE_SCALING_CENTERED    = 1,
-    DXGI_MODE_SCALING_STRETCHED   = 2,
+    DXGI_MODE_SCALING_STRETCHED   = 2
 }

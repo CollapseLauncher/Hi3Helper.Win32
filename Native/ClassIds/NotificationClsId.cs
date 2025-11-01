@@ -1,4 +1,5 @@
-﻿namespace Hi3Helper.Win32.Native.ClassIds;
+﻿// ReSharper disable ClassNeverInstantiated.Global
+namespace Hi3Helper.Win32.Native.ClassIds;
 
 public class NotificationClsId
 {

@@ -8,6 +8,8 @@ using System.Runtime.InteropServices.Marshalling;
 using System.Threading.Tasks;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedType.Global
 
 namespace Hi3Helper.Win32.ManagedTools
 {
@@ -52,7 +54,8 @@ namespace Hi3Helper.Win32.ManagedTools
             }
 
 
-            SafeHandleMarshaller<TSafeHandle>.ManagedToUnmanagedIn marshalIn = new();
+            SafeHandleMarshaller<TSafeHandle>.ManagedToUnmanagedIn marshalIn =
+                new SafeHandleMarshaller<TSafeHandle>.ManagedToUnmanagedIn();
             marshalIn.FromManaged(fileHandle);
             try
             {

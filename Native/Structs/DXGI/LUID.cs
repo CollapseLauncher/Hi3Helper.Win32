@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
 #pragma warning disable IDE0051
 namespace Hi3Helper.Win32.Native.Structs.DXGI;
 

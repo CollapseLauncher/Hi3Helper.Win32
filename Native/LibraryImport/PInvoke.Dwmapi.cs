@@ -1,6 +1,7 @@
 ﻿using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMethodReturnValue.Global
 
 namespace Hi3Helper.Win32.Native.LibraryImport
 {

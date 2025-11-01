@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// ReSharper disable UnusedMember.Global
+// ReSharper disable InconsistentNaming
 
-namespace Hi3Helper.Win32.Native.Enums.DXGI
+namespace Hi3Helper.Win32.Native.Enums.DXGI;
+
+public enum DXGI_CREATE_FACTORY_FLAGS : uint
 {
- public enum DXGI_CREATE_FACTORY_FLAGS : uint
- {
-  DXGI_CREATE_FACTORY_DEBUG = 0x00000001,
- }
+    DXGI_CREATE_FACTORY_DEBUG = 0x00000001
 }

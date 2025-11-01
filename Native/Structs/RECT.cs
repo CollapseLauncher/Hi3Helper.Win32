@@ -1,6 +1,9 @@
 ﻿using System.Drawing;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StructCanBeMadeReadOnly
+// ReSharper disable UnusedMember.Global
+// ReSharper disable ConvertToAutoPropertyWhenPossible
+// ReSharper disable CommentTypo
 #pragma warning disable IDE0290
 
 namespace Hi3Helper.Win32.Native.Structs
@@ -25,10 +28,12 @@ namespace Hi3Helper.Win32.Native.Structs
         {
         }
 
+        // ReSharper disable once UnusedMember.Global
         public Rect(Point location, Size size) : this(location.X, location.Y, unchecked(location.X + size.Width), unchecked(location.Y + size.Height))
         {
         }
 
+        // ReSharper disable once ConvertToPrimaryConstructor
         public Rect(int left, int top, int right, int bottom)
 
         {
@@ -42,7 +47,7 @@ namespace Hi3Helper.Win32.Native.Structs
         // ReSharper disable once IdentifierTypo
         // ReSharper disable once InconsistentNaming
         public static Rect FromXYWH(int x, int y, int width, int height) =>
-            new(x, y, unchecked(x + width), unchecked(y + height));
+            new Rect(x, y, unchecked(x + width), unchecked(y + height));
 
         public readonly int Width => unchecked(_right - _left);
 
@@ -54,12 +59,14 @@ namespace Hi3Helper.Win32.Native.Structs
 
         public readonly int Y => _top;
 
-        public readonly Size Size => new(Width, Height);
+        public readonly Size Size => new Size(Width, Height);
 
-        public static implicit operator Rectangle(Rect value) => new(value._left, value._top, value.Width, value.Height);
+        public static implicit operator Rectangle(Rect value) =>
+            new Rectangle(value._left, value._top, value.Width, value.Height);
 
-        public static implicit operator RectangleF(Rect value) => new(value._left, value._top, value.Width, value.Height);
+        public static implicit operator RectangleF(Rect value) =>
+            new RectangleF(value._left, value._top, value.Width, value.Height);
 
-        public static implicit operator Rect(Rectangle value) => new(value);
+        public static implicit operator Rect(Rectangle value) => new Rect(value);
     }
 }

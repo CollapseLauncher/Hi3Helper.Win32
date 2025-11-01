@@ -3,6 +3,7 @@ using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMethodReturnValue.Global
 #pragma warning disable CA1401
 
 namespace Hi3Helper.Win32.Native.LibraryImport

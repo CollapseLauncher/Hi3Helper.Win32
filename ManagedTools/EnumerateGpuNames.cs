@@ -1,16 +1,13 @@
 ﻿using Hi3Helper.Win32.Native.ClassIds.DXGI;
 using Hi3Helper.Win32.Native.Enums.DXGI;
-using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.Interfaces.DXGI;
 using Hi3Helper.Win32.Native.LibraryImport;
+using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.DXGI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hi3Helper.Win32.ManagedTools;
 
@@ -18,10 +15,9 @@ public static class EnumerateGpuNames
 {
     public static IEnumerable<string> GetEnumerateGpuNames()
     {
-        Guid adapterFactoryIid = new(DXGIClsId.IDXGIFactory6);
+        Guid adapterFactoryIid = new Guid(DXGIClsId.IDXGIFactory6);
         PInvoke.CreateDXGIFactory2(0, in adapterFactoryIid, out nint factoryPp)
                .ThrowOnFailure();
-
 
         Unsafe.SkipInit(out IDXGIFactory6? factory);
 
@@ -38,15 +34,15 @@ public static class EnumerateGpuNames
             uint index = 0;
 
         StartGo:
-            Guid adapterIid = new(DXGIClsId.IDXGIAdapter1);
-            int result = factory.EnumAdapterByGpuPreference(index,
-                                                            DXGI_GPU_PREFERENCE.HighPerformance,
-                                                            adapterIid,
-                                                            out nint adapterPp);
+            Guid adapterIid = new Guid(DXGIClsId.IDXGIAdapter1);
+            HResult result = factory.EnumAdapterByGpuPreference(index,
+                                                                DXGI_GPU_PREFERENCE.HighPerformance,
+                                                                adapterIid,
+                                                                out nint adapterPp);
 
             index++;
 
-            if (result != 0)
+            if (!result.Succeeded)
                 yield break;
 
             if (adapterPp == nint.Zero)

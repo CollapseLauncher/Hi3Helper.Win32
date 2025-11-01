@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 // ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
 
 // ReSharper disable CommentTypo
 // ReSharper disable StringLiteralTypo
@@ -293,6 +294,7 @@ public static class Dns
                                           recordType,
                                           bypassCache,
                                           throwIfNotFound: false,
+                                          logger: logger,
                                           token: token).ConfigureAwait(false);
 
         if (result == nint.Zero)
@@ -343,6 +345,7 @@ public static class Dns
     /// <param name="recordType">A type of the record to get.</param>
     /// <param name="bypassCache">Whether to bypass the DNS cacne.</param>
     /// <param name="throwIfNotFound">Whether to throw if no record is present.</param>
+    /// <param name="logger">A logger instance to log DNS query activities.</param>
     /// <param name="token">A cancellation token to cancel the async operation.</param>
     /// <returns>A pointer to the <see cref="DNS_RECORD"/> struct.</returns>
     public static unsafe Task<nint> DnsQueryAsync(
@@ -350,9 +353,11 @@ public static class Dns
         DnsRecordTypes    recordType,
         bool              bypassCache     = false,
         bool              throwIfNotFound = false,
+        ILogger?          logger          = null,
         CancellationToken token           = default)
     {
-        TaskCompletionSource<nint> tcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        TaskCompletionSource<nint> tcs =
+            new TaskCompletionSource<nint>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         DnsQueryOptions options = DNS_QUERY_REQUEST3.DefaultQueryOptions;
         if (bypassCache)
@@ -371,6 +376,13 @@ public static class Dns
                             NativeMemory.Free(queryCancel);
                             NativeMemory.Free(queryResult);
                             NativeMemory.Free(queryRequest);
+
+                            logger?.LogDebug("[Dns::DnsQueryAsync] (Host: {host} | {record}) Memory has been freed for Cancel ({a:x8}), Result ({b:x8}) and Request3 ({c:x8}) queries",
+                                             host,
+                                             recordType,
+                                             (nint)queryCancel,
+                                             (nint)queryResult,
+                                             (nint)queryRequest);
                         });
 
         DnsStatus status = PInvoke.DnsQueryEx(queryRequest, queryResult, queryCancel);
@@ -380,7 +392,13 @@ public static class Dns
         }
         else if (status is not DnsStatus.DnsRequestPending)
         {
-            tcs.SetException(GetWin32ExceptionFromStatus(status));
+            Win32Exception exception = GetWin32ExceptionFromStatus(status);
+            tcs.SetException(exception);
+
+            logger?.LogError(exception,
+                             "[Dns::DnsQueryAsync] (Host: {host} | {record}) An error has occurred while performing query!",
+                             host,
+                             recordType);
         }
         else
         {
@@ -388,6 +406,10 @@ public static class Dns
                            {
                                PInvoke.DnsCancelQuery(queryCancel);
                                tcs.SetCanceled(token);
+
+                               logger?.LogDebug("[Dns::DnsQueryAsync] (Host: {host} | {record}) Query has been cancelled!",
+                                                host,
+                                                recordType);
                            });
         }
 
@@ -418,6 +440,10 @@ public static class Dns
             }
 
             tcs.SetResult(queryResultRef.GetRecordPtr());
+
+            logger?.LogDebug("[Dns::DnsQueryAsync] (Host: {host} | {record}) Query has been executed successfully!",
+                             host,
+                             recordType);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Hi3Helper.Win32.Native.ClassIds;
+﻿// ReSharper disable InconsistentNaming
+// ReSharper disable ClassNeverInstantiated.Global
+namespace Hi3Helper.Win32.Native.ClassIds;
 
 public class BufferClsId
 {

@@ -5,13 +5,14 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Hi3Helper.Win32.ManagedTools
 {
     // ReSharper disable once PartialTypeWithSinglePart
     file static class DefaultComWrappersStatic
     {
-        public static readonly StrategyBasedComWrappers Default = new();
+        public static readonly StrategyBasedComWrappers Default = new StrategyBasedComWrappers();
     }
 
     public static class ComMarshal<TObjSource>

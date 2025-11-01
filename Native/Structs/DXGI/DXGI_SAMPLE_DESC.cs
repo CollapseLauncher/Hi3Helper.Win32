@@ -1,5 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
 // ReSharper disable GrammarMistakeInComment
+// ReSharper disable UnusedMember.Global
 #pragma warning disable IDE0051
 #pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
 

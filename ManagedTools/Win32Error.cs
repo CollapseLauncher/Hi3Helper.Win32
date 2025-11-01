@@ -3,6 +3,7 @@ using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Hi3Helper.Win32.ManagedTools
 {

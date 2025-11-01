@@ -14,7 +14,7 @@ namespace Hi3Helper.Win32.Native.Enums.DXGI;
 /// <para>This doc was truncated.</para>
 /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format#">Read more on learn.microsoft.com</see>.</para>
 /// </remarks>
-public enum DXGI_FORMAT
+public enum DXGI_FORMAT : uint
 {
     /// <summary>The format is not known.</summary>
     DXGI_FORMAT_UNKNOWN = 0,
@@ -324,5 +324,5 @@ public enum DXGI_FORMAT
     DXGI_FORMAT_V408 = 132,
     DXGI_FORMAT_SAMPLER_FEEDBACK_MIN_MIP_OPAQUE = 189,
     DXGI_FORMAT_SAMPLER_FEEDBACK_MIP_REGION_USED_OPAQUE = 190,
-    DXGI_FORMAT_A4B4G4R4_UNORM = 191,
+    DXGI_FORMAT_A4B4G4R4_UNORM = 191
 }

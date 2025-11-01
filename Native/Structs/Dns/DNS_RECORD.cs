@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 // ReSharper disable CommentTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnassignedReadonlyField
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Hi3Helper.Win32.Native.Structs.Dns
 {

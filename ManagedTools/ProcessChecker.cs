@@ -11,6 +11,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 // ReSharper disable RedundantUnsafeContext
 // ReSharper disable UnusedMember.Global
+// ReSharper disable OutParameterValueIsAlwaysDiscarded.Global
 
 namespace Hi3Helper.Win32.ManagedTools
 {
@@ -117,7 +118,8 @@ namespace Hi3Helper.Win32.ManagedTools
 
                     // Use the struct buffer into the ReadOnlySpan<char> to be compared with
                     // the input from "processName" argument.
-                    ReadOnlySpan<char> imageNameSpan = new(unicodeString->Buffer, unicodeString->Length / 2);
+                    ReadOnlySpan<char> imageNameSpan =
+                        new ReadOnlySpan<char>(unicodeString->Buffer, unicodeString->Length / 2);
                     bool isMatchedExecutable = !useStartsWithMatch ? 
                         imageNameSpan.Equals(processName, StringComparison.OrdinalIgnoreCase) :
                         imageNameSpan.StartsWith(processName, StringComparison.OrdinalIgnoreCase);
@@ -174,7 +176,8 @@ namespace Hi3Helper.Win32.ManagedTools
                                 }
 
                                 // Get the command line query
-                                ReadOnlySpan<char> processCmdLineSpan = new(bufferProcessCmdPtr, bufferProcessCmdLenReturn);
+                                ReadOnlySpan<char> processCmdLineSpan =
+                                    new ReadOnlySpan<char>(bufferProcessCmdPtr, bufferProcessCmdLenReturn);
 
                                 // Get the span of origin path to compare
                                 ReadOnlySpan<char> checkForOriginPathDir = checkForOriginPath;
@@ -381,7 +384,7 @@ namespace Hi3Helper.Win32.ManagedTools
                 return TrySetProcessPriority(processId, priority, logger);
             }
 
-            logger?.LogError("Cannot find process for such name: {} at: {}", processName, string.IsNullOrEmpty(checkFromOriginPath) ? "[default]" : checkFromOriginPath);
+            logger?.LogError("Cannot find process for such name: {a} at: {b}", processName, string.IsNullOrEmpty(checkFromOriginPath) ? "[default]" : checkFromOriginPath);
             return false;
         }
 
@@ -408,7 +411,7 @@ namespace Hi3Helper.Win32.ManagedTools
                 }
 
                 // Return true as successful
-                logger?.LogInformation("Process Id: {} priority has been set to: {}", processId, priority);
+                logger?.LogInformation("Process Id: {a} priority has been set to: {b}", processId, priority);
                 return true;
             }
             finally
@@ -419,7 +422,7 @@ namespace Hi3Helper.Win32.ManagedTools
 
             void PrintErrMessage(string message)
             {
-                logger?.LogError("{} for ProcessId: {} to Priority: {}", message, processId, priority);
+                logger?.LogError("{a} for ProcessId: {b} to Priority: {c}", message, processId, priority);
                 logger?.LogError("Error: {}", Win32Error.GetLastWin32ErrorMessage());
             }
         }

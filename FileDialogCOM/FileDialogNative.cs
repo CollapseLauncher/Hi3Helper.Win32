@@ -30,7 +30,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
     public static class FileDialogNative
     {
         private static          nint          _parentHandler = nint.Zero;
-        private static readonly SemaphoreSlim Semaphore      = new(1, 1);
+        private static readonly SemaphoreSlim Semaphore      = new SemaphoreSlim(1, 1);
 
         private static readonly Guid FileOpenDialogGuid = new Guid(CLSIDGuid.FileOpenDialog);
         private static readonly Guid FileSaveDialogGuid = new Guid(CLSIDGuid.FileSaveDialog);

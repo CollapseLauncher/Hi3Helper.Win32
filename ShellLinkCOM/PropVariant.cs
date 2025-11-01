@@ -15,7 +15,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
 
         public static PropVariant FromString(string str)
         {
-            PropVariant pv = new()
+            PropVariant pv = new PropVariant
             {
                 variantType = 31,  // VT_LPWSTR
                 pointerValue = Marshal.StringToCoTaskMemUni(str)
@@ -27,7 +27,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         public static PropVariant FromGuid(Guid guid)
         {
             byte[] bytes = guid.ToByteArray();
-            PropVariant pv = new()
+            PropVariant pv = new PropVariant
             {
                 variantType = 72,  // VT_CLSID
                 pointerValue = Marshal.AllocCoTaskMem(bytes.Length)

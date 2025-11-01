@@ -1,5 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
-
+// ReSharper disable UnusedMember.Global
 namespace Hi3Helper.Win32.Native.Enums.DXGI;
 
 public enum DXGI_GPU_PREFERENCE : uint

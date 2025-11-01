@@ -5,7 +5,6 @@ using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using System;
-using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,6 +15,11 @@ using System.Runtime.Versioning;
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable CommentTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedParameter.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 
 #pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 namespace Hi3Helper.Win32.ShellLinkCOM
@@ -104,7 +108,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
 
                 flags |= large ? SHGetFileInfoConstants.SHGFI_LARGEICON : SHGetFileInfoConstants.SHGFI_SMALLICON;
 
-                FileIcon fileIcon = new(Target, flags);
+                FileIcon fileIcon = new FileIcon(Target, flags);
                 return fileIcon.ShellIcon;
             }
 

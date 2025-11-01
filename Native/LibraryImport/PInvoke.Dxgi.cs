@@ -1,6 +1,8 @@
 ﻿using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Runtime.InteropServices;
+// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
 
 namespace Hi3Helper.Win32.Native.LibraryImport
 {

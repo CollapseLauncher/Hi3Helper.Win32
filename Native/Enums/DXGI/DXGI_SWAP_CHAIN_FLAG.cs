@@ -13,7 +13,7 @@ namespace Hi3Helper.Win32.Native.Enums.DXGI;
 /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgi/ne-dxgi-dxgi_swap_chain_flag#">Read more on learn.microsoft.com</see>.</para>
 /// </remarks>
 [Flags]
-public enum DXGI_SWAP_CHAIN_FLAG
+public enum DXGI_SWAP_CHAIN_FLAG : uint
 {
     /// <summary>
     /// <para>Set this flag to turn off automatic image rotation; that is, do not perform a rotation when transferring the contents of the front buffer to the monitor. Use this flag to avoid a bandwidth penalty when an application expects to handle rotation. This option is valid only during full-screen mode.</para>
@@ -78,5 +78,5 @@ public enum DXGI_SWAP_CHAIN_FLAG
     /// </summary>
     DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING = 0x00000800,
     /// <summary></summary>
-    DXGI_SWAP_CHAIN_FLAG_RESTRICTED_TO_ALL_HOLOGRAPHIC_DISPLAYS = 0x00001000,
+    DXGI_SWAP_CHAIN_FLAG_RESTRICTED_TO_ALL_HOLOGRAPHIC_DISPLAYS = 0x00001000
 }
