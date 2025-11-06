@@ -42,12 +42,12 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool AllocConsole();
-        
+
         [LibraryImport("kernel32.dll", EntryPoint = "FreeConsole", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool FreeConsole();
-        
+
         [LibraryImport("kernel32.dll", EntryPoint = "AttachConsole", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -135,7 +135,7 @@ namespace Hi3Helper.Win32.Native.LibraryImport
                        StringMarshalling = StringMarshalling.Utf16)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial int GetCurrentPackageFullName(ref int packageFullNameLength, out string? packageFullName);
-        
+
         [LibraryImport("kernel32.dll", EntryPoint = "RtlCopyMemory", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial void RtlCopyMemory(nint dest, nint src, uint count);
@@ -187,5 +187,34 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("kernel32.dll", EntryPoint = "CreateEventW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         public static unsafe partial nint CreateEvent(nint lpEventAttributes, int bManualReset, int bInitialState, string? lpName);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "CreateProcessAsUserW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool CreateProcessAsUser(
+            nint hToken,
+            string lpApplicationName,
+            string lpCommandLine,
+            nint lpProcessAttributes,
+            nint lpThreadAttributes,
+            [MarshalAs(UnmanagedType.Bool)] bool bInheritHandles,
+            ProcessCreationFlags dwCreationFlags,
+            nint lpEnvironment,
+            string lpCurrentDirectory,
+            ref STARTUPINFOEX lpStartupInfo,
+            out PROCESS_INFORMATION lpProcessInformation);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "InitializeProcThreadAttributeList", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool InitializeProcThreadAttributeList(nint lpAttributeList, int dwAttributeCount,
+                                                                     int dwFlags, ref nint lpSize);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "UpdateProcThreadAttribute", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool UpdateProcThreadAttribute(nint lpAttributeList, uint dwFlags, PROC_THREAD_ATTRIBUTE attribute,
+                                                             nint lpValue, nint cbSize, nint lpPreviousValue,
+                                                             nint lpReturnSize);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "DeleteProcThreadAttributeList", SetLastError = true)]
+        public static partial void DeleteProcThreadAttributeList(nint lpAttributeList);
     }
 }

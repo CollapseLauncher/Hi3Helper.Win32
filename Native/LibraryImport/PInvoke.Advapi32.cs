@@ -28,5 +28,19 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("advapi32.dll", EntryPoint = "RegCloseKey")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial int RegCloseKey(nint hKey);
+
+        [LibraryImport("advapi32.dll", EntryPoint = "OpenProcessToken", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool OpenProcessToken(nint ProcessHandle, TOKEN_ACCESS DesiredAccess, out nint TokenHandle);
+
+        [LibraryImport("advapi32.dll", EntryPoint = "DuplicateTokenEx", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool DuplicateTokenEx(
+            nint hExistingToken,
+            TOKEN_ACCESS dwDesiredAccess,
+            nint lpTokenAttributes,
+            SECURITY_IMPERSONATION_LEVEL ImpersonationLevel,
+            TOKEN_TYPE TokenType,
+            out nint phNewToken);
     }
 }
