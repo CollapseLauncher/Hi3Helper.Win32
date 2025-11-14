@@ -2,6 +2,9 @@
 using Hi3Helper.Win32.Native.LibraryImport;
 using System;
 using System.Runtime.CompilerServices;
+// ReSharper disable UnusedType.Global
+// ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.ManagedTools;
 
@@ -26,7 +29,7 @@ public static class PathUtil
         {
             // Special-cased values to not use SHGetFolderPath when we have a more direct option available.
             case Environment.SpecialFolder.System:
-                // This assumes the system directory always exists and thus we don't need to do anything special for any SpecialFolderOption.
+                // This assumes the system directory always exists, and thus we don't need to do anything special for any SpecialFolderOption.
                 return Environment.SystemDirectory;
             default:
                 return string.Empty;

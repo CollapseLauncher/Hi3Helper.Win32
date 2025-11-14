@@ -11,6 +11,7 @@ using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable CommentTypo
 // ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Hi3Helper.Win32.ManagedTools
 {
@@ -53,7 +54,7 @@ namespace Hi3Helper.Win32.ManagedTools
                 WriteFileListToConcatBuffer(filePathSpan, concatBuf);
 
                 // Get a pointer to the rented buffer and cast it to SHFILEOPSTRUCTW
-                SHFILEOPSTRUCTW fileOp = new()
+                SHFILEOPSTRUCTW fileOp = new SHFILEOPSTRUCTW
                 {
                     // Set the file operation parameters
                     wFunc  = funcType,

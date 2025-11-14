@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 // ReSharper disable CommentTypo
 // ReSharper disable GrammarMistakeInComment
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Hi3Helper.Win32.ManagedTools
 {

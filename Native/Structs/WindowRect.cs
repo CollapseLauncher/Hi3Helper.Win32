@@ -1,4 +1,5 @@
-﻿namespace Hi3Helper.Win32.Native.Structs
+﻿// ReSharper disable MemberCanBePrivate.Global
+namespace Hi3Helper.Win32.Native.Structs
 {
     public struct WindowRect
     {

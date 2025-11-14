@@ -1,5 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
 namespace Hi3Helper.Win32.FileDialogCOM
 {
     internal class IIDGuid

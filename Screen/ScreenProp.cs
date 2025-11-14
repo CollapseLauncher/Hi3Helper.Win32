@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace Hi3Helper.Win32.Screen
 {
@@ -61,7 +62,8 @@ namespace Hi3Helper.Win32.Screen
             return new Size { Width = (int)localDevMode->dmPelsWidth, Height = (int)localDevMode->dmPelsHeight };
         }
 
-        private static Size GetScreenSize() => new()
+        private static Size GetScreenSize() =>
+            new Size
         {
             Width = PInvoke.GetSystemMetrics(SystemMetric.SM_CXSCREEN),
             Height = PInvoke.GetSystemMetrics(SystemMetric.SM_CYSCREEN)

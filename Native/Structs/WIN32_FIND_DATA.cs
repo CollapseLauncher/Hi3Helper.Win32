@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Hi3Helper.Win32.Native.Structs
 {
@@ -24,14 +25,13 @@ namespace Hi3Helper.Win32.Native.Structs
         public       uint     dwCreatorType;
         public       ushort   wFinderFlags;
 
-        public Span<char> FileNameBuffer
-            => new((char*)Unsafe.AsPointer(ref cFileName[0]), 260);
+        public Span<char> FileNameBuffer => new Span<char>((char*)Unsafe.AsPointer(ref cFileName[0]), 260);
 
         public ReadOnlySpan<char> FileName =>
             MemoryMarshal.CreateReadOnlySpanFromNullTerminated((char*)Unsafe.AsPointer(ref cFileName[0]));
 
-        public Span<char> AlternateFileNameBuffer
-            => new((char*)Unsafe.AsPointer(ref cAlternateFileName[0]), 14);
+        public Span<char> AlternateFileNameBuffer =>
+            new Span<char>((char*)Unsafe.AsPointer(ref cAlternateFileName[0]), 14);
 
         public ReadOnlySpan<char> AlternativeFileName =>
             MemoryMarshal.CreateReadOnlySpanFromNullTerminated((char*)Unsafe.AsPointer(ref cAlternateFileName[0]));

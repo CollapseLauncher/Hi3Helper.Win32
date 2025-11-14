@@ -3,6 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMethodReturnValue.Global
 
 namespace Hi3Helper.Win32.Native.LibraryImport
 {

@@ -1,6 +1,7 @@
 ﻿// ReSharper disable InconsistentNaming
 
 using System.Runtime.InteropServices;
+// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.Native.Structs.Dns
 {
