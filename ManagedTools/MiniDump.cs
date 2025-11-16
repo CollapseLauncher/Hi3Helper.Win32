@@ -2,6 +2,7 @@ using Hi3Helper.Win32.Native.Enums;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
@@ -27,7 +28,7 @@ namespace Hi3Helper.Win32.ManagedTools
         /// <returns>
         /// This returns <c>true</c> if the dump is created successfully; otherwise, <c>false</c>.
         /// </returns>
-        public static bool TryCreateMiniDump<TSafeHandle>(
+        public static bool TryCreateMiniDump<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TSafeHandle>(
             Process        processToDump,
             TSafeHandle    fileHandle,
             out Exception? error,
