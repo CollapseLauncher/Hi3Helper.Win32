@@ -58,7 +58,7 @@ public unsafe partial interface IDXGISwapChain : IDXGIDeviceSubObject
     /// <remarks>
     /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiswapchain-getbuffer">Learn more about this API from learn.microsoft.com</see>.</para>
     /// </remarks>
-    void GetBuffer(uint Buffer, Guid* riid, out void* ppSurface);
+    void GetBuffer(uint Buffer, in Guid riid, out nint ppSurface);
 
     /// <summary>Sets the display state to windowed or full screen.</summary>
     /// <param name="Fullscreen">

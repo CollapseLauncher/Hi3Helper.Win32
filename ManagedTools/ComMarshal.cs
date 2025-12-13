@@ -272,8 +272,8 @@ namespace Hi3Helper.Win32.ManagedTools
 
         public static bool TryCreateComObjectFromReference(
             IntPtr          comObjPpv,
-            out TObjSource? comObjResult,
-            out Exception?  exceptionIfFalse)
+            [NotNullWhen(true)] out TObjSource? comObjResult,
+            [NotNullWhen(false)] out Exception? exceptionIfFalse)
         {
             Unsafe.SkipInit(out comObjResult);
             Unsafe.SkipInit(out exceptionIfFalse);
