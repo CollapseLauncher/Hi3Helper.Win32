@@ -26,5 +26,5 @@ public unsafe partial interface IDXGIDeviceSubObject : IDXGIObject
     /// <para>Type: <b><a href="https://docs.microsoft.com/windows/win32/com/structure-of-com-error-codes">HRESULT</a></b> A code that indicates success or failure (see <a href="https://docs.microsoft.com/windows/desktop/direct3ddxgi/dxgi-error">DXGI_ERROR</a>).</para>
     /// </returns>
     /// <remarks>The type of interface that is returned can be any interface published by the device. For example, it could be an IDXGIDevice * called pDevice, and therefore the REFIID would be obtained by calling __uuidof(pDevice).</remarks>\
-    void GetDevice(Guid* riid, out void* ppDevice);
+    void GetDevice(in Guid riid, out nint /* void */ ppDevice);
 }

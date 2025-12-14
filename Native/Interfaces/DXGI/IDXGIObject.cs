@@ -1,5 +1,4 @@
 ﻿using Hi3Helper.Win32.Native.ClassIds.DXGI;
-using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
@@ -38,9 +37,7 @@ public unsafe partial interface IDXGIObject
     /// <para>This doc was truncated.</para>
     /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiobject-setprivatedata#">Read more on learn.microsoft.com</see>.</para>
     /// </remarks>
-    [PreserveSig]
-    [return: MarshalAs(UnmanagedType.Error)]
-    HResult SetPrivateData(in Guid Name, uint DataSize, nint pData);
+    void SetPrivateData(in Guid Name, uint DataSize, nint pData);
 
     /// <summary>Set an interface in the object's private data.</summary>
     /// <param name="Name">
@@ -58,9 +55,7 @@ public unsafe partial interface IDXGIObject
     /// <para>This API associates an interface pointer with the object. When the interface is set its reference count is incremented. When the data are overwritten (by calling SPD or SPDI with the same GUID) or the object is destroyed, ::Release() is called and the interface's reference count is decremented.</para>
     /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiobject-setprivatedatainterface#">Read more on learn.microsoft.com</see>.</para>
     /// </remarks>
-    [PreserveSig]
-    [return: MarshalAs(UnmanagedType.Error)]
-    HResult SetPrivateDataInterface(in Guid Name, nint pUnknown);
+    void SetPrivateDataInterface(in Guid Name, nint pUnknown);
 
     /// <summary>Get a pointer to the object's data.</summary>
     /// <param name="Name">
@@ -83,9 +78,7 @@ public unsafe partial interface IDXGIObject
     /// <para>This doc was truncated.</para>
     /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiobject-getprivatedata#">Read more on learn.microsoft.com</see>.</para>
     /// </remarks>
-    [PreserveSig]
-    [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetPrivateData(in Guid Name, ref uint pDataSize, nint pData);
+    void GetPrivateData(in Guid Name, ref uint pDataSize, nint pData);
 
     /// <summary>Gets the parent of the object.</summary>
     /// <param name="riid">
@@ -102,7 +95,5 @@ public unsafe partial interface IDXGIObject
     /// <remarks>
     /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiobject-getparent">Learn more about this API from learn.microsoft.com</see>.</para>
     /// </remarks>
-    [PreserveSig]
-    [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetParent(in Guid riid, out nint /* void */ ppParent);
+    void GetParent(in Guid riid, out nint /* void */ ppParent);
 }

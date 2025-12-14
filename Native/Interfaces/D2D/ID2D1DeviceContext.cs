@@ -30,7 +30,7 @@ public partial interface ID2D1DeviceContext : ID2D1RenderTarget
     void CreateColorContextFromWicColorContext([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IWICColorContext>))] IWICColorContext wicColorContext, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1ColorContext>))] out ID2D1ColorContext colorContext);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1devicecontext-createbitmapfromdxgisurface(idxgisurface_constd2d1_bitmap_properties1_id2d1bitmap1)
-    void CreateBitmapFromDxgiSurface([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGISurface>))] IDXGISurface surface, nint /* optional D2D1_BITMAP_PROPERTIES1* */ bitmapProperties, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Bitmap1>))] out ID2D1Bitmap1 bitmap);
+    void CreateBitmapFromDxgiSurface([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGISurface>))] IDXGISurface surface, nint bitmapProperties, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Bitmap1>))] out ID2D1Bitmap1 bitmap);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1devicecontext-createeffect
     void CreateEffect(in Guid effectId, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Effect>))] out ID2D1Effect effect);
