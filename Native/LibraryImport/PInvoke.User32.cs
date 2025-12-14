@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Enums.D2D;
 using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
 // ReSharper disable IdentifierTypo
@@ -136,5 +137,8 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("user32.dll", EntryPoint = "ShutdownBlockReasonDestroy", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool ShutdownBlockReasonDestroy(nint windowHandle);
+
+        [LibraryImport("user32.dll", EntryPoint = "GetSysColor")]
+        public static partial uint GetSysColor(SYS_COLOR_INDEX nIndex);
     }
 }

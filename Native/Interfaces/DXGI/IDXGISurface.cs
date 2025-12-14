@@ -20,7 +20,7 @@ public unsafe partial interface IDXGISurface : IDXGIDeviceSubObject
     /// <remarks>
     /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgisurface-getdesc">Learn more about this API from learn.microsoft.com</see>.</para>
     /// </remarks>
-    void GetDesc(out DXGI_SURFACE_DESC* pDesc);
+    void GetDesc(out DXGI_SURFACE_DESC pDesc);
 
     /// <summary>Get a pointer to the data contained in the surface, and deny GPU access to the surface.</summary>
     /// <param name="pLockedRect">

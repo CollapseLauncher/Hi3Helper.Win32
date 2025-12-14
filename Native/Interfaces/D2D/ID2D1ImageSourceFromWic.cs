@@ -1,0 +1,20 @@
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+
+namespace Hi3Helper.Win32.Native.Interfaces.D2D;
+
+[GeneratedComInterface]
+[Guid("77395441-1c8f-4555-8683-f50dab0fe792")]
+public partial interface ID2D1ImageSourceFromWic : ID2D1ImageSource
+{
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1imagesourcefromwic-ensurecached(constd2d1_rect_u_)
+    void EnsureCached(nint /* optional D2D_RECT_U* */ rectangleToFill);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1imagesourcefromwic-trimcache(constd2d1_rect_u)
+    void TrimCache(nint /* optional D2D_RECT_U* */ rectangleToPreserve);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1imagesourcefromwic-getsource
+    [PreserveSig]
+    void GetSource([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IWICBitmapSource>))] out IWICBitmapSource wicBitmapSource);
+}

@@ -1,0 +1,7 @@
+﻿namespace Hi3Helper.Win32.Native.Enums.D2D;
+
+public enum D2D1_RENDERING_PRIORITY
+{
+    D2D1_RENDERING_PRIORITY_NORMAL = 0,
+    D2D1_RENDERING_PRIORITY_LOW = 1,
+}

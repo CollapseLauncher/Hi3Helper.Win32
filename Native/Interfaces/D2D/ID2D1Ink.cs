@@ -1,0 +1,44 @@
+﻿using Hi3Helper.Win32.Native.Structs.D2D;
+using System;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+
+namespace Hi3Helper.Win32.Native.Interfaces.D2D;
+
+[GeneratedComInterface]
+[Guid("b499923b-7029-478f-a8b3-432c7c5f5312")]
+public partial interface ID2D1Ink : ID2D1Resource
+{
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1ink-setstartpoint(constd2d1_ink_point)
+    [PreserveSig]
+    void SetStartPoint(in D2D1_INK_POINT startPoint);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1ink-getstartpoint
+    [PreserveSig]
+    D2D1_INK_POINT GetStartPoint();
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1ink-addsegments
+    void AddSegments([In][MarshalUsing(CountElementName = nameof(segmentsCount))] D2D1_INK_BEZIER_SEGMENT[] segments, uint segmentsCount);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1ink-removesegmentsatend
+    void RemoveSegmentsAtEnd(uint segmentsCount);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1ink-setsegments
+    void SetSegments(uint startSegment, [In][MarshalUsing(CountElementName = nameof(segmentsCount))] D2D1_INK_BEZIER_SEGMENT[] segments, uint segmentsCount);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1ink-setsegmentatend(constd2d1_ink_bezier_segment)
+    void SetSegmentAtEnd(in D2D1_INK_BEZIER_SEGMENT segment);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1ink-getsegmentcount
+    [PreserveSig]
+    uint GetSegmentCount();
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1ink-getsegments
+    void GetSegments(uint startSegment, [In][Out][MarshalUsing(CountElementName = nameof(segmentsCount))] D2D1_INK_BEZIER_SEGMENT[] segments, uint segmentsCount);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1ink-streamasgeometry(id2d1inkstyle_constd2d1_matrix_3x2_f__float_id2d1simplifiedgeometrysink)
+    void StreamAsGeometry([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1InkStyle?>))] ID2D1InkStyle? inkStyle, nint /* optional D2D_MATRIX_3X2_F* */ worldTransform, float flatteningTolerance, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1SimplifiedGeometrySink>))] ID2D1SimplifiedGeometrySink geometrySink);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1ink-getbounds
+    void GetBounds([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1InkStyle?>))] ID2D1InkStyle? inkStyle, nint /* optional D2D_MATRIX_3X2_F* */ worldTransform, out D2D_RECT_F bounds);
+}

@@ -1,0 +1,30 @@
+﻿using Hi3Helper.Win32.Native.Enums.D2D;
+using Hi3Helper.Win32.Native.Interfaces.DXGI;
+using Hi3Helper.Win32.Native.Structs.D2D;
+using System;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+
+namespace Hi3Helper.Win32.Native.Interfaces.D2D;
+
+[GeneratedComInterface]
+[Guid("a898a84c-3873-4588-b08b-ebbf978df041")]
+public partial interface ID2D1Bitmap1 : ID2D1Bitmap
+{
+    // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1bitmap1-getcolorcontext
+    [PreserveSig]
+    void GetColorContext([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1ColorContext>))] out ID2D1ColorContext colorContext);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1bitmap1-getoptions
+    [PreserveSig]
+    D2D1_BITMAP_OPTIONS GetOptions();
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1bitmap1-getsurface
+    void GetSurface([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGISurface>))] out IDXGISurface dxgiSurface);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1bitmap1-map
+    void Map(D2D1_MAP_OPTIONS options, out D2D1_MAPPED_RECT mappedRect);
+
+    // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1bitmap1-unmap
+    void Unmap();
+}

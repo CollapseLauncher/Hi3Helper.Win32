@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.Enums.D3D;
+using Hi3Helper.Win32.Native.Interfaces.DXGI;
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;

@@ -1,0 +1,14 @@
+﻿using Hi3Helper.Win32.Native.Enums.D2D;
+
+namespace Hi3Helper.Win32.Native.Structs.D2D;
+
+public struct D2D1_STROKE_STYLE_PROPERTIES
+{
+    public D2D1_CAP_STYLE startCap;
+    public D2D1_CAP_STYLE endCap;
+    public D2D1_CAP_STYLE dashCap;
+    public D2D1_LINE_JOIN lineJoin;
+    public float miterLimit;
+    public D2D1_DASH_STYLE dashStyle;
+    public float dashOffset;
+}

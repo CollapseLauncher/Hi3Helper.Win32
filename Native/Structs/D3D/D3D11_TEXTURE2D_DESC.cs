@@ -4,7 +4,7 @@ using Hi3Helper.Win32.Native.Structs.DXGI;
 
 namespace Hi3Helper.Win32.Native.Structs.D3D;
 
-public partial struct D3D11_TEXTURE2D_DESC
+public struct D3D11_TEXTURE2D_DESC
 {
     public uint Width;
     public uint Height;

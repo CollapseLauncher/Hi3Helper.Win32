@@ -1,0 +1,8 @@
+﻿namespace Hi3Helper.Win32.Native.Enums.D2D;
+
+public enum DWRITE_FONT_STYLE
+{
+    DWRITE_FONT_STYLE_NORMAL = 0,
+    DWRITE_FONT_STYLE_OBLIQUE = 1,
+    DWRITE_FONT_STYLE_ITALIC = 2,
+}

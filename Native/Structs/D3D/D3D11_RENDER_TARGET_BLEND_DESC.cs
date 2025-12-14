@@ -1,0 +1,15 @@
+﻿using Hi3Helper.Win32.Native.Enums.D3D;
+
+namespace Hi3Helper.Win32.Native.Structs.D3D;
+
+public struct D3D11_RENDER_TARGET_BLEND_DESC
+{
+    public BOOL BlendEnable;
+    public D3D11_BLEND SrcBlend;
+    public D3D11_BLEND DestBlend;
+    public D3D11_BLEND_OP BlendOp;
+    public D3D11_BLEND SrcBlendAlpha;
+    public D3D11_BLEND DestBlendAlpha;
+    public D3D11_BLEND_OP BlendOpAlpha;
+    public byte RenderTargetWriteMask;
+}

@@ -2,7 +2,7 @@
 
 namespace Hi3Helper.Win32.Native.Structs;
 
-public partial struct HMODULE : IEquatable<HMODULE>
+public struct HMODULE : IEquatable<HMODULE>
 {
     public static readonly HMODULE Null = new();
 

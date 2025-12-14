@@ -1,0 +1,11 @@
+﻿using System;
+
+namespace Hi3Helper.Win32.Native.Enums.D2D;
+
+[Flags]
+public enum DWRITE_FONT_SIMULATIONS
+{
+    DWRITE_FONT_SIMULATIONS_NONE = 0,
+    DWRITE_FONT_SIMULATIONS_BOLD = 1,
+    DWRITE_FONT_SIMULATIONS_OBLIQUE = 2,
+}

@@ -9,5 +9,5 @@ namespace Hi3Helper.Win32.Native.Interfaces.DXGI;
 [GeneratedComInterface]
 public partial interface ISwapChainPanelNative
 {
-    void SetSwapChain(nint swapChain);
+    void SetSwapChain([MarshalAs(UnmanagedType.Interface)] IDXGISwapChain? swapChain);
 }

@@ -1,0 +1,11 @@
+﻿using System;
+
+namespace Hi3Helper.Win32.Native.Enums.D2D;
+
+[Flags]
+public enum D2D1_RENDER_TARGET_USAGE
+{
+    D2D1_RENDER_TARGET_USAGE_NONE = 0,
+    D2D1_RENDER_TARGET_USAGE_FORCE_BITMAP_REMOTING = 1,
+    D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE = 2,
+}

@@ -1,0 +1,10 @@
+﻿namespace Hi3Helper.Win32.Native.Enums.D3D;
+
+public enum D3D11_CONTEXT_TYPE
+{
+    D3D11_CONTEXT_TYPE_ALL = 0,
+    D3D11_CONTEXT_TYPE_3D = 1,
+    D3D11_CONTEXT_TYPE_COMPUTE = 2,
+    D3D11_CONTEXT_TYPE_COPY = 3,
+    D3D11_CONTEXT_TYPE_VIDEO = 4,
+}
