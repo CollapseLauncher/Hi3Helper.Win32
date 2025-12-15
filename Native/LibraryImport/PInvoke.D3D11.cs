@@ -1,6 +1,9 @@
 ﻿using Hi3Helper.Win32.Native.Enums.D3D;
+using Hi3Helper.Win32.Native.Interfaces.DXGI;
 using Hi3Helper.Win32.Native.Structs;
+using Hi3Helper.Win32.Native.Structs.D2D;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 
@@ -27,5 +30,12 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         public static unsafe partial HResult CreateDirect3D11SurfaceFromDXGISurface(
             nint dgxiSurface,
             out nint ppGraphicsSurface);
+
+        [LibraryImport("D2d1.dll", EntryPoint = "D2D1CreateDevice")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static unsafe partial HResult D2D1CreateDevice(
+            [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGIDevice>))] IDXGIDevice dxgiDevice,
+            in D2D1_CREATION_PROPERTIES creationProperties,
+            out nint d2dDevice);
     }
 }

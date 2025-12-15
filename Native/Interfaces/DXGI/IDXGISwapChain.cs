@@ -21,7 +21,7 @@ public unsafe partial interface IDXGISwapChain : IDXGIDeviceSubObject
     void Present(uint SyncInterval, DXGI_PRESENT Flags);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiswapchain-getbuffer
-    void GetBuffer(uint Buffer, in Guid riid, out nint /* void */ ppSurface);
+    void GetBuffer(uint Buffer, in Guid riid, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGISurface?>))] out IDXGISurface? ppSurface);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiswapchain-setfullscreenstate
     void SetFullscreenState(BOOL Fullscreen, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGIOutput?>))] IDXGIOutput? pTarget);

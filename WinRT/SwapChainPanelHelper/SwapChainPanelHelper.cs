@@ -2,6 +2,7 @@
 using Hi3Helper.Win32.Native.Enums.D2D;
 using Hi3Helper.Win32.Native.Enums.D3D;
 using Hi3Helper.Win32.Native.Enums.DXGI;
+using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.Interfaces.D2D;
 using Hi3Helper.Win32.Native.Interfaces.D3D;
 using Hi3Helper.Win32.Native.Interfaces.DXGI;
@@ -11,14 +12,89 @@ using Hi3Helper.Win32.Native.Structs.D2D;
 using Hi3Helper.Win32.Native.Structs.DXGI;
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Windows.Graphics.DirectX.Direct3D11;
 using WinRT;
 
 namespace Hi3Helper.Win32.WinRT.SwapChainPanelHelper;
 
-public static class SwapChainPanelHelper
+public static partial class SwapChainPanelHelper
 {
     public const int D3D11_SDK_VERSION = 7;
+
+    private static Guid IDXGISurface_IID = typeof(IDXGISurface).GUID;
+
+    public static readonly D3D_FEATURE_LEVEL[] FeatureLevels = [
+        D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1,
+            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0,
+            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_10_1,
+            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_10_0,
+            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_3,
+            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_2,
+            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_1
+    ];
+
+    public static unsafe void GetNativeSurfaceImageSource(
+        IWinRTObject surfaceImageSource,
+        out ISurfaceImageSourceNativeWithD2D nativeObject)
+    {
+        D3D11_CREATE_DEVICE_FLAG flags = D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+#if DEBUG
+        flags |= D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_DEBUG;
+#endif
+        PInvoke.D3D11CreateDevice(
+            nint.Zero,
+            D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE,
+            HMODULE.Null,
+            flags,
+            FeatureLevels,
+            FeatureLevels.Length,
+            D3D11_SDK_VERSION,
+            out nint ppD3D11device,
+            0u,
+            out nint ppD3D11DeviceImmediateContext).ThrowOnFailure();
+
+        D2D1_CREATION_PROPERTIES option = default;
+        option.threadingMode = D2D1_THREADING_MODE.D2D1_THREADING_MODE_MULTI_THREADED;
+
+        if (!ComMarshal<IDXGIDevice3>.TryCreateComObjectFromReference(ppD3D11device,
+                                              out IDXGIDevice3? dxgiDevice,
+                                              out Exception? ex))
+        {
+            throw ex;
+        }
+
+        PInvoke.D2D1CreateDevice(
+            dxgiDevice,
+            in option,
+            out nint ppD2D1device).ThrowOnFailure();
+
+        if (!ComMarshal<IWinRTObject>.TryCastComObjectAs(surfaceImageSource,
+                                                         out nativeObject,
+                                                         out ex))
+        {
+            throw ex;
+        }
+
+        nativeObject.SetDevice(ppD2D1device);
+    }
+
+    public static unsafe void BeginDrawNativeSurfaceImageSource(
+        ISurfaceImageSourceNativeWithD2D nativeObject,
+        Rect updateRect,
+        out nint direct3dSurfacePpv)
+    {
+        nativeObject.BeginDraw(updateRect, in IDXGISurface_IID, out nint dxgiSurfacePpv, out var offset);
+        PInvoke.CreateDirect3D11SurfaceFromDXGISurface(dxgiSurfacePpv, out direct3dSurfacePpv);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe void MediaPlayer_CopyFrameToVideoSurfaceUnsafe(
+        nint playerInstance,
+        nint surface)
+    {
+        ((delegate* unmanaged[Stdcall]<nint, nint, int>)(*(nint*)(*(nint*)playerInstance + 10 * (nint)sizeof(delegate* unmanaged[Stdcall]<nint, nint, int>))))(playerInstance, surface);
+    }
 
     public static unsafe void InitializeD3D11Device(
         IWinRTObject swapChainPanel,
@@ -29,17 +105,7 @@ public static class SwapChainPanelHelper
         Unsafe.SkipInit(out swapChainContext);
         Unsafe.SkipInit(out nint ppSwapChainP);
 
-        D3D_FEATURE_LEVEL[] featureLevels = [
-            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1,
-            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0,
-            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_10_1,
-            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_10_0,
-            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_3,
-            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_2,
-            D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_1
-        ];
-
-        CreateD3D11Device(featureLevels,
+        CreateD3D11Device(FeatureLevels,
             out nint ppd3d11Device,
             out var d3d11Device,
             out var d3d11DeviceContext,
@@ -114,13 +180,7 @@ public static class SwapChainPanelHelper
         };
 
         // Direct2D needs the DXGI version of the backbuffer surface pointer.
-        dxgiSwapChain2.GetBuffer(0, typeof(IDXGISurface).GUID, out nint ppBackBufferSurface);
-        if (!ComMarshal<IDXGISurface>.TryCreateComObjectFromReference(ppBackBufferSurface,
-                                              out IDXGISurface? dxgiSurface,
-                                              out ex))
-        {
-            throw ex;
-        }
+        dxgiSwapChain2.GetBuffer(0, typeof(IDXGISurface).GUID, out IDXGISurface? dxgiSurface);
 
         if (!ComMarshal<IDXGISurface>.TryCastComObjectAs(dxgiSurface,
                                               out ID3D11Texture2D? d3d11Texture2D,
@@ -135,8 +195,11 @@ public static class SwapChainPanelHelper
         d2d1DeviceContext.SetDpi(bitmapProperties.dpiX, bitmapProperties.dpiY);
         d2d1DeviceContext.SetTarget(d2d1Bitmap);
 
+        ComWrappers.TryGetComInstance(dxgiSurface,
+            out nint dxgiSurfacePpv);
+
         // Prepare IDirect3DSurface
-        PInvoke.CreateDirect3D11SurfaceFromDXGISurface(ppBackBufferSurface, out nint d3dSurfacePpv).ThrowOnFailure();
+        PInvoke.CreateDirect3D11SurfaceFromDXGISurface(dxgiSurfacePpv, out nint d3dSurfacePpv).ThrowOnFailure();
         IDirect3DSurface d3dSurface = MarshalInterface<IDirect3DSurface>.FromAbi(d3dSurfacePpv);
 
         // Return result

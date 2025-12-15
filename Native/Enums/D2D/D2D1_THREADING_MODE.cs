@@ -1,0 +1,7 @@
+﻿namespace Hi3Helper.Win32.Native.Enums.D2D;
+
+public enum D2D1_THREADING_MODE
+{
+    D2D1_THREADING_MODE_SINGLE_THREADED = 0,
+    D2D1_THREADING_MODE_MULTI_THREADED = 1,
+}

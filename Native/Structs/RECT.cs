@@ -13,16 +13,16 @@ namespace Hi3Helper.Win32.Native.Structs
     public struct Rect
     {
         /// <summary>Specifies the <i>x</i>-coordinate of the upper-left corner of the rectangle.</summary>
-        private readonly int _left;
+        private int _left;
 
         /// <summary>Specifies the <i>y</i>-coordinate of the upper-left corner of the rectangle.</summary>
-        private readonly int _top;
+        private int _top;
 
         /// <summary>Specifies the <i>x</i>-coordinate of the lower-right corner of the rectangle.</summary>
-        private readonly int _right;
+        private int _right;
 
         /// <summary>Specifies the <i>y</i>-coordinate of the lower-right corner of the rectangle.</summary>
-        private readonly int _bottom;
+        private int _bottom;
 
         public Rect(Rectangle value) : this(value.Left, value.Top, value.Right, value.Bottom)
         {
