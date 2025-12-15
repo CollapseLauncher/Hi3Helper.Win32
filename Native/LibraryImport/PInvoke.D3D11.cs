@@ -16,13 +16,13 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         public static unsafe partial HResult D3D11CreateDevice(
             nint pAdapter,
             D3D_DRIVER_TYPE driverType,
-            HMODULE software,
+            nint software,
             D3D11_CREATE_DEVICE_FLAG flags,
-            D3D_FEATURE_LEVEL[]? pFeatureLevels,
+            in D3D_FEATURE_LEVEL pFeatureLevels,
             int featureLevels,
             uint sdkVersion,
             out nint ppDevice,
-            D3D_FEATURE_LEVEL featureLevel,
+            ref D3D_FEATURE_LEVEL featureLevel,
             out nint ppImmediateContext);
 
         [LibraryImport("d3d11.dll", EntryPoint = "CreateDirect3D11SurfaceFromDXGISurface")]
