@@ -12,7 +12,7 @@ namespace Hi3Helper.Win32.ManagedTools
     // ReSharper disable once PartialTypeWithSinglePart
     file static class DefaultComWrappersStatic
     {
-        public static readonly StrategyBasedComWrappers Default = new StrategyBasedComWrappers();
+        public static readonly StrategyBasedComWrappers Default = new();
     }
 
     public static class ComMarshal<TObjSource>
@@ -276,7 +276,7 @@ namespace Hi3Helper.Win32.ManagedTools
         /// <param name="comObjPpv">Pointer of the COM Object Interface which will be obtained from.</param>
         /// <param name="comObjResult">The resulting type <typeparamref name="TObjSource"/> of COM Object Interface from the native pointer.</param>
         /// <param name="exceptionIfFalse">Exception if obtaining the COM Object Interface is failing.</param>
-        /// <param name="flags">The interface creation flags for the corresponding COM Object types. By default, this method only performs unwraping using <see cref="CreateObjectFlags.Unwrap"/>.</param>
+        /// <param name="flags">The interface creation flags for the corresponding COM Object types. By default, this method only performs unwrapping using <see cref="CreateObjectFlags.Unwrap"/>.</param>
         /// <returns>Returns <see langword="true"/> if the target COM Object Interface has been successfully obtained. Otherwise, <see langword="false"/>.</returns>
         public static bool TryCreateComObjectFromReference(
             nint          comObjPpv,
@@ -323,11 +323,13 @@ namespace Hi3Helper.Win32.ManagedTools
         /// <summary>
         /// Try to obtain COM Object Native Pointer from an Interface.
         /// </summary>
+        /// <param name="comObj">The COM Object to obtain the native pointer from.</param>
         /// <param name="comObjPpv">The native pointer of the COM Object Interface.</param>
         /// <param name="exceptionIfFalse">Exception if obtaining the native pointer is failing.</param>
+        /// <param name="flags">Flags for obtaining the native pointer.</param>
         /// <param name="requireQueryInterface">
         /// If set to <see langword="false"/>, create the pointer of the unwrapped <see cref="IUnknown"/> instance.
-        /// Otherwise if <see langword="true"/>, create the pointer of <typeparamref name="TObjSource"/> instance.
+        /// Otherwise, if <see langword="true"/>, create the pointer of <typeparamref name="TObjSource"/> instance.
         /// </param>
         /// <returns>Returns <see langword="true"/> if the native pointer of the COM Object Interface has been successfully obtained. Otherwise, <see langword="false"/>.</returns>
         public static bool TryGetComInterfaceReference(
@@ -341,12 +343,42 @@ namespace Hi3Helper.Win32.ManagedTools
             Unsafe.SkipInit(out exceptionIfFalse);
 
             ref readonly Guid comObjTargetIid = ref Nullable.GetValueRefOrDefaultRef(in ObjComIid);
-            if (Unsafe.IsNullRef(in comObjTargetIid))
+            if (!Unsafe.IsNullRef(in comObjTargetIid))
             {
-                exceptionIfFalse = ThrowNoGuidDefined<TObjSource>();
-                return false;
+                return TryGetComInterfaceReference(comObj, in comObjTargetIid, out comObjPpv, out exceptionIfFalse,
+                                                   flags,  requireQueryInterface);
             }
 
+            exceptionIfFalse = ThrowNoGuidDefined<TObjSource>();
+            return false;
+
+        }
+
+        /// <summary>
+        /// Try to obtain COM Object Native Pointer from an Interface with specified Interface ID.
+        /// </summary>
+        /// <param name="comObj">The COM Object to obtain the native pointer from.</param>
+        /// <param name="comObjPpv">The native pointer of the COM Object Interface.</param>
+        /// <param name="comObjIid">The Interface ID where you need to get the type of interface for.</param>
+        /// <param name="exceptionIfFalse">Exception if obtaining the native pointer is failing.</param>
+        /// <param name="flags">Flags for obtaining the native pointer.</param>
+        /// <param name="requireQueryInterface">
+        /// If set to <see langword="false"/>, create the pointer of the unwrapped <see cref="IUnknown"/> instance.
+        /// Otherwise, if <see langword="true"/>, create the pointer of <typeparamref name="TObjSource"/> instance.
+        /// </param>
+        /// <returns>Returns <see langword="true"/> if the native pointer of the COM Object Interface has been successfully obtained. Otherwise, <see langword="false"/>.</returns>
+        public static bool TryGetComInterfaceReference(
+            TObjSource comObj,
+            in Guid comObjIid,
+            out nint comObjPpv,
+            [NotNullWhen(false)] out Exception? exceptionIfFalse,
+            CreateComInterfaceFlags flags = CreateComInterfaceFlags.None,
+            bool requireQueryInterface = false)
+        {
+            Unsafe.SkipInit(out comObjPpv);
+            Unsafe.SkipInit(out exceptionIfFalse);
+
+            ref readonly Guid comObjTargetIid = ref comObjIid;
             comObjPpv = DefaultComWrappersStatic.Default.GetOrCreateComInterfaceForObject(comObj, flags);
             if (comObjPpv == nint.Zero)
             {
@@ -354,38 +386,40 @@ namespace Hi3Helper.Win32.ManagedTools
                 return false;
             }
 
-            if (requireQueryInterface)
+            if (!requireQueryInterface)
             {
-                bool isRetry = false;
+                return true;
+            }
 
-            RetryCast:
-                uint hr = (uint)Marshal.QueryInterface(comObjPpv, in comObjTargetIid, out nint queriedComObjPpv);
+            bool isRetry = false;
 
-                // If default wrapper throws "Specified cast is not valid." while on query
-                // (due to object owned by external wrapper), then try use .NET's ComWrapper
-                if (!isRetry &&
-                    hr == 0x80004002u)
+        RetryCast:
+            uint hr = (uint)Marshal.QueryInterface(comObjPpv, in comObjTargetIid, out nint queriedComObjPpv);
+
+            // If default wrapper throws "Specified cast is not valid." while on query
+            // (due to object owned by external wrapper), then try use .NET's ComWrapper
+            if (!isRetry &&
+                hr == 0x80004002u)
+            {
+                isRetry = true;
+                if (ComWrappers.TryGetComInstance(comObj, out comObjPpv))
                 {
-                    isRetry = true;
-                    if (ComWrappers.TryGetComInstance(comObj, out comObjPpv))
-                    {
-                        goto RetryCast;
-                    }
-
-                    // If the object is not owned by anyone, throw the error.
+                    goto RetryCast;
                 }
 
-                comObjPpv = queriedComObjPpv;
-                exceptionIfFalse = Marshal.GetExceptionForHR((int)hr);
-                if (exceptionIfFalse != null)
-                {
-                    return false;
-                }
+                // If the object is not owned by anyone, throw the error.
+            }
+
+            comObjPpv        = queriedComObjPpv;
+            exceptionIfFalse = Marshal.GetExceptionForHR((int)hr);
+            if (exceptionIfFalse != null)
+            {
+                return false;
             }
 
             return true;
         }
 
-        private static InvalidCastException ThrowNoGuidDefined<TObjTarget>() => new InvalidCastException($"Type of {typeof(TObjTarget).Name} has no Class Identifier ID (IID)");
+        private static InvalidCastException ThrowNoGuidDefined<TObjTarget>() => new($"Type of {typeof(TObjTarget).Name} has no Class Identifier ID (IID)");
     }
 }

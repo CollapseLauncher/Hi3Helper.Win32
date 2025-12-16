@@ -14,16 +14,19 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Windows.Graphics.DirectX.Direct3D11;
 using WinRT;
+// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 namespace Hi3Helper.Win32.WinRT.SwapChainPanelHelper;
 
-public static partial class SwapChainPanelHelper
+public static class SwapChainPanelHelper
 {
     public const int D3D11_SDK_VERSION = 7;
 
-    private static Guid IDXGISurface_IID = typeof(IDXGISurface).GUID;
-    private static Guid IDXGIFactory_IID = typeof(IDXGIFactory4).GUID;
-    private static Guid ID2D1Factory3_IID = typeof(ID2D1Factory3).GUID;
+    private static readonly Guid IDXGISurface_IID  = typeof(IDXGISurface).GUID;
+    private static readonly Guid IDXGIFactory_IID  = typeof(IDXGIFactory4).GUID;
+    private static readonly Guid ID2D1Factory3_IID = typeof(ID2D1Factory3).GUID;
 
     public static ReadOnlySpan<D3D_FEATURE_LEVEL> FeatureLevels => [
         D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1,
@@ -35,17 +38,18 @@ public static partial class SwapChainPanelHelper
         D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_1
     ];
 
-    public static unsafe void GetNativeSurfaceImageSource(
+    public static void GetNativeSurfaceImageSource(
         IWinRTObject surfaceImageSource,
-        out ISurfaceImageSourceNativeWithD2D nativeObject,
-        out D3DDeviceContext deviceContext)
+        out ISurfaceImageSourceNativeWithD2D? nativeObject,
+        out D3DDeviceContext deviceContext,
+        bool useD2D1Device = true)
     {
         Unsafe.SkipInit(out deviceContext);
 
         const D3D_DRIVER_TYPE DriverType = D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE;
 
-        D3D11_CREATE_DEVICE_FLAG flags = D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-        D3D_FEATURE_LEVEL supportedD3DFeature = default;
+        const D3D11_CREATE_DEVICE_FLAG flags               = D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+        D3D_FEATURE_LEVEL              supportedD3DFeature = default;
 
         PInvoke.D3D11CreateDevice(
             nint.Zero,
@@ -59,49 +63,45 @@ public static partial class SwapChainPanelHelper
             ref supportedD3DFeature,
             out nint ppD3D11DeviceImmediateContext).ThrowOnFailure();
 
-        D2D1_CREATION_PROPERTIES option = default;
-        option.threadingMode = D2D1_THREADING_MODE.D2D1_THREADING_MODE_MULTI_THREADED;
-
         if (!ComMarshal<IDXGIDevice3>.TryCreateComObjectFromReference(ppD3D11device,
-                                              out IDXGIDevice3? dxgiDevice,
-                                              out Exception? ex))
-        {
-            throw ex;
-        }
-
-        PInvoke.D2D1CreateDevice(
-            dxgiDevice,
-            in option,
-            out nint ppD2D1device).ThrowOnFailure();
-
-        if (!ComMarshal<IWinRTObject>.TryCastComObjectAs(surfaceImageSource,
+                                                                      out IDXGIDevice3? dxgiDevice,
+                                                                      out Exception? ex) ||
+            !ComMarshal<IWinRTObject>.TryCastComObjectAs(surfaceImageSource,
                                                          out nativeObject,
-                                                         out ex))
-        {
-            throw ex;
-        }
-
-        nativeObject.SetDevice(ppD2D1device);
-
-        if (!ComMarshal<ID3D11Device3>.TryCreateComObjectFromReference(ppD3D11device,
+                                                         out ex) ||
+            !ComMarshal<ID3D11Device3>.TryCreateComObjectFromReference(ppD3D11device,
                                                                        out ID3D11Device3? d3d11Device,
-                                                                       out ex))
-        {
-            throw ex;
-        }
-
-        if (!ComMarshal<ID3D11DeviceContext3>.TryCreateComObjectFromReference(ppD3D11DeviceImmediateContext,
+                                                                       out ex) ||
+            !ComMarshal<ID3D11DeviceContext3>.TryCreateComObjectFromReference(ppD3D11DeviceImmediateContext,
                                                                               out ID3D11DeviceContext3? d3d11DeviceImmediateContext,
                                                                               out ex))
         {
             throw ex;
         }
 
-        if (!ComMarshal<ID2D1Device2>.TryCreateComObjectFromReference(ppD2D1device,
-                                                                      out ID2D1Device2? d2d1Device,
-                                                                      out ex))
+        ID2D1Device2? d2d1Device = null;
+        if (!useD2D1Device)
         {
-            throw ex;
+            nativeObject.SetDevice(ppD3D11device);
+        }
+        else
+        {
+            D2D1_CREATION_PROPERTIES option = default;
+            // option.threadingMode = D2D1_THREADING_MODE.D2D1_THREADING_MODE_MULTI_THREADED;
+
+            PInvoke.D2D1CreateDevice(
+                dxgiDevice,
+                in option,
+                out nint ppD2D1device).ThrowOnFailure();
+
+            if (!ComMarshal<ID2D1Device2>.TryCreateComObjectFromReference(ppD2D1device,
+                                                                          out d2d1Device,
+                                                                          out ex))
+            {
+                throw ex;
+            }
+
+            nativeObject.SetDevice(ppD2D1device);
         }
 
         deviceContext = new D3DDeviceContext
@@ -109,7 +109,7 @@ public static partial class SwapChainPanelHelper
             D3D11Device = d3d11Device,
             D3D11DeviceContext = d3d11DeviceImmediateContext,
             DXGIDevice = dxgiDevice,
-            D2D1Device = d2d1Device,
+            D2D1Device = d2d1Device
         };
     }
 
@@ -141,25 +141,24 @@ public static partial class SwapChainPanelHelper
         nint surfaceP)
         => ((delegate* unmanaged[Stdcall]<nint, nint, int>)(*(*(void***)playerP + 10)))(playerP, surfaceP); // +10 == .CopyFrameToVideoSurface(nint)
 
-    public static unsafe void InitializeD3D11Device(
+    public static void InitializeD3D11Device(
         IWinRTObject swapChainPanel,
         double xamlScaleFactor,
         ref DXGI_SWAP_CHAIN_DESC1 description,
         out D3DDeviceContext? swapChainContext)
     {
         Unsafe.SkipInit(out swapChainContext);
-        Unsafe.SkipInit(out nint ppSwapChainP);
 
         CreateD3D11Device(FeatureLevels,
             out nint ppd3d11Device,
-            out var d3d11Device,
-            out var d3d11DeviceContext,
-            out var dxgiDevice,
-            out var d2d1Device,
-            out var d2d1DeviceContext,
-            out var d2d1Factory);
+            out ID3D11Device3? d3d11Device,
+            out ID3D11DeviceContext3? d3d11DeviceContext,
+            out IDXGIDevice3? dxgiDevice,
+            out ID2D1Device2? d2d1Device,
+            out ID2D1DeviceContext2? d2d1DeviceContext,
+            out ID2D1Factory3? d2d1Factory);
 
-        dxgiDevice.GetAdapter(out IDXGIAdapter dxgiAdapter); // Device -> Adapter
+        dxgiDevice!.GetAdapter(out IDXGIAdapter dxgiAdapter); // Device -> Adapter
         dxgiAdapter.GetParent(in IDXGIFactory_IID, out nint dxgiFactoryPpv); // Adapter -> Factory
         if (!ComMarshal<IDXGIFactory4>.TryCreateComObjectFromReference(dxgiFactoryPpv,
                                               out IDXGIFactory4? dxgiFactory,
@@ -191,7 +190,7 @@ public static partial class SwapChainPanelHelper
         // any cumulative composition scale applied due to zooming, render transforms, or the system's current scaling plateau.
         // For example, if a 100x100 SwapChainPanel has a cumulative 2x scale transform applied, we instead create a 200x200 swap chain
         // to avoid artifacts from scaling it up by 2x, then apply an inverse 1/2x transform to the swap chain to cancel out the 2x transform.
-        DXGI_MATRIX_3X2_F inverseScale = new DXGI_MATRIX_3X2_F
+        DXGI_MATRIX_3X2_F inverseScale = new()
         {
             _11 = (float)(1.0 / xamlScaleFactor),
             _22 = (float)(1.0 / xamlScaleFactor),
@@ -234,7 +233,7 @@ public static partial class SwapChainPanelHelper
         }
 
         // Get a D2D surface from the DXGI back buffer to use as the D2D render target.
-        d2d1DeviceContext.CreateBitmapFromDxgiSurface(dxgiSurface, nint.Zero, out ID2D1Bitmap1 d2d1Bitmap);
+        d2d1DeviceContext!.CreateBitmapFromDxgiSurface(dxgiSurface, nint.Zero, out ID2D1Bitmap1 d2d1Bitmap);
         d2d1DeviceContext.SetDpi(bitmapProperties.dpiX, bitmapProperties.dpiY);
         d2d1DeviceContext.SetTarget(d2d1Bitmap);
 
@@ -266,15 +265,15 @@ public static partial class SwapChainPanelHelper
         };
     }
 
-    private static unsafe void CreateD3D11Device(
+    private static void CreateD3D11Device(
         ReadOnlySpan<D3D_FEATURE_LEVEL> featureLevels,
         out nint ppD3D11device,
-        out ID3D11Device3 d3d11Device,
-        out ID3D11DeviceContext3 d3d11DeviceContext,
-        out IDXGIDevice3 dxgiDevice,
-        out ID2D1Device2 d2d1Device,
-        out ID2D1DeviceContext2 d2d1DeviceContext,
-        out ID2D1Factory3 d2d1Factory)
+        out ID3D11Device3? d3d11Device,
+        out ID3D11DeviceContext3? d3d11DeviceContext,
+        out IDXGIDevice3? dxgiDevice,
+        out ID2D1Device2? d2d1Device,
+        out ID2D1DeviceContext2? d2d1DeviceContext,
+        out ID2D1Factory3? d2d1Factory)
     {
         Unsafe.SkipInit(out ppD3D11device);
         Unsafe.SkipInit(out d3d11Device);
@@ -284,6 +283,7 @@ public static partial class SwapChainPanelHelper
         Unsafe.SkipInit(out d2d1DeviceContext);
         Unsafe.SkipInit(out d2d1Factory);
 
+        // ReSharper disable once ConvertToConstant.Local
         D3D11_CREATE_DEVICE_FLAG flags = D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #if DEBUG
         flags |= D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_DEBUG;
@@ -303,33 +303,25 @@ public static partial class SwapChainPanelHelper
             out nint ppD3D11DeviceImmediateContext).ThrowOnFailure();
 
         if (!ComMarshal<ID3D11Device3>.TryCreateComObjectFromReference(ppD3D11device,
-                                              out d3d11Device,
-                                              out Exception? ex))
-        {
-            throw ex;
-        }
-
-        if (!ComMarshal<IDXGIDevice3>.TryCreateComObjectFromReference(ppD3D11device,
-                                              out dxgiDevice,
-                                              out ex))
-        {
-            throw ex;
-        }
-
-        if (!ComMarshal<ID3D11DeviceContext3>.TryCreateComObjectFromReference(ppD3D11DeviceImmediateContext,
-                                              out d3d11DeviceContext,
-                                              out ex))
+                                                                       out d3d11Device,
+                                                                       out Exception? ex) ||
+            !ComMarshal<IDXGIDevice3>.TryCreateComObjectFromReference(ppD3D11device,
+                                                                      out dxgiDevice,
+                                                                      out ex) ||
+            !ComMarshal<ID3D11DeviceContext3>.TryCreateComObjectFromReference(ppD3D11DeviceImmediateContext,
+                                                                              out d3d11DeviceContext,
+                                                                              out ex))
         {
             throw ex;
         }
 
         CreateD2DFactory(out d2d1Factory);
-        d2d1Factory.CreateDevice(dxgiDevice, out d2d1Device);
+        d2d1Factory!.CreateDevice(dxgiDevice, out d2d1Device);
         d2d1Device.CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS.D2D1_DEVICE_CONTEXT_OPTIONS_NONE, out d2d1DeviceContext);
         d2d1DeviceContext.SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE.D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
     }
 
-    private static void CreateD2DFactory(out ID2D1Factory3 d2d1Factory)
+    private static void CreateD2DFactory(out ID2D1Factory3? d2d1Factory)
     {
         D2D1_FACTORY_OPTIONS option = default;
 
@@ -346,8 +338,8 @@ public static partial class SwapChainPanelHelper
             out nint ppD2D1Factory).ThrowOnFailure();
 
         if (!ComMarshal<ID2D1Factory3>.TryCreateComObjectFromReference(ppD2D1Factory,
-                                              out d2d1Factory,
-                                              out Exception? ex))
+                                                                       out d2d1Factory,
+                                                                       out Exception? ex))
         {
             throw ex;
         }
@@ -356,21 +348,21 @@ public static partial class SwapChainPanelHelper
 
 public class D3DDeviceContext : IDisposable
 {
-    public ID3D11Device3? D3D11Device { get; init; }
+    public ID3D11Device3?        D3D11Device        { get; init; }
     public ID3D11DeviceContext3? D3D11DeviceContext { get; init; }
-    public ID2D1Device2? D2D1Device { get; init; }
-    public ID2D1DeviceContext2? D2D1DeviceContext { get; init; }
-    public ID2D1Bitmap1? D2D1Bitmap { get; init; }
-    public ID2D1Factory3? D2D1Factory { get; init; }
+    public ID2D1Device2?         D2D1Device         { get; init; }
+    public ID2D1DeviceContext2?  D2D1DeviceContext  { get; init; }
+    public ID2D1Bitmap1?         D2D1Bitmap         { get; init; }
+    public ID2D1Factory3?        D2D1Factory        { get; init; }
 
-    public ID3D11Texture2D? D3D11Texture2D { get; init; }
+    public ID3D11Texture2D?  D3D11Texture2D  { get; init; }
     public IDirect3DSurface? Direct3DSurface { get; init; }
 
-    public IDXGIDevice3? DXGIDevice { get; init; }
+    public IDXGIDevice3?  DXGIDevice  { get; init; }
     public IDXGIFactory4? DXGIFactory { get; init; }
-    public IDXGISurface? DXGISurface { get; init; }
+    public IDXGISurface?  DXGISurface { get; init; }
 
-    public IDXGISwapChain2? DXGISwapChain { get; init; }
+    public IDXGISwapChain2?       DXGISwapChain        { get; init; }
     public ISwapChainPanelNative? SwapChainPanelNative { get; init; }
 
     public void Dispose()
