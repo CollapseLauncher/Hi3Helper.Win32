@@ -27,7 +27,7 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("d3d11.dll", EntryPoint = "CreateDirect3D11SurfaceFromDXGISurface")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static unsafe partial HResult CreateDirect3D11SurfaceFromDXGISurface(
+        public static unsafe partial int CreateDirect3D11SurfaceFromDXGISurface(
             nint dgxiSurface,
             out nint ppGraphicsSurface);
 

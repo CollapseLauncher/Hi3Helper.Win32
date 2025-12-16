@@ -113,28 +113,33 @@ public static partial class SwapChainPanelHelper
         };
     }
 
-    public static unsafe void BeginDrawNativeSurfaceImageSource(
-        ISurfaceImageSourceNativeWithD2D nativeObject,
-        Rect updateRect,
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe int NativeSurfaceImageSource_BeginDrawUnsafe(
+        nint nativeP,
+        in Rect updateRect,
         out nint direct3dSurfacePpv)
     {
-        nativeObject.BeginDraw(updateRect, in IDXGISurface_IID, out nint dxgiSurfacePpv, out var offset);
-        PInvoke.CreateDirect3D11SurfaceFromDXGISurface(dxgiSurfacePpv, out direct3dSurfacePpv);
+        nint dxgiSurfaceP = nint.Zero;
+        void* nativePpv = (void*)nativeP;
+
+        ulong pointOffsetI = 0;
+        void* updateRectP  = Unsafe.AsPointer(in updateRect);
+        void* surfaceIidP  = Unsafe.AsPointer(in IDXGISurface_IID);
+
+        ((delegate* unmanaged[Stdcall]<void*, void*, void*, void**, void*, int>)(*(*(void***)nativeP + 4)))(nativePpv, updateRectP, surfaceIidP, (void**)&dxgiSurfaceP, &pointOffsetI);
+
+        return PInvoke.CreateDirect3D11SurfaceFromDXGISurface(dxgiSurfaceP, out direct3dSurfacePpv);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static unsafe int EndDrawNativeSurfaceImageSource(nint nativeP)
-    {
-        return ((delegate* unmanaged[Stdcall]<nint, int>)(*(*(void***)nativeP + 5)))(nativeP); // +5 is .EndDraw()
-    }
+    public static unsafe int NativeSurfaceImageSource_EndDrawUnsafe(nint nativeP)
+        => ((delegate* unmanaged[Stdcall]<nint, int>)(*(*(void***)nativeP + 5)))(nativeP); // +5 is .EndDraw()
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static unsafe int MediaPlayer_CopyFrameToVideoSurfaceUnsafe(
         nint playerP,
         nint surfaceP)
-    {
-        return ((delegate* unmanaged[Stdcall]<nint, nint, int>)(*(*(void***)playerP + 10)))(playerP, surfaceP); // +10 == .CopyFrameToVideoSurface(nint)
-    }
+        => ((delegate* unmanaged[Stdcall]<nint, nint, int>)(*(*(void***)playerP + 10)))(playerP, surfaceP); // +10 == .CopyFrameToVideoSurface(nint)
 
     public static unsafe void InitializeD3D11Device(
         IWinRTObject swapChainPanel,
@@ -237,7 +242,9 @@ public static partial class SwapChainPanelHelper
             out nint dxgiSurfacePpv);
 
         // Prepare IDirect3DSurface
-        PInvoke.CreateDirect3D11SurfaceFromDXGISurface(dxgiSurfacePpv, out nint d3dSurfacePpv).ThrowOnFailure();
+        HResult hr = PInvoke.CreateDirect3D11SurfaceFromDXGISurface(dxgiSurfacePpv, out nint d3dSurfacePpv);
+        hr.ThrowOnFailure();
+
         IDirect3DSurface d3dSurface = MarshalInterface<IDirect3DSurface>.FromAbi(d3dSurfacePpv);
 
         // Return result
