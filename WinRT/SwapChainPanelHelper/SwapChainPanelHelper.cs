@@ -37,8 +37,11 @@ public static partial class SwapChainPanelHelper
 
     public static unsafe void GetNativeSurfaceImageSource(
         IWinRTObject surfaceImageSource,
-        out ISurfaceImageSourceNativeWithD2D nativeObject)
+        out ISurfaceImageSourceNativeWithD2D nativeObject,
+        out D3DDeviceContext deviceContext)
     {
+        Unsafe.SkipInit(out deviceContext);
+
         const D3D_DRIVER_TYPE DriverType = D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE;
 
         D3D11_CREATE_DEVICE_FLAG flags = D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_BGRA_SUPPORT;
@@ -79,6 +82,35 @@ public static partial class SwapChainPanelHelper
         }
 
         nativeObject.SetDevice(ppD2D1device);
+
+        if (!ComMarshal<ID3D11Device3>.TryCreateComObjectFromReference(ppD3D11device,
+                                                                       out ID3D11Device3? d3d11Device,
+                                                                       out ex))
+        {
+            throw ex;
+        }
+
+        if (!ComMarshal<ID3D11DeviceContext3>.TryCreateComObjectFromReference(ppD3D11DeviceImmediateContext,
+                                                                              out ID3D11DeviceContext3? d3d11DeviceImmediateContext,
+                                                                              out ex))
+        {
+            throw ex;
+        }
+
+        if (!ComMarshal<ID2D1Device2>.TryCreateComObjectFromReference(ppD2D1device,
+                                                                      out ID2D1Device2? d2d1Device,
+                                                                      out ex))
+        {
+            throw ex;
+        }
+
+        deviceContext = new D3DDeviceContext
+        {
+            D3D11Device = d3d11Device,
+            D3D11DeviceContext = d3d11DeviceImmediateContext,
+            DXGIDevice = dxgiDevice,
+            D2D1Device = d2d1Device,
+        };
     }
 
     public static unsafe void BeginDrawNativeSurfaceImageSource(
@@ -91,18 +123,24 @@ public static partial class SwapChainPanelHelper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static unsafe void MediaPlayer_CopyFrameToVideoSurfaceUnsafe(
-        nint playerInstance,
-        nint surface)
+    public static unsafe int EndDrawNativeSurfaceImageSource(nint nativeP)
     {
-        ((delegate* unmanaged[Stdcall]<nint, nint, int>)(*(nint*)(*(nint*)playerInstance + 10 * (nint)sizeof(delegate* unmanaged[Stdcall]<nint, nint, int>))))(playerInstance, surface);
+        return ((delegate* unmanaged[Stdcall]<nint, int>)(*(*(void***)nativeP + 5)))(nativeP); // +5 is .EndDraw()
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe int MediaPlayer_CopyFrameToVideoSurfaceUnsafe(
+        nint playerP,
+        nint surfaceP)
+    {
+        return ((delegate* unmanaged[Stdcall]<nint, nint, int>)(*(*(void***)playerP + 10)))(playerP, surfaceP); // +10 == .CopyFrameToVideoSurface(nint)
     }
 
     public static unsafe void InitializeD3D11Device(
         IWinRTObject swapChainPanel,
         double xamlScaleFactor,
         ref DXGI_SWAP_CHAIN_DESC1 description,
-        out SwapChainContext? swapChainContext)
+        out D3DDeviceContext? swapChainContext)
     {
         Unsafe.SkipInit(out swapChainContext);
         Unsafe.SkipInit(out nint ppSwapChainP);
@@ -203,7 +241,7 @@ public static partial class SwapChainPanelHelper
         IDirect3DSurface d3dSurface = MarshalInterface<IDirect3DSurface>.FromAbi(d3dSurfacePpv);
 
         // Return result
-        swapChainContext = new SwapChainContext
+        swapChainContext = new D3DDeviceContext
         {
             D3D11Device = d3d11Device,
             D3D11DeviceContext = d3d11DeviceContext,
@@ -309,7 +347,7 @@ public static partial class SwapChainPanelHelper
     }
 }
 
-public class SwapChainContext : IDisposable
+public class D3DDeviceContext : IDisposable
 {
     public ID3D11Device3? D3D11Device { get; init; }
     public ID3D11DeviceContext3? D3D11DeviceContext { get; init; }

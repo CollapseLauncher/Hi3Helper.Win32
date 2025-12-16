@@ -376,7 +376,6 @@ namespace Hi3Helper.Win32.ManagedTools
                 }
 
                 comObjPpv = queriedComObjPpv;
-
                 exceptionIfFalse = Marshal.GetExceptionForHR((int)hr);
                 if (exceptionIfFalse != null)
                 {
