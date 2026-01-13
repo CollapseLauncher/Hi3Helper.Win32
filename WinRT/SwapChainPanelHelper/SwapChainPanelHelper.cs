@@ -2,6 +2,8 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using WinRT;
+
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 // ReSharper disable CommentTypo
@@ -25,12 +27,13 @@ public static class SwapChainPanelHelper
         uint colorDummy        = 0;
 
         void* colorDummyP = Unsafe.AsPointer(in colorDummy);
+        void* updateRectP = Unsafe.AsPointer(in updateRect);
 
         // -- CanvasImageSource.CreateDrawingSession(Color);
         Marshal.ThrowExceptionForHR(((delegate* unmanaged[Stdcall]<nint, void*, void**, int>)(*(*(void***)imageSourceP + 6)))(imageSourceP, colorDummyP, (void**)&drawingSessionPpv));
 
         // -- CanvasDrawingSession.DrawImage(ICanvasImage);
-        Marshal.ThrowExceptionForHR(((delegate* unmanaged[Stdcall]<nint, void*, int>)(*(*(void***)drawingSessionPpv + 9)))(drawingSessionPpv, (void*)renderTargetP));
+        Marshal.ThrowExceptionForHR(((delegate* unmanaged[Stdcall]<nint, void*, void*, int>)(*(*(void***)drawingSessionPpv + 9)))(drawingSessionPpv, (void*)renderTargetP, updateRectP));
 
         // -- Query to WinRT's IDisposable
         Marshal.QueryInterface(drawingSessionPpv, in IDisposableWinRTObj_IID, out nint disposablePpv);
