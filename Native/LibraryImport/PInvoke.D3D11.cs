@@ -25,17 +25,30 @@ namespace Hi3Helper.Win32.Native.LibraryImport
             ref D3D_FEATURE_LEVEL featureLevel,
             out nint ppImmediateContext);
 
+        [LibraryImport("d3d11.dll", EntryPoint = "CreateDirect3DSurface")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static unsafe partial void CreateDirect3DSurface(
+            nint     dgxiSurface,
+            out nint ppGraphicsSurface);
+
         [LibraryImport("d3d11.dll", EntryPoint = "CreateDirect3D11SurfaceFromDXGISurface")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static unsafe partial int CreateDirect3D11SurfaceFromDXGISurface(
             nint dgxiSurface,
             out nint ppGraphicsSurface);
 
-        [LibraryImport("D2d1.dll", EntryPoint = "D2D1CreateDevice")]
+        [LibraryImport("d2d1.dll", EntryPoint = "D2D1CreateDevice")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static unsafe partial HResult D2D1CreateDevice(
             [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGIDevice>))] IDXGIDevice dxgiDevice,
             in D2D1_CREATION_PROPERTIES creationProperties,
             out nint d2dDevice);
+
+        [LibraryImport("d2d1.dll", EntryPoint = "D2D1CreateDeviceContext")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static unsafe partial HResult D2D1CreateDeviceContext(
+            [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGISurface>))] IDXGISurface dxgiSurface,
+            in D2D1_CREATION_PROPERTIES creationProperties,
+            out nint d2dDeviceContext);
     }
 }

@@ -6,14 +6,14 @@ namespace Hi3Helper.Win32.Native.Structs.D3D;
 
 public struct D3D11_TEXTURE2D_DESC
 {
-    public uint Width;
-    public uint Height;
-    public uint MipLevels;
-    public uint ArraySize;
-    public DXGI_FORMAT Format;
+    public uint             Width;
+    public uint             Height;
+    public uint             MipLevels;
+    public uint             ArraySize;
+    public DXGI_FORMAT      Format;
     public DXGI_SAMPLE_DESC SampleDesc;
-    public D3D11_USAGE Usage;
-    public uint BindFlags;
-    public uint CPUAccessFlags;
-    public uint MiscFlags;
+    public D3D11_USAGE      Usage;
+    public D3D11_BIND_FLAG  BindFlags;
+    public uint             CPUAccessFlags;
+    public uint             MiscFlags;
 }

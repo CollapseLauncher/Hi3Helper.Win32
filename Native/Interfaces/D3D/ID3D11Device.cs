@@ -7,6 +7,7 @@ using System.Runtime.InteropServices.Marshalling;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 
+[GeneratedComInterface]
 [Guid("db6f6ddb-ac77-4e88-8253-819df9bbf140")]
 public partial interface ID3D11Device
 {
@@ -17,7 +18,7 @@ public partial interface ID3D11Device
     void CreateTexture1D(in D3D11_TEXTURE1D_DESC pDesc, nint /* optional D3D11_SUBRESOURCE_DATA* */ pInitialData, nint /* optional ID3D11Texture1D* */ ppTexture1D);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createtexture2d
-    void CreateTexture2D(in D3D11_TEXTURE2D_DESC pDesc, nint /* optional D3D11_SUBRESOURCE_DATA* */ pInitialData, nint /* optional ID3D11Texture2D* */ ppTexture2D);
+    void CreateTexture2D(in D3D11_TEXTURE2D_DESC pDesc, nint /* optional D3D11_SUBRESOURCE_DATA* */ pInitialData, out nint /* optional ID3D11Texture2D* */ ppTexture2D);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createtexture3d
     void CreateTexture3D(in D3D11_TEXTURE3D_DESC pDesc, nint /* optional D3D11_SUBRESOURCE_DATA* */ pInitialData, nint /* optional ID3D11Texture3D* */ ppTexture3D);
@@ -99,7 +100,7 @@ public partial interface ID3D11Device
     void CheckCounterInfo(out D3D11_COUNTER_INFO pCounterInfo);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-checkcounter
-    void CheckCounter(in D3D11_COUNTER_DESC pDesc, out D3D11_COUNTER_TYPE pType, out uint pActiveCounters, [MarshalUsing(CountElementName = nameof(pNameLength))][MarshalAs(UnmanagedType.LPStr)] string? szName, nint /* optional uint* */ pNameLength, [MarshalUsing(CountElementName = nameof(pUnitsLength))][MarshalAs(UnmanagedType.LPStr)] string? szUnits, nint /* optional uint* */ pUnitsLength, [MarshalUsing(CountElementName = nameof(pDescriptionLength))][MarshalAs(UnmanagedType.LPStr)] string szDescription, nint /* optional uint* */ pDescriptionLength);
+    void CheckCounter(in D3D11_COUNTER_DESC pDesc, out D3D11_COUNTER_TYPE pType, out uint pActiveCounters, [MarshalUsing(typeof(Utf8StringMarshaller), CountElementName = nameof(pNameLength))] string? szName, nint /* optional uint* */ pNameLength, [MarshalUsing(typeof(Utf8StringMarshaller), CountElementName = nameof(pUnitsLength))] string? szUnits, nint /* optional uint* */ pUnitsLength, [MarshalUsing(typeof(Utf8StringMarshaller), CountElementName = nameof(pDescriptionLength))] string szDescription, nint /* optional uint* */ pDescriptionLength);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-checkfeaturesupport
     void CheckFeatureSupport(D3D11_FEATURE Feature, nint pFeatureSupportData, uint FeatureSupportDataSize);

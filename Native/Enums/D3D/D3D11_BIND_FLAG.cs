@@ -1,0 +1,20 @@
+﻿using System;
+// ReSharper disable UnusedMember.Global
+// ReSharper disable InconsistentNaming
+
+namespace Hi3Helper.Win32.Native.Enums.D3D;
+
+[Flags]
+public enum D3D11_BIND_FLAG
+{
+    D3D11_BIND_VERTEX_BUFFER    = 1,
+    D3D11_BIND_INDEX_BUFFER     = 2,
+    D3D11_BIND_CONSTANT_BUFFER  = 4,
+    D3D11_BIND_SHADER_RESOURCE  = 8,
+    D3D11_BIND_STREAM_OUTPUT    = 16,
+    D3D11_BIND_RENDER_TARGET    = 32,
+    D3D11_BIND_DEPTH_STENCIL    = 64,
+    D3D11_BIND_UNORDERED_ACCESS = 128,
+    D3D11_BIND_DECODER          = 512,
+    D3D11_BIND_VIDEO_ENCODER    = 1024,
+}

@@ -140,5 +140,11 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("user32.dll", EntryPoint = "GetSysColor")]
         public static partial uint GetSysColor(SYS_COLOR_INDEX nIndex);
+
+        [LibraryImport("user32.dll", EntryPoint = "ScreenToClient")]
+        public static partial HResult ScreenToClient(nint hwnd, ref POINTL lpPoint);
+
+        [LibraryImport("user32.dll", EntryPoint = "GetCursorPos")]
+        public static partial HResult GetCursorPos(out POINTL lpPoint);
     }
 }
