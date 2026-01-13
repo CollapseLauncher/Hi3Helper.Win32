@@ -372,7 +372,7 @@ namespace Hi3Helper.Win32.ManagedTools
             in Guid comObjIid,
             out nint comObjPpv,
             [NotNullWhen(false)] out Exception? exceptionIfFalse,
-            CreateComInterfaceFlags flags = CreateComInterfaceFlags.None,
+            CreateComInterfaceFlags flags = CreateComInterfaceFlags.TrackerSupport,
             bool requireQueryInterface = false)
         {
             Unsafe.SkipInit(out comObjPpv);
