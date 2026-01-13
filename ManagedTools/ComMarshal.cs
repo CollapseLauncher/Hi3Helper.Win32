@@ -336,7 +336,7 @@ namespace Hi3Helper.Win32.ManagedTools
             TObjSource comObj,
             out nint comObjPpv,
             [NotNullWhen(false)] out Exception? exceptionIfFalse,
-            CreateComInterfaceFlags flags = CreateComInterfaceFlags.None,
+            CreateComInterfaceFlags flags = CreateComInterfaceFlags.TrackerSupport,
             bool requireQueryInterface = false)
         {
             Unsafe.SkipInit(out comObjPpv);
@@ -409,6 +409,9 @@ namespace Hi3Helper.Win32.ManagedTools
 
                 // If the object is not owned by anyone, throw the error.
             }
+
+            // Decrement reference count of the original object.
+            Marshal.Release(comObjPpv);
 
             comObjPpv        = queriedComObjPpv;
             exceptionIfFalse = Marshal.GetExceptionForHR((int)hr);
