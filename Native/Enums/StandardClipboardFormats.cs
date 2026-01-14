@@ -31,6 +31,9 @@ namespace Hi3Helper.Win32.Native.Enums
         CF_PRIVATEFIRST    = 0x0200,
         CF_PRIVATELAST     = 0x02FF,
         CF_GDIOBJFIRST     = 0x0300,
-        CF_GDIOBJLAST      = 0x03FF
+        CF_GDIOBJLAST      = 0x03FF,
+
+        // Non standard
+        CF_PNG = 49331
     }
 }
