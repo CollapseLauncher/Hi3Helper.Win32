@@ -5,10 +5,14 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Buffers;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
+
 // ReSharper disable RedundantUnsafeContext
 // ReSharper disable UnusedMember.Global
 // ReSharper disable OutParameterValueIsAlwaysDiscarded.Global
@@ -22,12 +26,27 @@ namespace Hi3Helper.Win32.ManagedTools
         // https://github.com/dotnet/runtime/blob/main/src/libraries/Common/src/Interop/Windows/NtDll/Interop.NtQuerySystemInformation.cs#L11
 
         private const int SystemProcessInformation = 5;
-        private const int QueryLimitedInformation = 0x1000;
+        private const int QueryLimitedInformation  = 0x1000;
 
-        private const int  DefaultNtQueryChangedLen = 4 << 17;
-        private const nint InvalidHandleValue = -1;
-        private const int  ProcessSetInformation = 0x0200;
-        private static int _dynamicNtQueryChangedBufferLen = DefaultNtQueryChangedLen;
+        private const  int    DefaultNtQueryChangedLen        = 4 << 17;
+        private const  nint   InvalidHandleValue              = -1;
+        private const  int    ProcessSetInformation           = 0x0200;
+        private static int    _dynamicNtQueryChangedBufferLen = DefaultNtQueryChangedLen;
+
+        private static byte[] _sharedBuffer = ArrayPool<byte>.Shared.Rent(DefaultNtQueryChangedLen);
+
+        private static byte[] GetBufferOrResized(int requestedLen)
+        {
+            if (_sharedBuffer.Length >= requestedLen)
+            {
+                return _sharedBuffer;
+            }
+
+            ArrayPool<byte>.Shared.Return(Interlocked
+                                             .Exchange(ref _sharedBuffer,
+                                                       ArrayPool<byte>.Shared.Rent(requestedLen)));
+            return _sharedBuffer;
+        }
 
         public static unsafe bool IsProcessExist(int processId)
         {
@@ -46,10 +65,12 @@ namespace Hi3Helper.Win32.ManagedTools
         public static unsafe bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", ILogger? logger = null)
             => IsProcessExist(processName, out processId, out windowHandle, checkForOriginPath, false, logger);
 
-        public static unsafe bool IsProcessExist(ReadOnlySpan<char> processName, out int processId, out nint windowHandle, string checkForOriginPath = "", bool useStartsWithMatch = true, ILogger? logger = null)
+        public static unsafe bool IsProcessExist(ReadOnlySpan<char> processName, out int processId,
+                                                 out nint           windowHandle, string checkForOriginPath = "",
+                                                 bool               useStartsWithMatch = true, ILogger? logger = null)
         {
             // Set default process id number to 0
-            processId = 0;
+            processId    = 0;
             windowHandle = nint.Zero;
 
             // If the buffer length is more than 2 MiB, then reset the length to default
@@ -59,162 +80,160 @@ namespace Hi3Helper.Win32.ManagedTools
             }
 
             // Initialize the first buffer to 512 KiB
-            ArrayPool<byte> arrayPool = ArrayPool<byte>.Shared;
-            byte[] ntQueryCachedBuffer = arrayPool.Rent(_dynamicNtQueryChangedBufferLen);
-            bool isReallocate = false;
-            // ReSharper disable once RedundantAssignment
+            byte[] ntQueryCachedBuffer = GetBufferOrResized(_dynamicNtQueryChangedBufferLen);
+            bool   isReallocate        = false;
 
             // Get size of UNICODE_STRING struct
             int sizeOfUnicodeString = sizeof(UNICODE_STRING);
 
-        StartOver:
-            try
+            StartOver:
+            // If the buffer request is more than 2 MiB, then return false
+            if (_dynamicNtQueryChangedBufferLen > 2 << 20)
+                return false;
+
+            // If buffer reallocation is requested, then re-rent the buffer
+            // from ArrayPool<T>.Shared
+            if (isReallocate)
+                ntQueryCachedBuffer = GetBufferOrResized(_dynamicNtQueryChangedBufferLen);
+
+            // Get the pointer of the buffer
+            byte* dataBufferPtr = (byte*)Marshal.UnsafeAddrOfPinnedArrayElement(ntQueryCachedBuffer, 0);
             {
-                // If the buffer request is more than 2 MiB, then return false
-                if (_dynamicNtQueryChangedBufferLen > 2 << 20)
-                    return false;
+                // Get the query of the current running process and store it to the buffer
+                uint hNtQuerySystemInformationResult =
+                    PInvoke.NtQuerySystemInformation(SystemProcessInformation, dataBufferPtr,
+                                                     (uint)ntQueryCachedBuffer.Length, out uint length);
 
-                // If buffer reallocation is requested, then re-rent the buffer
-                // from ArrayPool<T>.Shared
-                if (isReallocate)
-                    ntQueryCachedBuffer = arrayPool.Rent(_dynamicNtQueryChangedBufferLen);
-
-                // Get the pointer of the buffer
-                byte* dataBufferPtr = (byte*)Marshal.UnsafeAddrOfPinnedArrayElement(ntQueryCachedBuffer, 0);
+                // If the required length of the data is exceeded than the current buffer,
+                // then try to reallocate and start over to the top.
+                const uint statusInfoLengthMismatch = 0xC0000004;
+                if (hNtQuerySystemInformationResult == statusInfoLengthMismatch ||
+                    length > ntQueryCachedBuffer.Length)
                 {
-                    // Get the query of the current running process and store it to the buffer
-                    uint hNtQuerySystemInformationResult = PInvoke.NtQuerySystemInformation(SystemProcessInformation, dataBufferPtr, (uint)ntQueryCachedBuffer.Length, out uint length);
+                    // Round up length
+                    _dynamicNtQueryChangedBufferLen = (int)BitOperations.RoundUpToPowerOf2(length);
+                    logger?.LogWarning("Buffer requested is insufficient! Requested: {length} > Capacity: {bufLen}, Resizing the buffer...",
+                                       length,
+                                       ntQueryCachedBuffer.Length);
+                    isReallocate = true;
+                    goto StartOver;
+                }
 
-                    // If the required length of the data is exceeded than the current buffer,
-                    // then try to reallocate and start over to the top.
-                    const uint statusInfoLengthMismatch = 0xC0000004;
-                    if (hNtQuerySystemInformationResult == statusInfoLengthMismatch || length > ntQueryCachedBuffer.Length)
-                    {
-                        // Round up length
-                        _dynamicNtQueryChangedBufferLen = (int)BitOperations.RoundUpToPowerOf2(length);
-                        logger?.LogWarning("Buffer requested is insufficient! Requested: {length} > Capacity: {bufLen}, Resizing the buffer...", length, ntQueryCachedBuffer.Length);
-                        isReallocate = true;
-                        goto StartOver;
-                    }
+                // If other error has occurred, then return false as failed.
+                if (hNtQuerySystemInformationResult != 0)
+                {
+                    logger?.LogError("Error happened while operating NtQuerySystemInformation(): {ex}",
+                                     Win32Error.GetLastWin32ErrorMessage());
+                    return false;
+                }
 
-                    // If other error has occurred, then return false as failed.
-                    if (hNtQuerySystemInformationResult != 0)
+                // Start reading data from the buffer
+                int currentOffset = 0;
+                ReadQueryData:
+                // Get the current position of the pointer based on its offset
+                byte* curPosPtr = dataBufferPtr + currentOffset;
+
+                // Get the increment of the next entry offset
+                // and get the struct from the given pointer offset + 56 bytes ahead
+                // to obtain the process name.
+                int nextEntryOffset = *(int*)curPosPtr;
+                var unicodeString   = (UNICODE_STRING*)(curPosPtr + 56);
+
+                // Use the struct buffer into the ReadOnlySpan<char> to be compared with
+                // the input from "processName" argument.
+                var imageNameSpan = new ReadOnlySpan<char>(unicodeString->Buffer, unicodeString->Length / 2);
+                bool isMatchedExecutable = !useStartsWithMatch
+                    ? imageNameSpan.Equals(processName, StringComparison.OrdinalIgnoreCase)
+                    : imageNameSpan.StartsWith(processName, StringComparison.OrdinalIgnoreCase);
+
+                if (isMatchedExecutable)
+                {
+                    // Move the offset of the current pointer and get the processId value
+                    processId = *(int*)(curPosPtr + 56 + sizeOfUnicodeString + 8);
+
+                    // Try to find the window id and assign it to windowHandle
+                    windowHandle = MainWindowFinder.FindMainWindow(processId);
+
+                    // If the origin path argument is null, then return as true.
+                    if (string.IsNullOrEmpty(checkForOriginPath))
+                        return true;
+
+                    // Try open the process and get the handle
+                    nint processHandle = PInvoke.OpenProcess(QueryLimitedInformation, false, processId);
+
+                    // If failed, then log the Win32 error and return false.
+                    if (processHandle == InvalidHandleValue
+                        || processHandle == nint.Zero)
                     {
-                        logger?.LogError("Error happened while operating NtQuerySystemInformation(): {ex}", Win32Error.GetLastWin32ErrorMessage());
+                        logger?.LogError("Error happened while operating OpenProcess(): {ex}",
+                                         Win32Error.GetLastWin32ErrorMessage());
                         return false;
                     }
 
-                    // Start reading data from the buffer
-                    int currentOffset = 0;
-                    ReadQueryData:
-                    // Get the current position of the pointer based on its offset
-                    byte* curPosPtr = dataBufferPtr + currentOffset;
+                    // If the string is not null, then check if the file path is exactly the same.
+                    // START!!
 
-                    // Get the increment of the next entry offset
-                    // and get the struct from the given pointer offset + 56 bytes ahead
-                    // to obtain the process name.
-                    int nextEntryOffset = *(int*)curPosPtr;
-                    UNICODE_STRING* unicodeString = (UNICODE_STRING*)(curPosPtr + 56);
-
-                    // Use the struct buffer into the ReadOnlySpan<char> to be compared with
-                    // the input from "processName" argument.
-                    ReadOnlySpan<char> imageNameSpan =
-                        new ReadOnlySpan<char>(unicodeString->Buffer, unicodeString->Length / 2);
-                    bool isMatchedExecutable = !useStartsWithMatch ? 
-                        imageNameSpan.Equals(processName, StringComparison.OrdinalIgnoreCase) :
-                        imageNameSpan.StartsWith(processName, StringComparison.OrdinalIgnoreCase);
-
-                    if (isMatchedExecutable)
+                    try
                     {
-                        // Move the offset of the current pointer and get the processId value
-                        processId = *(int*)(curPosPtr + 56 + sizeOfUnicodeString + 8);
-
-                        // Try to find the window id and assign it to windowHandle
-                        windowHandle = MainWindowFinder.FindMainWindow(processId);
-
-                        // If the origin path argument is null, then return as true.
-                        if (string.IsNullOrEmpty(checkForOriginPath))
-                            return true;
-
-                        // Try open the process and get the handle
-                        nint processHandle = PInvoke.OpenProcess(QueryLimitedInformation, false, processId);
-
-                        // If failed, then log the Win32 error and return false.
-                        if (processHandle == InvalidHandleValue
-                         || processHandle == nint.Zero)
+                        // Get the command line query of the process
+                        if (!TryGetProcessCommandLineString(processHandle,
+                                                            out string? processCmdStr))
                         {
-                            logger?.LogError("Error happened while operating OpenProcess(): {ex}", Win32Error.GetLastWin32ErrorMessage());
+                            logger
+                              ?.LogError("Error happened while operating QueryFullProcessImageName(): {errorMsg}",
+                                         Win32Error.GetLastWin32ErrorMessage());
                             return false;
                         }
 
-                        // If the string is not null, then check if the file path is exactly the same.
-                        // START!!
+                        // Compare and return if any of result is equal
+                        bool isCommandPathEqual = !useStartsWithMatch
+                            ? processCmdStr.Equals(checkForOriginPath,
+                                                   StringComparison.OrdinalIgnoreCase)
+                            : processCmdStr.StartsWith(checkForOriginPath,
+                                                       StringComparison.OrdinalIgnoreCase);
 
-                        // Try rent the new buffer to get the command line
-                        const int bufferProcessCmdLen       = 1 << 10;
-                        int       bufferProcessCmdLenReturn = bufferProcessCmdLen;
-                        char[]    bufferProcessCmd          = ArrayPool<char>.Shared.Rent(bufferProcessCmdLen);
-                        try
-                        {
-                            // Cast processCmd buffer as pointer
-                            char* bufferProcessCmdPtr = (char*)Marshal.UnsafeAddrOfPinnedArrayElement(bufferProcessCmd, 0);
-                            {
-                                // Get the command line query of the process
-                                bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, &bufferProcessCmdLenReturn);
-                                // If the query is unsuccessful, then log the Win32 error and return false.
-                                if (!hQueryFullProcessImageNameResult)
-                                {
-                                    logger?.LogError($"Error happened while operating QueryFullProcessImageName(): {Win32Error.GetLastWin32ErrorMessage()}");
-                                    return false;
-                                }
-
-                                // If the requested return length is more than capacity (-2 for null terminator), then return false.
-                                if (bufferProcessCmdLenReturn > bufferProcessCmdLen - 2)
-                                {
-                                    logger?.LogError($"The process command line length is more than requested length: {bufferProcessCmdLen - 2} < return {bufferProcessCmdLenReturn}");
-                                    return false;
-                                }
-
-                                // Get the command line query
-                                ReadOnlySpan<char> processCmdLineSpan =
-                                    new ReadOnlySpan<char>(bufferProcessCmdPtr, bufferProcessCmdLenReturn);
-
-                                // Get the span of origin path to compare
-                                ReadOnlySpan<char> checkForOriginPathDir = checkForOriginPath;
-
-                                // Compare and return if any of result is equal
-                                bool isCommandPathEqual = !useStartsWithMatch ? 
-                                    processCmdLineSpan.Equals(checkForOriginPathDir, StringComparison.OrdinalIgnoreCase) :
-                                    processCmdLineSpan.StartsWith(checkForOriginPathDir, StringComparison.OrdinalIgnoreCase);
-
-                                if (isCommandPathEqual)
-                                    return true;
-                            }
-                        }
-                        finally
-                        {
-                            // Return the buffer
-                            ArrayPool<char>.Shared.Return(bufferProcessCmd);
-
-                            // Close the OpenProcess handle
-                            PInvoke.CloseHandle(processHandle);
-                        }
+                        if (isCommandPathEqual)
+                            return true;
                     }
-
-                    // Otherwise, if the next entry offset is not 0 (not ended), then read
-                    // the next data and move forward based on the given offset.
-                    currentOffset += nextEntryOffset;
-                    if (nextEntryOffset != 0)
-                        goto ReadQueryData;
+                    finally
+                    {
+                        // Close the OpenProcess handle
+                        PInvoke.CloseHandle(processHandle);
+                    }
                 }
-            }
-            finally
-            {
-                // Return the buffer to the ArrayPool<T>.Shared
-                arrayPool.Return(ntQueryCachedBuffer);
+
+                // Otherwise, if the next entry offset is not 0 (not ended), then read
+                // the next data and move forward based on the given offset.
+                currentOffset += nextEntryOffset;
+                if (nextEntryOffset != 0)
+                    goto ReadQueryData;
             }
 
             return false;
+        }
+
+        private static bool TryGetProcessCommandLineString(
+            nint                            procHandle,
+            [NotNullWhen(true)] out string? commandLine)
+        {
+            const int stackBufferMaxSize = 1 << 10;
+            Unsafe.SkipInit(out commandLine);
+
+            Span<char> charSpan      = stackalloc char[stackBufferMaxSize];
+            ref char   charRef       = ref MemoryMarshal.GetReference(charSpan);
+            int        charOutputLen = charSpan.Length;
+
+            if (!PInvoke.QueryFullProcessImageName(procHandle,
+                                                   0,
+                                                   ref charRef,
+                                                   ref charOutputLen) ||
+                charOutputLen == 0)
+            {
+                return false;
+            }
+
+            commandLine = new string(charSpan[..charOutputLen]);
+            return true;
         }
 
         public static unsafe string? GetProcessPathByProcessId(int processId, ILogger? logger = null)
@@ -229,41 +248,22 @@ namespace Hi3Helper.Win32.ManagedTools
                 return null;
             }
 
-            // Try rent the new buffer to get the command line
-            const int bufferProcessCmdLen       = 1 << 10;
-            int       bufferProcessCmdLenReturn = bufferProcessCmdLen;
-            char[]    bufferProcessCmd          = ArrayPool<char>.Shared.Rent(bufferProcessCmdLen);
-
             try
             {
-                // Cast processCmd buffer as pointer
-                char* bufferProcessCmdPtr = (char*)Marshal.UnsafeAddrOfPinnedArrayElement(bufferProcessCmd, 0);
                 {
                     // Get the command line query of the process
-                    bool hQueryFullProcessImageNameResult = PInvoke.QueryFullProcessImageName(processHandle, 0, bufferProcessCmdPtr, &bufferProcessCmdLenReturn);
+                    if (TryGetProcessCommandLineString(processHandle, out string? processCmd))
+                    {
+                        return processCmd;
+                    }
+
                     // If the query is unsuccessful, then log the Win32 error and return false.
-                    if (!hQueryFullProcessImageNameResult)
-                    {
-                        logger?.LogError("Error happened while operating QueryFullProcessImageName(): {ex}", Win32Error.GetLastWin32ErrorMessage());
-                        return null;
-                    }
-
-                    if (bufferProcessCmdLenReturn <= bufferProcessCmdLen - 2)
-                    {
-                        // Return string
-                        return new string(bufferProcessCmdPtr, 0, bufferProcessCmdLenReturn);
-                    }
-
-                    // If the requested return length is more than capacity (-2 for null terminator), then return null.
-                    logger?.LogError("The process command line length is more than requested length: {len1} < return {len2}", bufferProcessCmdLen - 2, bufferProcessCmdLenReturn);
+                    logger?.LogError("Error happened while operating QueryFullProcessImageName(): {ex}", Win32Error.GetLastWin32ErrorMessage());
                     return null;
                 }
             }
             finally
             {
-                // Return the buffer
-                ArrayPool<char>.Shared.Return(bufferProcessCmd);
-
                 // Close the process handle
                 PInvoke.CloseHandle(processHandle);
             }
@@ -273,9 +273,9 @@ namespace Hi3Helper.Win32.ManagedTools
 
         private static Process[] GetInstanceProcesses()
         {
-            using var currentProcess = Process.GetCurrentProcess();
-            var       processes      = Process.GetProcessesByName(currentProcess.ProcessName);
-            
+            using Process currentProcess = Process.GetCurrentProcess();
+            Process[]     processes      = Process.GetProcessesByName(currentProcess.ProcessName);
+
             // Order by start time to get the first instance
             processes = processes.OrderBy(p => p.StartTime).ToArray();
 

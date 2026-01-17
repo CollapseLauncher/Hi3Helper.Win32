@@ -66,7 +66,7 @@ public static class RandomStreamExtension
 
             if (stream.CanRead)
             {
-                return (IOutputStream)AsInputStream(stream, bypassChecks);
+                return (IOutputStream)stream.AsInputStream(bypassChecks);
             }
 
             StreamReadOperationOptimization opt = stream.GetOptimization();
