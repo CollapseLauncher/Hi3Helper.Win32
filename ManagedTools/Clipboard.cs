@@ -88,8 +88,12 @@ namespace Hi3Helper.Win32.ManagedTools
                     return;
                 }
 
-                ReadOnlySpan<char> span     = inputString;
-                ReadOnlySpan<byte> byteSpan = MemoryMarshal.AsBytes(span);
+                ReadOnlySpan<char> span        = inputString;
+                Span<char>         stackBuffer = stackalloc char[span.Length + 1]; // Adds null terminator since it needs that.
+                stackBuffer.Clear();
+                span.CopyTo(stackBuffer);
+
+                ReadOnlySpan<byte> byteSpan = MemoryMarshal.AsBytes(stackBuffer);
                 CopyDataToClipboard(byteSpan, clipboardFlags, logger);
             }
             finally
