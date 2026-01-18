@@ -25,4 +25,9 @@ public struct DXGI_RATIONAL
     /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgicommon/ns-dxgicommon-dxgi_rational#members">Read more on learn.microsoft.com</see>.</para>
     /// </summary>
     public uint Denominator;
+
+    public static implicit operator double(DXGI_RATIONAL desc) => (double)desc.Numerator / desc.Denominator;
+    public static implicit operator float(DXGI_RATIONAL desc) => (float)desc.Numerator / desc.Denominator;
+    public static implicit operator int(DXGI_RATIONAL desc) => (int)(desc.Numerator / desc.Denominator);
+    public static implicit operator uint(DXGI_RATIONAL desc) => desc.Numerator / desc.Denominator;
 }

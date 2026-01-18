@@ -11,6 +11,14 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 {
     public delegate bool EnumWindowsProc(nint windowHandle, nint lParam);
 
+    public delegate void WinEventDelegate(nint hWinEventHook,
+                                          uint eventType,
+                                          nint hwnd,
+                                          int idObject,
+                                          int idChild,
+                                          uint dwEventThread,
+                                          uint dwmsEventTime);
+
     public static partial class PInvoke
     {
         [LibraryImport("user32.dll", EntryPoint = "ShowWindow")]
@@ -89,9 +97,9 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("user32.dll", EntryPoint = "EnumDisplaySettingsW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool EnumDisplaySettings(
-            [MarshalAs(UnmanagedType.LPTStr)] string? lpszDeviceName, // display device
-            int                                       iModeNum,       // graphics mode
-            nint                                      lpDevMode       // graphics mode settings
+            string?      lpszDeviceName, // display device
+            int          iModeNum,       // graphics mode
+            out DEVMODEW lpDevMode       // graphics mode settings
             );
 
         [LibraryImport("user32.dll", EntryPoint = "ChangeDisplaySettingsW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
@@ -146,5 +154,22 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("user32.dll", EntryPoint = "GetCursorPos")]
         public static partial HResult GetCursorPos(out POINTL lpPoint);
+
+        [LibraryImport("user32.dll", EntryPoint = "SetWinEventHook")]
+        public static partial nint SetWinEventHook(uint eventMin,
+                                                   uint eventMax,
+                                                   nint hmodWinEventProc,
+                                                   WinEventDelegate lpfnWinEventProc,
+                                                   uint idProcess,
+                                                   uint idThread,
+                                                   uint dwFlags);
+
+        [LibraryImport("user32.dll", EntryPoint = "MonitorFromWindow")]
+        public static partial nint MonitorFromWindow(nint hwnd,
+                                                     uint dwFlags);
+
+        [LibraryImport("user32.dll", EntryPoint = "GetMonitorInfoW")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool GetMonitorInfo(nint hMonitor, ref MONITORINFOEXW lpmi);
     }
 }

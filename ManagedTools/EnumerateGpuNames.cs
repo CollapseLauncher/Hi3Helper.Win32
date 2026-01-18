@@ -13,6 +13,70 @@ namespace Hi3Helper.Win32.ManagedTools;
 
 public static class EnumerateGpuNames
 {
+    public static IEnumerable<IDXGIAdapter1> EnumerateGpuAdapters(IDXGIFactory6 factory)
+    {
+        uint index = 0;
+
+    StartGo:
+        Guid adapterIid = new Guid(DXGIClsId.IDXGIAdapter1);
+        HResult result = factory.EnumAdapterByGpuPreference(index,
+                                                            DXGI_GPU_PREFERENCE.HighPerformance,
+                                                            adapterIid,
+                                                            out nint adapterPp);
+
+        index++;
+
+        if (!result.Succeeded)
+            yield break;
+
+        if (adapterPp == nint.Zero)
+        {
+            goto StartGo;
+        }
+
+        if (!ComMarshal<IDXGIAdapter1>
+               .TryCreateComObjectFromReference(adapterPp,
+                                                out IDXGIAdapter1? adapter,
+                                                out Exception? adapterError) ||
+            adapter == null)
+        {
+            throw adapterError ?? new COMException();
+        }
+
+        yield return adapter;
+        goto StartGo;
+    }
+
+    public static IEnumerable<IDXGIOutput> EnumerateOutputs(IDXGIAdapter1 adapter)
+    {
+        uint index = 0;
+
+    StartGo:
+        HResult result = adapter.EnumOutputs(index,
+                                             out nint outputPp);
+        index++;
+
+        if (!result.Succeeded)
+            yield break;
+
+        if (outputPp == nint.Zero)
+        {
+            goto StartGo;
+        }
+
+        if (!ComMarshal<IDXGIOutput>
+               .TryCreateComObjectFromReference(outputPp,
+                                                out IDXGIOutput? output,
+                                                out Exception? outputError) ||
+            output == null)
+        {
+            throw outputError ?? new COMException();
+        }
+
+        yield return output;
+        goto StartGo;
+    }
+
     public static IEnumerable<string> GetEnumerateGpuNames()
     {
         Guid adapterFactoryIid = new Guid(DXGIClsId.IDXGIFactory6);
@@ -20,7 +84,6 @@ public static class EnumerateGpuNames
                .ThrowOnFailure();
 
         Unsafe.SkipInit(out IDXGIFactory6? factory);
-
         try
         {
             if (!ComMarshal<IDXGIFactory6>.TryCreateComObjectFromReference(factoryPp,
@@ -31,51 +94,12 @@ public static class EnumerateGpuNames
                 throw factoryError ?? new COMException();
             }
 
-            uint index = 0;
-
-        StartGo:
-            Guid adapterIid = new Guid(DXGIClsId.IDXGIAdapter1);
-            HResult result = factory.EnumAdapterByGpuPreference(index,
-                                                                DXGI_GPU_PREFERENCE.HighPerformance,
-                                                                adapterIid,
-                                                                out nint adapterPp);
-
-            index++;
-
-            if (!result.Succeeded)
-                yield break;
-
-            if (adapterPp == nint.Zero)
+            foreach (IDXGIAdapter1 adapter in EnumerateGpuAdapters(factory))
             {
-                yield return "Unknown Device";
-                goto StartGo;
-            }
-
-            Unsafe.SkipInit(out IDXGIAdapter1? adapter);
-
-            try
-            {
-                if (!ComMarshal<IDXGIAdapter1>
-                       .TryCreateComObjectFromReference(adapterPp,
-                                                        out adapter,
-                                                        out Exception? adapterError) ||
-                    adapter == null)
-                {
-                    throw adapterError ?? new COMException();
-                }
-
                 yield return GetDescriptionString(adapter);
+                ComMarshal<IDXGIAdapter1>.TryReleaseComObject(adapter,
+                                                              out _);
             }
-            finally
-            {
-                if (adapter != null)
-                {
-                    ComMarshal<IDXGIAdapter1>.TryReleaseComObject(adapter,
-                                                                  out _);
-                }
-            }
-
-            goto StartGo;
         }
         finally
         {
@@ -85,7 +109,6 @@ public static class EnumerateGpuNames
                                                               out _);
             }
         }
-
 
         static unsafe string GetDescriptionString(IDXGIAdapter1 adapter)
         {

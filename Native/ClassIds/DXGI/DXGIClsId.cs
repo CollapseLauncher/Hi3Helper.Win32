@@ -7,7 +7,7 @@ namespace Hi3Helper.Win32.Native.ClassIds.DXGI;
 
 public class DXGIClsId
 {
-    public const string IDXGIObject          = "AEC22FB8-76F3-4639-9BE0-28EB43A67A2E";
+    public const string IDXGIObject          = "aec22fb8-76f3-4639-9be0-28eb43a67a2e";
     public const string IDXGIDeviceSubObject = "3D3E0379-F9DE-4D58-BB6C-18D62992F1A6";
     public const string IDXGIFactory         = "7B7166EC-21C7-44AE-B21A-C9AE321AE369";
     public const string IDXGIFactory1        = "770AAE78-F26F-4DBA-A829-253C83D1B387";
@@ -21,6 +21,6 @@ public class DXGIClsId
 
     public const string IDXGISwapChain  = "310D36A0-D2E7-4C0A-AA04-6A9D23B8886A";
     public const string IDXGISwapChain1 = "790A45F7-0D42-4876-983A-0A55CFE6F4AA";
-    public const string IDXGIOutput     = "AE02EEDB-C735-4690-8D52-5A8DC20213AA";
+    public const string IDXGIOutput     = "ae02eedb-c735-4690-8d52-5a8dc20213aa";
     public const string IDXGISurface    = "CAFCB56C-6AC3-4889-BF47-9E23BBD260EC";
 }

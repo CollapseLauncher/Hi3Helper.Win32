@@ -31,8 +31,8 @@ public unsafe partial interface IDXGIAdapter : IDXGIObject
     /// <para><div class="alert"><b>Note</b>  If you call this API in a Session 0 process, it returns <a href="https://docs.microsoft.com/windows/desktop/direct3ddxgi/dxgi-error">DXGI_ERROR_NOT_CURRENTLY_AVAILABLE</a>.</div> <div> </div> When the <b>EnumOutputs</b> method succeeds and fills the <i>ppOutput</i> parameter with the address of the pointer to the output interface, <b>EnumOutputs</b> increments the output interface's reference count. To avoid a memory leak, when you finish using the output interface, call the <a href="https://docs.microsoft.com/windows/desktop/api/unknwn/nf-unknwn-iunknown-release">Release</a> method to decrement the reference count. <b>EnumOutputs</b> first returns the output on which the desktop primary is displayed. This output corresponds with an index of zero. <b>EnumOutputs</b> then returns other outputs.</para>
     /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiadapter-enumoutputs#">Read more on learn.microsoft.com</see>.</para>
     /// </remarks>
-    void EnumOutputs(uint output,
-                     out nint ppOutput);
+    [PreserveSig]
+    int EnumOutputs(uint output, out nint ppOutput);
 
     /// <summary>Gets a DXGI 1.0 description of an adapter (or video card).</summary>
     /// <param name="pDesc">
