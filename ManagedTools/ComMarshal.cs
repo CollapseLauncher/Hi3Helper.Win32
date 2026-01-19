@@ -302,10 +302,18 @@ namespace Hi3Helper.Win32.ManagedTools
                 return true;
             }
 
-            // Get or Create Object
-            comObjResult = (TObjSource)DefaultComWrappersStatic
-                                      .Default
-                                      .GetOrCreateObjectForComInstance(comObjPpv, flags);
+            try
+            {
+                // Get or Create Object
+                comObjResult = (TObjSource)DefaultComWrappersStatic
+                                          .Default
+                                          .GetOrCreateObjectForComInstance(comObjPpv, flags);
+            }
+            catch (Exception ex)
+            {
+                exceptionIfFalse = ex;
+                return false;
+            }
 
             // Fail-safe: Ensure the object is not null.
             // If null, then back to GetEnsureCreation with ppv set to null.
