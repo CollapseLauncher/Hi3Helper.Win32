@@ -299,6 +299,7 @@ namespace Hi3Helper.Win32.ManagedTools
             {
                 Unsafe.SkipInit(out exceptionIfFalse);
                 comObjResult = (TObjSource)cachedWrappedObject;
+                Marshal.Release(comObjPpv);
                 return true;
             }
 
@@ -320,6 +321,7 @@ namespace Hi3Helper.Win32.ManagedTools
             // If not, then return true.
             if (!Unsafe.IsNullRef(ref comObjResult))
             {
+                Marshal.Release(comObjPpv);
                 return true;
             }
 
@@ -359,7 +361,6 @@ namespace Hi3Helper.Win32.ManagedTools
 
             exceptionIfFalse = ThrowNoGuidDefined<TObjSource>();
             return false;
-
         }
 
         /// <summary>
