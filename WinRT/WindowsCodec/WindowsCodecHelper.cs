@@ -41,8 +41,8 @@ public static class WindowsCodecHelper
     private static readonly Guid MFT_CATEGORY_VIDEO_DECODER                     = new("D6C02D4B-6833-45B4-971A-05A4B04BAB91");
     private static readonly Guid MFT_CATEGORY_AUDIO_DECODER                     = new("9ea73fb4-ef7a-4559-8d5d-719d8f0426c7");
 
-    private static HashSet<Guid> SupportedVideoCodec = new();
-    private static HashSet<Guid> SupportedAudioCodec = new();
+    private static readonly HashSet<Guid> SupportedVideoCodec = [];
+    private static readonly HashSet<Guid> SupportedAudioCodec = [];
 
     static WindowsCodecHelper()
     {
