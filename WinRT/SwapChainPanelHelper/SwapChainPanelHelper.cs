@@ -29,20 +29,20 @@ public static class SwapChainPanelHelper
     {
         // -- CanvasImageSource.CreateDrawingSession(Color, Rect);
         s_beginDraw = (delegate* unmanaged[Stdcall]<nint, uint, in Rect, out nint, int>)(*(*(void***)imageSourceP + 7));
-        s_beginDraw(imageSourceP, DefaultDummyColor, in updateWinRect, out nint drawingSessionPpv);
+        Marshal.ThrowExceptionForHR(s_beginDraw(imageSourceP, DefaultDummyColor, in updateWinRect, out nint drawingSessionPpv));
 
         // -- CanvasDrawingSession.DrawImage(ICanvasBitmap, Rect);
         //    This method is the shortest based on the implementation source at:
         //    https://github.com/microsoft/Win2D/blob/65e90b29055de64b02e7f2a3d3f042b7fa36326c/winrt/lib/drawing/CanvasDrawingSession.cpp#L254
         s_drawImage = (delegate* unmanaged[Stdcall]<nint, nint, in Rect, int>)(*(*(void***)drawingSessionPpv + 12));
-        s_drawImage(drawingSessionPpv, renderTargetP, in updateWinRect);
+        Marshal.ThrowExceptionForHR(s_drawImage(drawingSessionPpv, renderTargetP, in updateWinRect));
 
         // -- Query to WinRT's IDisposable
         QueryInterfaceShort(drawingSessionPpv, in IDisposableWinRTObj_IID, out nint disposablePpv);
 
         // -- CanvasDrawingSession.Dispose()
         s_dispose = (delegate* unmanaged[Stdcall]<nint, int>)(*(*(void***)disposablePpv + 6));
-        s_dispose(disposablePpv);
+        Marshal.ThrowExceptionForHR(s_dispose(disposablePpv));
 
         // -- Release object
         ReleaseShort(drawingSessionPpv);
