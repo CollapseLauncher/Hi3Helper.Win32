@@ -7,7 +7,6 @@ using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.DXGI;
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -27,29 +26,20 @@ public static class ScreenProp
         int found = 0;
         int sizeOfDevMode = Marshal.SizeOf<DEVMODEW>();
 
-        byte[] buffer = ArrayPool<byte>.Shared.Rent(sizeOfDevMode);
-        nint bufferPtr = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
-        try
+        int lastWidth = 0;
+        int lastHeight = 0;
+        while (PInvoke.EnumDisplaySettings(null, index, out DEVMODEW mode))
         {
-            int lastWidth = 0;
-            int lastHeight = 0;
-            while (PInvoke.EnumDisplaySettings(null, index, out DEVMODEW mode))
+            ++index;
+            if (lastWidth == mode.dmPelsWidth && lastHeight == mode.dmPelsHeight)
             {
-                ++index;
-                if (lastWidth == mode.dmPelsWidth && lastHeight == mode.dmPelsHeight)
-                {
-                    continue;
-                }
-
-                ++found;
-                lastWidth  = (int)mode.dmPelsWidth;
-                lastHeight = (int)mode.dmPelsHeight;
-                yield return new(lastWidth, lastHeight);
+                continue;
             }
-        }
-        finally
-        {
-            ArrayPool<byte>.Shared.Return(buffer);
+
+            ++found;
+            lastWidth = (int)mode.dmPelsWidth;
+            lastHeight = (int)mode.dmPelsHeight;
+            yield return new(lastWidth, lastHeight);
         }
 
         if (found == 0)
