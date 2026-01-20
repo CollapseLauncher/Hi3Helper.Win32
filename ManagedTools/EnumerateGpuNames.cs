@@ -37,10 +37,9 @@ public static class EnumerateGpuNames
         if (!ComMarshal<IDXGIAdapter1>
                .TryCreateComObjectFromReference(adapterPp,
                                                 out IDXGIAdapter1? adapter,
-                                                out Exception? adapterError) ||
-            adapter == null)
+                                                out Exception? adapterError))
         {
-            throw adapterError ?? new COMException();
+            throw adapterError;
         }
 
         yield return adapter;
@@ -67,10 +66,9 @@ public static class EnumerateGpuNames
         if (!ComMarshal<IDXGIOutput>
                .TryCreateComObjectFromReference(outputPp,
                                                 out IDXGIOutput? output,
-                                                out Exception? outputError) ||
-            output == null)
+                                                out Exception? outputError))
         {
-            throw outputError ?? new COMException();
+            throw outputError;
         }
 
         yield return output;
@@ -88,10 +86,9 @@ public static class EnumerateGpuNames
         {
             if (!ComMarshal<IDXGIFactory6>.TryCreateComObjectFromReference(factoryPp,
                                                                            out factory,
-                                                                           out Exception? factoryError) ||
-                factory == null)
+                                                                           out Exception? factoryError))
             {
-                throw factoryError ?? new COMException();
+                throw factoryError;
             }
 
             foreach (IDXGIAdapter1 adapter in EnumerateGpuAdapters(factory))
@@ -109,6 +106,8 @@ public static class EnumerateGpuNames
                                                               out _);
             }
         }
+
+        yield break;
 
         static unsafe string GetDescriptionString(IDXGIAdapter1 adapter)
         {

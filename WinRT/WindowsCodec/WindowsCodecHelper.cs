@@ -8,13 +8,19 @@ using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.MediaFoundation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml.Linq;
+
+// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
 
 namespace Hi3Helper.Win32.WinRT.WindowsCodec;
 
+/// <summary>
+/// Windows codec helper class to check for supported codecs using native Media Foundation and WIC
+/// </summary>
 public static class WindowsCodecHelper
 {
     private const uint GENERIC_READ   = 0x80000000u;
@@ -22,6 +28,7 @@ public static class WindowsCodecHelper
     private const uint MFSTARTUP_LITE = 0x00000001u;
 
     private const uint MF_SOURCE_READER_FIRST_VIDEO_STREAM = 0xFFFFFFFC;
+    private const uint MF_SOURCE_READER_FIRST_AUDIO_STREAM = 0xFFFFFFFD;
     private const uint MFT_ENUM_FLAG_SORTANDFILTER         = 0x00000040;
 
     // https://github.com/jishi/Jishi.StreamToSonos/tree/master/NAudio/MediaFoundation
@@ -34,12 +41,11 @@ public static class WindowsCodecHelper
     // -- Factory Class ID
     private static readonly Guid CLSID_MFReadWriteClassFactory = new("48e2ed0f-98c2-4a37-bed5-166312ddd83f");
     private static readonly Guid CLSID_MFSourceReader          = new("1777133C-0881-411B-A577-AD545F0714C4");
+    // https://github.com/dahall/Vanara/blob/1db7a8a251c7e45235f6e5bf2605b37db3642751/PInvoke/Direct2D/WindowsCodecs.Enums.cs#L1613
+    private static readonly Guid CLSID_WICImagingFactory       = new("cacaf262-9370-4615-a13b-9f5539da4c0a");
 
-    private static readonly Guid MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE             = new("C6E13360-30AC-11D0-A18C-00A0C9118956");
-    private static readonly Guid MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID = new("8AC3587A-4AE7-42D8-99E0-0A6013EEF90F");
-    private static readonly Guid MF_READWRITE_DISABLE_CONVERTERS                = new("98D5B065-1374-4847-8D92-5F1A4D5B3B99");
-    private static readonly Guid MFT_CATEGORY_VIDEO_DECODER                     = new("D6C02D4B-6833-45B4-971A-05A4B04BAB91");
-    private static readonly Guid MFT_CATEGORY_AUDIO_DECODER                     = new("9ea73fb4-ef7a-4559-8d5d-719d8f0426c7");
+    private static readonly Guid MFT_CATEGORY_VIDEO_DECODER = new("D6C02D4B-6833-45B4-971A-05A4B04BAB91");
+    private static readonly Guid MFT_CATEGORY_AUDIO_DECODER = new("9ea73fb4-ef7a-4559-8d5d-719d8f0426c7");
 
     private static readonly HashSet<Guid> SupportedVideoCodec = [];
     private static readonly HashSet<Guid> SupportedAudioCodec = [];
@@ -116,7 +122,7 @@ public static class WindowsCodecHelper
                 }
                 finally
                 {
-                    if (transform != null) ComMarshal<IMFTransform>.TryReleaseComObject(transform, out _);
+                    ComMarshal<IMFTransform>.TryReleaseComObject(transform, out _);
                     if (mftPpv != nint.Zero) Marshal.Release(mftPpv);
                 }
             }
@@ -137,22 +143,32 @@ public static class WindowsCodecHelper
         }
     }
 
-
+    /// <summary>
+    /// Determines whether the image or video file is supported natively using Media Foundation and WIC.<br/>
+    /// To specifically check for image or video support, use <see cref="IsFileSupportedImage(string)"/> or <see cref="IsFileSupportedVideo(string, out bool, out bool, out Guid, out Guid)"/> instead.
+    /// </summary>
+    /// <param name="filePath">The URL or Local File Path of the file to check.</param>
+    /// <returns><see langword="true"/> if whether the file is supported as an image or video file. Otherwise, <see langword="false"/>.</returns>
     public static bool IsFileSupported(string filePath)
     {
         if (IsFileSupportedImage(filePath))
             return true;
 
-        if (IsFileSupportedVideo(filePath))
-            return true;
-
-        return false;
+        return IsFileSupportedVideo(filePath,
+                                    out _,
+                                    out _,
+                                    out _,
+                                    out _);
     }
 
-    private static bool IsFileSupportedImage(string filePath)
+    /// <summary>
+    /// Determines whether the specified file is a natively supported image format by Windows Imaging Component (WIC).
+    /// </summary>
+    /// <param name="filePath">The URL or Local File Path of the file to check.</param>
+    /// <returns><see langword="true"/> if whether the file is supported as an image file. Otherwise, <see langword="false"/>.</returns>
+    public static bool IsFileSupportedImage(string filePath)
     {
-        Guid factoryGuid = new("CACAF262-9370-4615-A13B-9F5539DA4C0A");
-        if (!ComMarshal<IWICImagingFactory>.TryCreateComObject(in factoryGuid,
+        if (!ComMarshal<IWICImagingFactory>.TryCreateComObject(in CLSID_WICImagingFactory,
                                                                CLSCTX.CLSCTX_INPROC_SERVER,
                                                                out IWICImagingFactory? factory,
                                                                out _))
@@ -176,7 +192,7 @@ public static class WindowsCodecHelper
             }
 
             Unsafe.SkipInit(out Guid guidContainerFormat);
-            decoder?.GetContainerFormat(out guidContainerFormat);
+            decoder.GetContainerFormat(out guidContainerFormat);
             return guidContainerFormat != Guid.Empty;
         }
         finally
@@ -186,6 +202,20 @@ public static class WindowsCodecHelper
         }
     }
 
+    /// <summary>
+    /// Determines whether the specified file is a natively supported video format by Media Foundation.
+    /// </summary>
+    /// <param name="filePath">The URL or Local File Path of the file to check.</param>
+    /// <param name="canPlayVideo">Whether the video codec is supported.</param>
+    /// <param name="canPlayAudio">Whether the audio codec is supported.</param>
+    /// <param name="audioCodecGuid">The <see cref="Guid"/> of the audio codec.</param>
+    /// <param name="videoCodecGuid">The <see cref="Guid"/> of the video codec. Some FourCC identified-based codec string can be obtained using <see cref="TryGetFourCCString"/> method.</param>
+    /// <returns>
+    /// <see langword="true"/> if whether the file is supported as a video file. Otherwise, <see langword="false"/>.
+    /// Though, this method will always return <see langword="false"/> if the video codec is not supported.
+    /// Even if this method returns <see langword="true"/>, doesn't mean that the audio codec is supported.
+    /// You might need to make sure the audio support via <paramref name="canPlayAudio"/> argument.
+    /// </returns>
     public static bool IsFileSupportedVideo(string   filePath,
                                             out bool canPlayVideo,
                                             out bool canPlayAudio,
@@ -197,98 +227,95 @@ public static class WindowsCodecHelper
         Unsafe.SkipInit(out audioCodecGuid);
         Unsafe.SkipInit(out videoCodecGuid);
 
+        Unsafe.SkipInit(out IMFReadWriteClassFactory? factory);
+        Unsafe.SkipInit(out IMFSourceReader? reader);
+        Unsafe.SkipInit(out IMFMediaType? videoMediaType);
+        Unsafe.SkipInit(out IMFMediaType? audioMediaType);
+
         try
         {
             PInvoke.MFStartup(MF_VERSION, MFSTARTUP_LITE);
             if (!ComMarshal<IMFReadWriteClassFactory>
                    .TryCreateComObject(in CLSID_MFReadWriteClassFactory,
                                        CLSCTX.CLSCTX_INPROC_SERVER,
-                                       out IMFReadWriteClassFactory? factory,
+                                       out factory,
                                        out _))
             {
                 return false;
             }
 
-            nint[]  ppMfAttributes = new nint[1];
-            HResult hr             = PInvoke.MFCreateAttributes(ppMfAttributes, ppMfAttributes.Length);
+            Guid readerIid = typeof(IMFSourceReader).GUID;
+            HResult hr = factory.CreateInstanceFromURL(in CLSID_MFSourceReader, filePath, null, in readerIid, out nint readerPpv);
+
             if (!hr ||
-                !ComMarshal<IMFAttributes>.TryCreateComObjectFromReference(ppMfAttributes[0],
-                                                                           out IMFAttributes? attribute,
-                                                                           out _))
+                !ComMarshal<IMFSourceReader>.TryCreateComObjectFromReference(readerPpv, out reader, out _))
             {
                 return false;
             }
 
-            return false;
+            reader.GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, out nint videoMediaTypePpv);
+            reader.GetNativeMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, 0, out nint audioMediaTypePpv);
+            ComMarshal<IMFMediaType>.TryCreateComObjectFromReference(videoMediaTypePpv,
+                                                                     out videoMediaType,
+                                                                     out _);
+            ComMarshal<IMFMediaType>.TryCreateComObjectFromReference(audioMediaTypePpv,
+                                                                     out audioMediaType,
+                                                                     out _);
+
+            videoMediaType?.GetGUID(in MF_MT_SUBTYPE, out videoCodecGuid);
+            audioMediaType?.GetGUID(in MF_MT_SUBTYPE, out audioCodecGuid);
+
+            canPlayVideo = SupportedVideoCodec.Contains(videoCodecGuid);
+            canPlayAudio = SupportedAudioCodec.Contains(audioCodecGuid);
+            return canPlayVideo;
         }
         finally
         {
+            ComMarshal<IMFMediaType>.TryReleaseComObject(audioMediaType, out _);
+            ComMarshal<IMFMediaType>.TryReleaseComObject(videoMediaType, out _);
+            ComMarshal<IMFSourceReader>.TryReleaseComObject(reader, out _);
+            ComMarshal<IMFReadWriteClassFactory>.TryReleaseComObject(factory, out _);
             PInvoke.MFShutdown();
         }
     }
 
-    private static bool IsFileSupportedVideo(string filePath)
+    /// <summary>
+    /// Try to get the FourCC string from a given codec <see cref="Guid"/>.
+    /// </summary>
+    /// <param name="guid">The <see cref="Guid"/> of the codec.</param>
+    /// <param name="codecString">FourCC string output</param>
+    /// <returns>
+    /// <see langword="true"/> if the FourCC string can be obtained from the <see cref="Guid"/>'s bytes. Otherwise, <see langword="false"/>.
+    /// </returns>
+    public static unsafe bool TryGetFourCCString(
+        in                      Guid    guid,
+        [NotNullWhen(true)] out string? codecString)
     {
-        Unsafe.SkipInit(out IMFSourceReader? reader);
-        Unsafe.SkipInit(out IMFAttributes? attribute);
-        try
+        const int sizeOfGuid = 16;
+        Unsafe.SkipInit(out codecString);
+
+        if (Unsafe.IsNullRef(in guid))
         {
-            PInvoke.MFStartup(MF_VERSION, MFSTARTUP_LITE);
-
-            Guid factoryGuid = new("48e2ed0f-98c2-4a37-bed5-166312ddd83f");
-            if (!ComMarshal<IMFReadWriteClassFactory>
-                   .TryCreateComObject(in factoryGuid,
-                                       CLSCTX.CLSCTX_INPROC_SERVER,
-                                       out IMFReadWriteClassFactory? factory,
-                                       out _))
-            {
-                return false;
-            }
-
-            Guid readerFactoryGuid = new("1777133C-0881-411B-A577-AD545F0714C4");
-            Guid readerIidGuid     = typeof(IMFSourceReader).GUID;
-
-            nint[]  ppMfAttributes = new nint[1];
-            HResult hr             = PInvoke.MFCreateAttributes(ppMfAttributes, ppMfAttributes.Length);
-            if (!hr)
-            {
-                return false;
-            }
-
-            if (!ComMarshal<IMFAttributes>.TryCreateComObjectFromReference(ppMfAttributes[0], out attribute, out _))
-            {
-                return false;
-            }
-            // attribute.SetGUID(in MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, in MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-            attribute.SetUINT32(in MF_READWRITE_DISABLE_CONVERTERS, 1);
-
-            Uri fileUri = new(filePath);
-            hr  = factory.CreateInstanceFromURL(in readerFactoryGuid, fileUri.ToString(), null, in readerIidGuid, out nint ppvReader);
-            if (!hr || ppvReader == nint.Zero)
-            {
-                return false;
-            }
-
-            if (!ComMarshal<IMFSourceReader>.TryCreateComObjectFromReference(ppvReader, out reader, out _))
-            {
-                return false;
-            }
-
-            hr = reader.SetStreamSelection(MF_SOURCE_READER_FIRST_VIDEO_STREAM, true);
-            if (!hr)
-            {
-                return false;
-            }
-
-            hr = reader.ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, out _, out _, out _, out nint ppSample);
-            if (ppSample != nint.Zero) Marshal.Release(ppSample);
-
-            return hr;
+            return false;
         }
-        finally
+
+        Span<byte> guidBytes = stackalloc byte[sizeOfGuid];
+        if (!guid.TryWriteBytes(guidBytes))
         {
-            if (reader != null) ComMarshal<IMFSourceReader>.TryReleaseComObject(reader, out _);
-            PInvoke.MFShutdown();
+            return false;
         }
+
+        ReadOnlySpan<byte> fourCCSpan = guidBytes[..4]
+                                       .Trim((byte)0x20)
+                                       .Trim((byte)0x0); // Trim out spaces or null
+
+        Span<char> charSpan = stackalloc char[fourCCSpan.Length];
+        if (!Encoding.ASCII.TryGetChars(fourCCSpan, charSpan, out int charsWritten))
+        {
+            return false;
+        }
+
+        codecString = new string(charSpan[..charsWritten]);
+        return true;
     }
 }
