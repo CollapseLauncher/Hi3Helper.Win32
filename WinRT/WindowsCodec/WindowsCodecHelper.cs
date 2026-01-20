@@ -219,13 +219,13 @@ public static class WindowsCodecHelper
     public static bool IsFileSupportedVideo(string   filePath,
                                             out bool canPlayVideo,
                                             out bool canPlayAudio,
-                                            out Guid audioCodecGuid,
-                                            out Guid videoCodecGuid)
+                                            out Guid videoCodecGuid,
+                                            out Guid audioCodecGuid)
     {
         Unsafe.SkipInit(out canPlayVideo);
         Unsafe.SkipInit(out canPlayAudio);
-        Unsafe.SkipInit(out audioCodecGuid);
         Unsafe.SkipInit(out videoCodecGuid);
+        Unsafe.SkipInit(out audioCodecGuid);
 
         Unsafe.SkipInit(out IMFReadWriteClassFactory? factory);
         Unsafe.SkipInit(out IMFSourceReader? reader);
@@ -310,7 +310,8 @@ public static class WindowsCodecHelper
                                        .Trim((byte)0x0); // Trim out spaces or null
 
         Span<char> charSpan = stackalloc char[fourCCSpan.Length];
-        if (!Encoding.ASCII.TryGetChars(fourCCSpan, charSpan, out int charsWritten))
+        if (!Encoding.UTF8.TryGetChars(fourCCSpan, charSpan, out int charsWritten) ||
+            !Ascii.IsValid(charSpan[..charsWritten]))
         {
             return false;
         }
