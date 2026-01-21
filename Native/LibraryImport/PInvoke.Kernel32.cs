@@ -181,7 +181,8 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("kernel32.dll", EntryPoint = "QueryFullProcessImageNameW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static unsafe partial HResult QueryFullProcessImageName(nint hProcess, int dwFlags, ref char lpExeName, ref int lpdwSize);
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static unsafe partial bool QueryFullProcessImageName(nint hProcess, int dwFlags, ref char lpExeName, ref int lpdwSize);
 
         [LibraryImport("kernel32.dll", EntryPoint = "SetEvent", SetLastError = true)]
         public static partial int SetEvent(nint hEvent);
