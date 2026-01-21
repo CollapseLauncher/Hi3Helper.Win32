@@ -327,7 +327,8 @@ namespace Hi3Helper.Win32.ManagedTools
 
             // Fail-safe: Back to GetEnsureCreation with null ppv.
             comObjPpv = nint.Zero;
-            return TryCreateComObjectFromReference(comObjPpv, out _, out _);
+            // ReSharper disable once TailRecursiveCall
+            return TryCreateComObjectFromReference(comObjPpv, out comObjResult, out exceptionIfFalse, flags);
         }
 
         /// <summary>
@@ -336,7 +337,6 @@ namespace Hi3Helper.Win32.ManagedTools
         /// <param name="comObj">The COM Object to obtain the native pointer from.</param>
         /// <param name="comObjPpv">The native pointer of the COM Object Interface.</param>
         /// <param name="exceptionIfFalse">Exception if obtaining the native pointer is failing.</param>
-        /// <param name="flags">Flags for obtaining the native pointer.</param>
         /// <param name="requireQueryInterface">
         /// If set to <see langword="false"/>, create the pointer of the unwrapped <see cref="IUnknown"/> instance.
         /// Otherwise, if <see langword="true"/>, create the pointer of <typeparamref name="TObjSource"/> instance.
@@ -346,7 +346,6 @@ namespace Hi3Helper.Win32.ManagedTools
             TObjSource comObj,
             out nint comObjPpv,
             [NotNullWhen(false)] out Exception? exceptionIfFalse,
-            CreateComInterfaceFlags flags = CreateComInterfaceFlags.TrackerSupport,
             bool requireQueryInterface = false)
         {
             Unsafe.SkipInit(out comObjPpv);
@@ -355,8 +354,11 @@ namespace Hi3Helper.Win32.ManagedTools
             ref readonly Guid comObjTargetIid = ref Nullable.GetValueRefOrDefaultRef(in ObjComIid);
             if (!Unsafe.IsNullRef(in comObjTargetIid))
             {
-                return TryGetComInterfaceReference(comObj, in comObjTargetIid, out comObjPpv, out exceptionIfFalse,
-                                                   flags,  requireQueryInterface);
+                return TryGetComInterfaceReference(comObj,
+                                                   in comObjTargetIid,
+                                                   out comObjPpv,
+                                                   out exceptionIfFalse,
+                                                   requireQueryInterface);
             }
 
             exceptionIfFalse = ThrowNoGuidDefined<TObjSource>();
@@ -370,7 +372,6 @@ namespace Hi3Helper.Win32.ManagedTools
         /// <param name="comObjPpv">The native pointer of the COM Object Interface.</param>
         /// <param name="comObjIid">The Interface ID where you need to get the type of interface for.</param>
         /// <param name="exceptionIfFalse">Exception if obtaining the native pointer is failing.</param>
-        /// <param name="flags">Flags for obtaining the native pointer.</param>
         /// <param name="requireQueryInterface">
         /// If set to <see langword="false"/>, create the pointer of the unwrapped <see cref="IUnknown"/> instance.
         /// Otherwise, if <see langword="true"/>, create the pointer of <typeparamref name="TObjSource"/> instance.
@@ -381,15 +382,15 @@ namespace Hi3Helper.Win32.ManagedTools
             in Guid comObjIid,
             out nint comObjPpv,
             [NotNullWhen(false)] out Exception? exceptionIfFalse,
-            CreateComInterfaceFlags flags = CreateComInterfaceFlags.TrackerSupport,
             bool requireQueryInterface = false)
         {
             Unsafe.SkipInit(out comObjPpv);
             Unsafe.SkipInit(out exceptionIfFalse);
 
             ref readonly Guid comObjTargetIid = ref comObjIid;
-            comObjPpv = DefaultComWrappersStatic.Default.GetOrCreateComInterfaceForObject(comObj, flags);
-            if (comObjPpv == nint.Zero)
+
+            // Try to unwrap the object.
+            if (!ComWrappers.TryGetComInstance(comObj, out comObjPpv))
             {
                 exceptionIfFalse = new NullReferenceException($"Cannot obtain the native pointer of ComObject type: {typeof(TObjSource)} as the type might not be a COM Interface.");
                 return false;
