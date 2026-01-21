@@ -1,6 +1,9 @@
 ﻿using Hi3Helper.Win32.ManagedTools;
 using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Enums.D3D;
+using Hi3Helper.Win32.Native.Enums.MediaFoundation;
 using Hi3Helper.Win32.Native.Enums.WIC;
+using Hi3Helper.Win32.Native.Interfaces.DXGI;
 using Hi3Helper.Win32.Native.Interfaces.MediaFoundation;
 using Hi3Helper.Win32.Native.Interfaces.WIC;
 using Hi3Helper.Win32.Native.LibraryImport;
@@ -23,13 +26,14 @@ namespace Hi3Helper.Win32.WinRT.WindowsCodec;
 /// </summary>
 public static class WindowsCodecHelper
 {
-    private const uint GENERIC_READ   = 0x80000000u;
-    private const uint MF_VERSION     = 0x00020070u;
-    private const uint MFSTARTUP_LITE = 0x00000001u;
+    private const uint GENERIC_READ       = 0x80000000u;
+    private const uint MF_E_NO_MORE_TYPES = 0xC00D36B9u;
+    private const uint E_NOTIMPL          = 0x80004001u;
+    private const uint MF_VERSION         = 0x00020070u;
+    private const uint MFSTARTUP_LITE     = 0x00000001u;
 
     private const uint MF_SOURCE_READER_FIRST_VIDEO_STREAM = 0xFFFFFFFC;
     private const uint MF_SOURCE_READER_FIRST_AUDIO_STREAM = 0xFFFFFFFD;
-    private const uint MFT_ENUM_FLAG_SORTANDFILTER         = 0x00000040;
 
     // https://github.com/jishi/Jishi.StreamToSonos/tree/master/NAudio/MediaFoundation
     // -- MediaType
@@ -47,39 +51,79 @@ public static class WindowsCodecHelper
     private static readonly Guid MFT_CATEGORY_VIDEO_DECODER = new("D6C02D4B-6833-45B4-971A-05A4B04BAB91");
     private static readonly Guid MFT_CATEGORY_AUDIO_DECODER = new("9ea73fb4-ef7a-4559-8d5d-719d8f0426c7");
 
+    private static readonly Guid MF_TRANSFORM_ASYNC_UNLOCK   = new("e5666d6b-3422-4eb6-a421-da7db1f8e207");
+    private static readonly Guid MFT_FRIENDLY_NAME_Attribute = new("314ffbae-5b41-4c95-9c19-4e7d586face3");
+    private static readonly Guid MF_SA_D3D11_AWARE           = new("206b4fc8-fcf9-4c51-afe3-9764369e33a0");
+
     private static readonly HashSet<Guid> SupportedVideoCodec = [];
     private static readonly HashSet<Guid> SupportedAudioCodec = [];
 
-    static WindowsCodecHelper()
-    {
-        GetCodecTypeToHashSet(SupportedVideoCodec, in MFT_CATEGORY_VIDEO_DECODER, in MFMediaType_Video);
-        GetCodecTypeToHashSet(SupportedAudioCodec, in MFT_CATEGORY_AUDIO_DECODER, in MFMediaType_Audio);
-    }
+    // HACK: Add the codec manually due to VP90 FourCC isn't registered, even the extension does exist.
+    private static readonly Guid   MEDIASUBTYPE_VP80         = new("30385056-0000-0010-8000-00AA00389B71");
+    private static readonly Guid   MEDIASUBTYPE_VP90         = new("30395056-0000-0010-8000-00AA00389B71");
+    private const           string VP9TransformExtensionName = "VP9VideoExtensionDecoder";
 
-    private static void GetCodecTypeToHashSet(HashSet<Guid> hashSet,
-                                              in Guid       categoryGuid,
-                                              in Guid       mediaTypeGuid)
+    // HACK: Make sure to initialize HW-decoder early to make sure the HW transforms are detected.
+    public static ReadOnlySpan<D3D_FEATURE_LEVEL> FeatureLevels => [
+        D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1,
+        D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_10_1,
+        D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_10_0,
+        D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_3,
+        D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_2,
+        D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_1
+    ];
+
+    private const  int                   D3D11_SDK_VERSION                   = 7;
+    private static nint                  ppD3D11deviceShared                 = nint.Zero;
+    private static nint                  ppD3D11DeviceImmediateContextShared = nint.Zero;
+    private static IMFDXGIDeviceManager? deviceManagerShared;
+    private static nint                  deviceManagerSharedPpv = nint.Zero;
+
+    private static unsafe void GetCodecTypeToHashSet(HashSet<Guid> hashSet,
+                                                     in Guid       categoryGuid,
+                                                     in Guid       mediaTypeGuid)
     {
         Unsafe.SkipInit(out IMFActivate[] mftActivates);
+        Unsafe.SkipInit(out nint mftActivatesPpv);
 
         try
         {
+            const MFT_ENUM_FLAG flags = MFT_ENUM_FLAG.MFT_ENUM_FLAG_ASYNCMFT |
+                                        MFT_ENUM_FLAG.MFT_ENUM_FLAG_LOCALMFT |
+                                        MFT_ENUM_FLAG.MFT_ENUM_FLAG_HARDWARE |
+                                        MFT_ENUM_FLAG.MFT_ENUM_FLAG_SYNCMFT |
+                                        MFT_ENUM_FLAG.MFT_ENUM_FLAG_SORTANDFILTER;
             HResult hr =
-                PInvoke.MFTEnumEx(in categoryGuid,
-                                  MFT_ENUM_FLAG_SORTANDFILTER,
-                                  in Unsafe.NullRef<MFT_REGISTER_TYPE_INFO>(),
-                                  in Unsafe.NullRef<MFT_REGISTER_TYPE_INFO>(),
-                                  out mftActivates,
-                                  out _);
+                PInvoke.MFTEnum2(in categoryGuid,
+                                 flags,
+                                 in Unsafe.NullRef<MFT_REGISTER_TYPE_INFO>(),
+                                 in Unsafe.NullRef<MFT_REGISTER_TYPE_INFO>(),
+                                 null,
+                                 out mftActivatesPpv,
+                                 out int mftActivatesCount);
             if (!hr)
             {
                 return;
+            }
+
+            Span<nint> mftActivatesPtrSpan = new((void*)mftActivatesPpv, mftActivatesCount);
+            mftActivates = new IMFActivate[mftActivatesCount];
+            for (int i = 0; i < mftActivatesCount; i++)
+            {
+                ComMarshal<IMFActivate>.TryCreateComObjectFromReference(mftActivatesPtrSpan[i],
+                                                                        out mftActivates[i],
+                                                                        out _);
             }
 
             Guid iidImfTransform = typeof(IMFTransform).GUID;
             foreach (IMFActivate activate in mftActivates)
             {
                 hr = activate.ActivateObject(iidImfTransform, out nint mftPpv);
+                activate.GetAllocatedString(in MFT_FRIENDLY_NAME_Attribute,
+                                            out string? activateName,
+                                            out _);
+
                 Unsafe.SkipInit(out IMFTransform? transform);
                 try
                 {
@@ -90,11 +134,17 @@ public static class WindowsCodecHelper
                     {
                         continue;
                     }
+                    // AddTransformFromHW(transform);
 
                     for (uint i = 0; ; i++)
                     {
                         hr = transform.GetInputAvailableType(0, i, out IMFMediaType? ppType);
-                        if (!hr || ppType == null)
+                        if ((uint)hr is MF_E_NO_MORE_TYPES or E_NOTIMPL)
+                        {
+                            break;
+                        }
+
+                        if (ppType == null)
                         {
                             break;
                         }
@@ -108,7 +158,15 @@ public static class WindowsCodecHelper
                             }
 
                             if (majorType == mediaTypeGuid)
+                            {
                                 hashSet.Add(subType);
+                            }
+
+                            if (activateName.Equals(VP9TransformExtensionName, StringComparison.OrdinalIgnoreCase) &&
+                                subType == MEDIASUBTYPE_VP80)
+                            {
+                                hashSet.Add(MEDIASUBTYPE_VP90); // Add VP9 FourCC GUID to the hash set
+                            }
                         }
                         finally
                         {
@@ -123,7 +181,7 @@ public static class WindowsCodecHelper
                 finally
                 {
                     ComMarshal<IMFTransform>.TryReleaseComObject(transform, out _);
-                    if (mftPpv != nint.Zero) Marshal.Release(mftPpv);
+                    // if (mftPpv != nint.Zero) Marshal.Release(mftPpv);
                 }
             }
         }
@@ -133,13 +191,66 @@ public static class WindowsCodecHelper
         }
         finally
         {
-            if (mftActivates != null!)
+            if (mftActivatesPpv != nint.Zero)
             {
-                foreach (IMFActivate activate in mftActivates)
-                {
-                    ComMarshal<IMFActivate>.TryReleaseComObject(activate, out _);
-                }
+                Marshal.FreeCoTaskMem(mftActivatesPpv);
             }
+        }
+    }
+
+    private static void AddTransformFromHW(IMFTransform transform)
+    {
+        if (!transform.GetAttributes(out IMFAttributes? attributes) ||
+            attributes == null)
+        {
+            return;
+        }
+
+        if (!attributes.GetUINT32(in MF_SA_D3D11_AWARE, out uint isd3d11Aware))
+        {
+            return;
+        }
+
+        if (isd3d11Aware <= 0) return;
+        attributes.SetUINT32(in MF_TRANSFORM_ASYNC_UNLOCK, 1);
+
+        if (ppD3D11deviceShared == nint.Zero || ppD3D11DeviceImmediateContextShared == nint.Zero)
+        {
+            const D3D_DRIVER_TYPE          DriverType          = D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE;
+            const D3D11_CREATE_DEVICE_FLAG flags               = D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_VIDEO_SUPPORT;
+            D3D_FEATURE_LEVEL              supportedD3DFeature = default;
+
+            PInvoke.D3D11CreateDevice(nint.Zero,
+                                      DriverType,
+                                      nint.Zero,
+                                      flags,
+                                      in MemoryMarshal.GetReference(FeatureLevels),
+                                      FeatureLevels.Length,
+                                      D3D11_SDK_VERSION,
+                                      out ppD3D11deviceShared,
+                                      ref supportedD3DFeature,
+                                      out ppD3D11DeviceImmediateContextShared).ThrowOnFailure();
+
+            if (!PInvoke.MFCreateDXGIDeviceManager(out uint resetToken,
+                                                   out deviceManagerShared) ||
+                deviceManagerShared == null)
+            {
+                return;
+            }
+
+            if (!deviceManagerShared.ResetDevice(ppD3D11deviceShared, resetToken))
+            {
+                return;
+            }
+            ComMarshal<IMFDXGIDeviceManager>.TryGetComInterfaceReference(deviceManagerShared,
+                                                                         out deviceManagerSharedPpv,
+                                                                         out _,
+                                                                         requireQueryInterface: true);
+        }
+
+        if (deviceManagerSharedPpv != nint.Zero)
+        {
+            transform.ProcessMessage(MFT_MESSAGE_TYPE.MFT_MESSAGE_SET_D3D_MANAGER, deviceManagerSharedPpv);
         }
     }
 
@@ -222,6 +333,17 @@ public static class WindowsCodecHelper
                                             out Guid videoCodecGuid,
                                             out Guid audioCodecGuid)
     {
+        if (SupportedAudioCodec.Count == 0)
+        {
+            GetCodecTypeToHashSet(SupportedAudioCodec, in MFT_CATEGORY_AUDIO_DECODER, in MFMediaType_Audio);
+        }
+
+        if (SupportedVideoCodec.Count == 0)
+        {
+            GetCodecTypeToHashSet(SupportedVideoCodec, in MFT_CATEGORY_VIDEO_DECODER, in MFMediaType_Video);
+        }
+        PInvoke.MFStartup(MF_VERSION, MFSTARTUP_LITE);
+
         Unsafe.SkipInit(out canPlayVideo);
         Unsafe.SkipInit(out canPlayAudio);
         Unsafe.SkipInit(out videoCodecGuid);
@@ -234,7 +356,6 @@ public static class WindowsCodecHelper
 
         try
         {
-            PInvoke.MFStartup(MF_VERSION, MFSTARTUP_LITE);
             if (!ComMarshal<IMFReadWriteClassFactory>
                    .TryCreateComObject(in CLSID_MFReadWriteClassFactory,
                                        CLSCTX.CLSCTX_INPROC_SERVER,

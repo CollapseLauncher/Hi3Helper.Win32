@@ -1,4 +1,5 @@
-﻿using Hi3Helper.Win32.Native.Structs;
+﻿using Hi3Helper.Win32.Native.Enums.MediaFoundation;
+using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable UnusedMember.Global
@@ -33,7 +34,7 @@ public partial interface IMFTransform
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetAttributes(); // Dummy
+    HResult GetAttributes([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IMFAttributes>))] out IMFAttributes? pAttributes); // Dummy
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
@@ -57,7 +58,7 @@ public partial interface IMFTransform
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetOutputAvailableType(); // Dummy
+    HResult GetOutputAvailableType(uint dwInputStreamID, uint dwTypeIndex, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IMFMediaType>))] out IMFMediaType? ppType); // Dummy
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
@@ -93,7 +94,7 @@ public partial interface IMFTransform
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult ProcessMessage(); // Dummy
+    HResult ProcessMessage(MFT_MESSAGE_TYPE eMessage, nint ulParam); // Dummy
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]

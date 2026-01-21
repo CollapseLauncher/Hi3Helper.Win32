@@ -29,11 +29,11 @@ public partial interface IMFAttributes
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetUINT32(); // Dummy
+    HResult GetUINT32(in Guid guidKey, out uint punValue); // Dummy
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetUINT64(); // Dummy
+    HResult GetUINT64(in Guid guidKey, out ulong punValue); // Dummy
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
@@ -53,7 +53,7 @@ public partial interface IMFAttributes
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetAllocatedString(); // Dummy
+    HResult GetAllocatedString(in Guid guidKey, [MarshalUsing(typeof(Utf16StringMarshaller), CountElementName = nameof(pcchLength))] out string? ppwszValue, out uint pcchLength); // Dummy
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]

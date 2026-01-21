@@ -1,4 +1,6 @@
-﻿using Hi3Helper.Win32.Native.Interfaces.MediaFoundation;
+﻿using Hi3Helper.Win32.Native.Enums.MediaFoundation;
+using Hi3Helper.Win32.Native.Interfaces.DXGI;
+using Hi3Helper.Win32.Native.Interfaces.MediaFoundation;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.MediaFoundation;
 using System;
@@ -24,12 +26,29 @@ public static partial class PInvoke
 
     [LibraryImport("Mfplat.dll", EntryPoint = "MFTEnumEx")]
     public static partial HResult MFTEnumEx(
-        in Guid                    guidCategory,
-        uint                       flags,
-        in  MFT_REGISTER_TYPE_INFO pInputType,
-        in  MFT_REGISTER_TYPE_INFO pOutputType,
+        in Guid                   guidCategory,
+        MFT_ENUM_FLAG             flags,
+        in MFT_REGISTER_TYPE_INFO pInputType,
+        in MFT_REGISTER_TYPE_INFO pOutputType,
 
         [MarshalUsing(CountElementName = nameof(pnumMFTActivate))]
         out IMFActivate[] pppMFTActivate,
         out int           pnumMFTActivate);
+
+    [LibraryImport("Mfplat.dll", EntryPoint = "MFTEnum2")]
+    public static partial HResult MFTEnum2(
+        in Guid                   guidCategory,
+        MFT_ENUM_FLAG             flags,
+        in MFT_REGISTER_TYPE_INFO pInputType,
+        in MFT_REGISTER_TYPE_INFO pOutputType,
+        IMFAttributes?            pAttributes,
+
+        out nint pppMFTActivate,
+        out int pnumMFTActivate);
+
+    [LibraryImport("Mfplat.dll", EntryPoint = "MFCreateDXGIDeviceManager")]
+    public static partial HResult MFCreateDXGIDeviceManager(
+        out uint                   resetToken,
+        [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IMFDXGIDeviceManager>))]
+        out IMFDXGIDeviceManager?  ppDeviceManager);
 }
