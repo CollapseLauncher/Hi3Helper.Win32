@@ -171,5 +171,10 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("user32.dll", EntryPoint = "GetMonitorInfoW")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool GetMonitorInfo(nint hMonitor, ref MONITORINFOEXW lpmi);
+
+        [LibraryImport("user32.dll", EntryPoint = "SendInput")]
+        public static partial uint SendInput(uint    nInputs,
+                                             [In] INPUT[] pInputs,
+                                             int     cbSize);
     }
 }
