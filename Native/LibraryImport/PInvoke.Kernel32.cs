@@ -218,5 +218,19 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("kernel32.dll", EntryPoint = "DeleteProcThreadAttributeList", SetLastError = true)]
         public static partial void DeleteProcThreadAttributeList(nint lpAttributeList);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "SetDllDirectoryW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool SetDllDirectory(string? lpPathName);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "GetDllDirectoryW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+        public static partial int GetDllDirectory(int nBufferLength, ref char lpBuffer);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "AddDllDirectory", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+        public static partial nint AddDllDirectory(string? newDirectory);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "RemoveDllDirectory", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool RemoveDllDirectory(nint cookie);
     }
 }
