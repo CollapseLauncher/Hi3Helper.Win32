@@ -13,6 +13,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 // ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable InconsistentNaming
 
 namespace Hi3Helper.Win32.Screen;
 
@@ -39,7 +40,7 @@ public static class ScreenProp
             ++found;
             lastWidth = (int)mode.dmPelsWidth;
             lastHeight = (int)mode.dmPelsHeight;
-            yield return new(lastWidth, lastHeight);
+            yield return new Size(lastWidth, lastHeight);
         }
 
         if (found == 0)
@@ -51,17 +52,18 @@ public static class ScreenProp
     public static int GetMaxHeight() => EnumerateScreenSizes().Max(x => x.Height);
 
     private static Size GetScreenSize() =>
-        new Size
-    {
-        Width = PInvoke.GetSystemMetrics(SystemMetric.SM_CXSCREEN),
-        Height = PInvoke.GetSystemMetrics(SystemMetric.SM_CYSCREEN)
-    };
+        new()
+        {
+            Width  = PInvoke.GetSystemMetrics(SystemMetric.SM_CXSCREEN),
+            Height = PInvoke.GetSystemMetrics(SystemMetric.SM_CYSCREEN)
+        };
 
-    public static double GetCurrentDisplayRefreshRate(nint hwnd)
+    public static double GetCurrentDisplayRefreshRate(nint hwnd, out string? monitorPath)
     {
+        Unsafe.SkipInit(out monitorPath);
         nint currentMonitor = PInvoke.MonitorFromWindow(hwnd, 2);
 
-        Guid adapterFactoryIid = new Guid(DXGIClsId.IDXGIFactory6);
+        Guid adapterFactoryIid = new(DXGIClsId.IDXGIFactory6);
         PInvoke.CreateDXGIFactory2(0, in adapterFactoryIid, out nint factoryPp)
                .ThrowOnFailure();
 
@@ -70,10 +72,9 @@ public static class ScreenProp
         {
             if (!ComMarshal<IDXGIFactory6>.TryCreateComObjectFromReference(factoryPp,
                                                                            out factory,
-                                                                           out Exception? factoryError) ||
-                factory == null)
+                                                                           out Exception? factoryError))
             {
-                throw factoryError ?? new COMException();
+                throw factoryError;
             }
 
             foreach (IDXGIAdapter1 adapter in EnumerateGpuNames.EnumerateGpuAdapters(factory))
@@ -84,13 +85,13 @@ public static class ScreenProp
                     {
                         try
                         {
-                            HResult hr = output.GetDesc(out DXGI_OUTPUT_DESC desc);
-                            if (desc.Monitor != currentMonitor)
+                            if (!output.GetDesc(out DXGI_OUTPUT_DESC desc) ||
+                                desc.Monitor != currentMonitor)
                             {
                                 continue;
                             }
 
-                            if (GetRefreshRateFromDXGIOutputDesc(output, ref desc, out double refreshRate))
+                            if (GetRefreshRateFromDXGIOutputDesc(output, ref desc, out double refreshRate, out monitorPath))
                             {
                                 return refreshRate;
                             }
@@ -118,9 +119,13 @@ public static class ScreenProp
         return 60d;
     }
 
-    private static unsafe bool GetRefreshRateFromDXGIOutputDesc(IDXGIOutput output, ref DXGI_OUTPUT_DESC desc, out double refreshRate)
+    private static bool GetRefreshRateFromDXGIOutputDesc(IDXGIOutput output,
+                                                         ref DXGI_OUTPUT_DESC desc,
+                                                         out double refreshRate,
+                                                         out string? displayPath)
     {
         const int ENUM_CURRENT_SETTINGS = -1;
+        Unsafe.SkipInit(out displayPath);
 
         refreshRate = 60d;
         MONITORINFOEXW monitorInfo = new();
@@ -130,12 +135,12 @@ public static class ScreenProp
         }
 
         string deviceName = monitorInfo.DeviceNameSpan.ToString();
-        if (!PInvoke.EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, out DEVMODEW mode))
+        if (!PInvoke.EnumDisplaySettings(deviceName, ENUM_CURRENT_SETTINGS, out DEVMODEW mode))
         {
             return false;
         }
 
-        bool useDefaultRefreshRate = 1 == mode.dmDisplayFrequency || 0 == mode.dmDisplayFrequency;
+        bool useDefaultRefreshRate = mode.dmDisplayFrequency is 1 or 0;
 
         DXGI_MODE_DESC requestDesc = default;
         requestDesc.Width = mode.dmPelsWidth;
@@ -146,8 +151,12 @@ public static class ScreenProp
         requestDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER.DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
         requestDesc.Scaling = DXGI_MODE_SCALING.DXGI_MODE_SCALING_UNSPECIFIED;
 
-        output.FindClosestMatchingMode(in requestDesc, out DXGI_MODE_DESC availableDesc, nint.Zero);
+        if (!output.FindClosestMatchingMode(in requestDesc, out DXGI_MODE_DESC availableDesc, nint.Zero))
+        {
+            return false;
+        }
 
+        displayPath = deviceName;
         refreshRate = availableDesc.RefreshRate;
         return true;
     }
