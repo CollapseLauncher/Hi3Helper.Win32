@@ -51,35 +51,6 @@ public static class SwapChainPanelHelper
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SkipLocalsInit]
-    public static unsafe void CanvasSessionDrawDiposeUnsafe(
-        nint                                                             imageSourceP,
-        nint                                                             renderTargetP,
-        delegate* unmanaged[Stdcall]<nint, uint, in Rect, out nint, int> s_beginDraw,
-        delegate* unmanaged[Stdcall]<nint, nint, in Rect, int>           s_drawImage,
-        delegate* unmanaged[Stdcall]<nint, int>                          s_dispose,
-        in Rect                                                          updateWinRect)
-    {
-        // -- CanvasImageSource.CreateDrawingSession(Color, Rect);
-        Marshal.ThrowExceptionForHR(s_beginDraw(imageSourceP, DefaultDummyColor, in updateWinRect, out nint drawingSessionPpv));
-
-        // -- CanvasDrawingSession.DrawImage(ICanvasBitmap, Rect);
-        //    This method is the shortest based on the implementation source at:
-        //    https://github.com/microsoft/Win2D/blob/65e90b29055de64b02e7f2a3d3f042b7fa36326c/winrt/lib/drawing/CanvasDrawingSession.cpp#L254
-        Marshal.ThrowExceptionForHR(s_drawImage(drawingSessionPpv, renderTargetP, in updateWinRect));
-
-        // -- Query to WinRT's IDisposable
-        QueryInterfaceShort(drawingSessionPpv, in IDisposableWinRTObj_IID, out nint disposablePpv);
-
-        // -- CanvasDrawingSession.Dispose()
-        Marshal.ThrowExceptionForHR(s_dispose(disposablePpv));
-
-        // -- Release object
-        ReleaseShort(drawingSessionPpv);
-        ReleaseShort(disposablePpv);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [SkipLocalsInit]
     public static unsafe nint CanvasSessionDrawUnsafe(
         nint                                                             imageSourceP,
         nint                                                             renderTargetP,
