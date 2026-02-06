@@ -176,5 +176,8 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         public static partial uint SendInput(uint    nInputs,
                                              [In] INPUT[] pInputs,
                                              int     cbSize);
+
+        [LibraryImport("user32.dll", EntryPoint = "RegisterClipboardFormatW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        public static partial uint RegisterClipboardFormat(string? lpszFormat);
     }
 }
