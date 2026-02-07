@@ -3,7 +3,6 @@ using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Buffers;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -33,7 +32,7 @@ namespace Hi3Helper.Win32.ManagedTools
         private const  int    ProcessSetInformation           = 0x0200;
         private static int    _dynamicNtQueryChangedBufferLen = DefaultNtQueryChangedLen;
 
-        private static byte[] _sharedBuffer = ArrayPool<byte>.Shared.Rent(DefaultNtQueryChangedLen);
+        private static byte[] _sharedBuffer = BigArrayPool<byte>.Shared.Rent(DefaultNtQueryChangedLen);
 
         private static byte[] GetBufferOrResized(int requestedLen)
         {
@@ -42,9 +41,9 @@ namespace Hi3Helper.Win32.ManagedTools
                 return _sharedBuffer;
             }
 
-            ArrayPool<byte>.Shared.Return(Interlocked
-                                             .Exchange(ref _sharedBuffer,
-                                                       ArrayPool<byte>.Shared.Rent(requestedLen)));
+            BigArrayPool<byte>.Shared.Return(Interlocked
+                                                .Exchange(ref _sharedBuffer,
+                                                          BigArrayPool<byte>.Shared.Rent(requestedLen)));
             return _sharedBuffer;
         }
 
@@ -136,12 +135,12 @@ namespace Hi3Helper.Win32.ManagedTools
                 // Get the increment of the next entry offset
                 // and get the struct from the given pointer offset + 56 bytes ahead
                 // to obtain the process name.
-                int nextEntryOffset = *(int*)curPosPtr;
-                var unicodeString   = (UNICODE_STRING*)(curPosPtr + 56);
+                int             nextEntryOffset = *(int*)curPosPtr;
+                UNICODE_STRING* unicodeString   = (UNICODE_STRING*)(curPosPtr + 56);
 
                 // Use the struct buffer into the ReadOnlySpan<char> to be compared with
                 // the input from "processName" argument.
-                var imageNameSpan = new ReadOnlySpan<char>(unicodeString->Buffer, unicodeString->Length / 2);
+                ReadOnlySpan<char> imageNameSpan = new(unicodeString->Buffer, unicodeString->Length / 2);
                 bool isMatchedExecutable = !useStartsWithMatch
                     ? imageNameSpan.Equals(processName, StringComparison.OrdinalIgnoreCase)
                     : imageNameSpan.StartsWith(processName, StringComparison.OrdinalIgnoreCase);
