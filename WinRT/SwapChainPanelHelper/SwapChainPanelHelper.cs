@@ -15,26 +15,26 @@ public static class SwapChainPanelHelper
     /// BEWARE: This IID is different from regular IDisposable.
     /// </summary>
     private static readonly Guid IDisposableWinRTObj_IID = new("30d5a829-7fa4-4026-83bb-d75bae4ea99e");
-    private const uint DefaultDummyColor = 0xCEFABEBA; // Just a random
+    private const uint DefaultDummyColor = 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SkipLocalsInit]
     public static unsafe void GetDirectNativeDelegateForDrawRoutine(
-        nint                                                                 imageSourceP,
-        nint                                                                 renderTargetP,
-        out delegate* unmanaged[Stdcall]<nint, uint, in Rect, out nint, int> s_beginDraw,
-        out delegate* unmanaged[Stdcall]<nint, nint, in Rect, int>           s_drawImage,
-        out delegate* unmanaged[Stdcall]<nint, int>                          s_dispose,
-        in  Rect                                                             updateWinRect)
+        nint                                                                           imageSourceP,
+        nint                                                                           renderTargetP,
+        out delegate* unmanaged[Stdcall]<nint, uint, ref readonly Rect, out nint, int> s_beginDraw,
+        out delegate* unmanaged[Stdcall]<nint, nint, ref readonly Rect, int>           s_drawImage,
+        out delegate* unmanaged[Stdcall]<nint, int>                                    s_dispose,
+        in  Rect                                                                       updateWinRect)
     {
         // -- CanvasImageSource.CreateDrawingSession(Color, Rect);
-        s_beginDraw = (delegate* unmanaged[Stdcall]<nint, uint, in Rect, out nint, int>)(*(*(void***)imageSourceP + 7));
+        s_beginDraw = (delegate* unmanaged[Stdcall]<nint, uint, ref readonly Rect, out nint, int>)(*(*(void***)imageSourceP + 7));
         Marshal.ThrowExceptionForHR(s_beginDraw(imageSourceP, DefaultDummyColor, in updateWinRect, out nint drawingSessionPpv));
 
         // -- CanvasDrawingSession.DrawImage(ICanvasBitmap, Rect);
         //    This method is the shortest based on the implementation source at:
         //    https://github.com/microsoft/Win2D/blob/65e90b29055de64b02e7f2a3d3f042b7fa36326c/winrt/lib/drawing/CanvasDrawingSession.cpp#L254
-        s_drawImage = (delegate* unmanaged[Stdcall]<nint, nint, in Rect, int>)(*(*(void***)drawingSessionPpv + 12));
+        s_drawImage = (delegate* unmanaged[Stdcall]<nint, nint, ref readonly Rect, int>)(*(*(void***)drawingSessionPpv + 12));
         Marshal.ThrowExceptionForHR(s_drawImage(drawingSessionPpv, renderTargetP, in updateWinRect));
 
         // -- Query to WinRT's IDisposable
@@ -52,11 +52,11 @@ public static class SwapChainPanelHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SkipLocalsInit]
     public static unsafe nint CanvasSessionDrawUnsafe(
-        nint                                                             imageSourceP,
-        nint                                                             renderTargetP,
-        delegate* unmanaged[Stdcall]<nint, uint, in Rect, out nint, int> s_beginDraw,
-        delegate* unmanaged[Stdcall]<nint, nint, in Rect, int>           s_drawImage,
-        in Rect                                                          updateWinRect)
+        nint                                                                       imageSourceP,
+        nint                                                                       renderTargetP,
+        delegate* unmanaged[Stdcall]<nint, uint, ref readonly Rect, out nint, int> s_beginDraw,
+        delegate* unmanaged[Stdcall]<nint, nint, ref readonly Rect, int>           s_drawImage,
+        in Rect                                                                    updateWinRect)
     {
         // -- CanvasImageSource.CreateDrawingSession(Color, Rect);
         Marshal.ThrowExceptionForHR(s_beginDraw(imageSourceP, DefaultDummyColor, in updateWinRect, out nint drawingSessionPpv));
@@ -89,15 +89,15 @@ public static class SwapChainPanelHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SkipLocalsInit]
     public static unsafe void MediaPlayerCopyFrameUnsafe(
-        nint    playerP,
-        nint    surfaceP,
-        in Rect updateWinRect)
-        => Marshal.ThrowExceptionForHR(((delegate* unmanaged[Stdcall]<nint, nint, in Rect, int>)(*(*(void***)playerP + 11)))(playerP, surfaceP, in updateWinRect)); // +11 == .CopyFrameToVideoSurface(nint, Rect)
+        nint              playerP,
+        nint              surfaceP,
+        ref readonly Rect updateWinRect)
+        => Marshal.ThrowExceptionForHR(((delegate* unmanaged[Stdcall]<nint, nint, ref readonly Rect, int>)(*(*(void***)playerP + 11)))(playerP, surfaceP, in updateWinRect)); // +11 == .CopyFrameToVideoSurface(nint, Rect)
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SkipLocalsInit]
-    public static unsafe int QueryInterfaceShort(nint pUnk, in Guid iid, out nint ppv)
-        => ((delegate* unmanaged<nint, in Guid, out nint, int>)
+    public static unsafe int QueryInterfaceShort(nint pUnk, ref readonly Guid iid, out nint ppv)
+        => ((delegate* unmanaged<nint, ref readonly Guid, out nint, int>)
             (**(void***)pUnk))(pUnk, in iid, out ppv);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
