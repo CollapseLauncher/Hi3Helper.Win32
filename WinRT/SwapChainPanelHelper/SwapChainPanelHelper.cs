@@ -90,19 +90,26 @@ public static class SwapChainPanelHelper
     [SkipLocalsInit]
     public static unsafe void MediaPlayerCopyFrameUnsafe(
         nint              playerP,
-        nint              surfaceP,
-        ref readonly Rect updateWinRect)
-        => Marshal.ThrowExceptionForHR(((delegate* unmanaged[Stdcall]<nint, nint, ref readonly Rect, int>)(*(*(void***)playerP + 11)))(playerP, surfaceP, in updateWinRect)); // +11 == .CopyFrameToVideoSurface(nint, Rect)
+        nint              surfaceP)
+        => Marshal.ThrowExceptionForHR(((delegate* unmanaged[Stdcall]<nint, nint, int>)(*(*(void***)playerP + 10)))(playerP, surfaceP)); // +10 == .CopyFrameToVideoSurface(IDirect3DSurface)
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SkipLocalsInit]
-    public static unsafe int QueryInterfaceShort(nint pUnk, ref readonly Guid iid, out nint ppv)
+    public static unsafe void MediaPlayerCopyFrameUnsafe(
+        nint              playerP,
+        nint              surfaceP,
+        ref readonly Rect updateWinRect)
+        => Marshal.ThrowExceptionForHR(((delegate* unmanaged[Stdcall]<nint, nint, ref readonly Rect, int>)(*(*(void***)playerP + 11)))(playerP, surfaceP, in updateWinRect)); // +11 == .CopyFrameToVideoSurface(IDirect3DSurface, Rect)
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [SkipLocalsInit]
+    private static unsafe int QueryInterfaceShort(nint pUnk, ref readonly Guid iid, out nint ppv)
         => ((delegate* unmanaged<nint, ref readonly Guid, out nint, int>)
             (**(void***)pUnk))(pUnk, in iid, out ppv);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SkipLocalsInit]
-    public static unsafe int ReleaseShort(nint pUnk)
+    private static unsafe int ReleaseShort(nint pUnk)
         => ((delegate* unmanaged<nint, int>)
             (*(*(void***)pUnk + 2)))(pUnk);
 }
