@@ -34,7 +34,7 @@ public static class EnumerateGpuNames
             goto StartGo;
         }
 
-        if (!ComMarshal2<IDXGIAdapter1>
+        if (!ComMarshal<IDXGIAdapter1>
                .TryCreateComObjectFromReference(adapterPp,
                                                 out IDXGIAdapter1? adapter,
                                                 out Exception? adapterError))
@@ -72,7 +72,7 @@ public static class EnumerateGpuNames
         PInvoke.CreateDXGIFactory2(0, in adapterFactoryIid, out IDXGIFactory2? factory2)
                .ThrowOnFailure();
 
-        if (!ComMarshal2<IDXGIFactory2>.TryCastComObjectAs(factory2!,
+        if (!ComMarshal<IDXGIFactory2>.TryCastComObjectAs(factory2!,
                                                            out IDXGIFactory6? factory,
                                                            out Exception? factoryError))
         {

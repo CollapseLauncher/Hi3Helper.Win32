@@ -114,18 +114,15 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 
             bool isShortcutExist = File.Exists(shortcutPath);
 
-            IPersistFile?   persistFileW   = null;
-            IPropertyStore? propertyStoreW = null;
-
             try
             {
                 if (!ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
                                                                  in ShellLinkClsId.IGuid_IPersistFile,
-                                                                 out persistFileW,
+                                                                 out IPersistFile? persistFileW,
                                                                  out exception) ||
                     !ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
                                                                  in ShellLinkClsId.IGuid_IPropertyStore,
-                                                                 out propertyStoreW,
+                                                                 out IPropertyStore? propertyStoreW,
                                                                  out exception))
                 {
                     currentInstance.Logger?.LogError(exception, $"An error has occurred while trying to cast COM Instance from {nameof(IShellLinkW)} to {nameof(IPersistFile)} or {nameof(IPropertyStore)}");

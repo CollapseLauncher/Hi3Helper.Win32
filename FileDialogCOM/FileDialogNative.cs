@@ -181,9 +181,9 @@ namespace Hi3Helper.Win32.FileDialogCOM
             string? Impl()
             {
                 if (!ComMarshal<IFileSaveDialog>.TryCreateComObject(in FileSaveDialogGuid,
-                                                                    CLSCTX.CLSCTX_INPROC_SERVER,
-                                                                    out IFileSaveDialog? dialog,
-                                                                    out Exception? exception))
+                                                                     CLSCTX.CLSCTX_INPROC_SERVER,
+                                                                     out IFileSaveDialog? dialog,
+                                                                     out Exception? exception))
                 {
                     throw exception;
                 }
@@ -214,7 +214,6 @@ namespace Hi3Helper.Win32.FileDialogCOM
                 }
                 finally
                 {
-                    _ = ComMarshal<IFileSaveDialog>.TryReleaseComObject(dialog, out _);
                     FreeRefCoTaskMem(ref filterArray);
                 }
             }

@@ -65,8 +65,8 @@ public static class ScreenProp
                .ThrowOnFailure();
 
         if (!ComMarshal<IDXGIFactory2>.TryCastComObjectAs(factory2!,
-                                                          out IDXGIFactory6? factory,
-                                                          out Exception? factoryError))
+                                                           out IDXGIFactory6? factory,
+                                                           out Exception? factoryError))
         {
             throw factoryError;
         }
