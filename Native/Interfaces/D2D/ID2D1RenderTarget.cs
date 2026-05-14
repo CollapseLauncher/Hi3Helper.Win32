@@ -14,97 +14,97 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 public partial interface ID2D1RenderTarget : ID2D1Resource
 {
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-createbitmap
-    void CreateBitmap(D2D_SIZE_U size, nint /* optional void* */ srcData, uint pitch, in D2D1_BITMAP_PROPERTIES bitmapProperties, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Bitmap>))] out ID2D1Bitmap bitmap);
+    void CreateBitmap(D2D_SIZE_U size, nint /* optional void* */ srcData, uint pitch, in D2D1_BITMAP_PROPERTIES bitmapProperties, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Bitmap>))] out ID2D1Bitmap bitmap);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-createbitmapfromwicbitmap
-    void CreateBitmapFromWicBitmap([MarshalUsing(typeof(ComInterfaceMarshaller<IWICBitmapSource>))] IWICBitmapSource wicBitmapSource, nint /* optional D2D1_BITMAP_PROPERTIES* */ bitmapProperties, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Bitmap>))] out ID2D1Bitmap bitmap);
+    void CreateBitmapFromWicBitmap([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IWICBitmapSource>))] IWICBitmapSource wicBitmapSource, nint /* optional D2D1_BITMAP_PROPERTIES* */ bitmapProperties, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Bitmap>))] out ID2D1Bitmap bitmap);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-createsharedbitmap
-    void CreateSharedBitmap(in Guid riid, nint data, nint /* optional D2D1_BITMAP_PROPERTIES* */ bitmapProperties, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Bitmap>))] out ID2D1Bitmap bitmap);
+    void CreateSharedBitmap(in Guid riid, nint data, nint /* optional D2D1_BITMAP_PROPERTIES* */ bitmapProperties, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Bitmap>))] out ID2D1Bitmap bitmap);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-createbitmapbrush
-    void CreateBitmapBrush([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Bitmap?>))] ID2D1Bitmap? bitmap, nint /* optional D2D1_BITMAP_BRUSH_PROPERTIES* */ bitmapBrushProperties, nint /* optional D2D1_BRUSH_PROPERTIES* */ brushProperties, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1BitmapBrush>))] out ID2D1BitmapBrush bitmapBrush);
+    void CreateBitmapBrush([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Bitmap?>))] ID2D1Bitmap? bitmap, nint /* optional D2D1_BITMAP_BRUSH_PROPERTIES* */ bitmapBrushProperties, nint /* optional D2D1_BRUSH_PROPERTIES* */ brushProperties, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1BitmapBrush>))] out ID2D1BitmapBrush bitmapBrush);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-createsolidcolorbrush
-    void CreateSolidColorBrush(in D3DCOLORVALUE color, nint /* optional D2D1_BRUSH_PROPERTIES* */ brushProperties, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1SolidColorBrush>))] out ID2D1SolidColorBrush solidColorBrush);
+    void CreateSolidColorBrush(in D3DCOLORVALUE color, nint /* optional D2D1_BRUSH_PROPERTIES* */ brushProperties, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1SolidColorBrush>))] out ID2D1SolidColorBrush solidColorBrush);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-creategradientstopcollection
-    void CreateGradientStopCollection([In][MarshalUsing(CountElementName = nameof(gradientStopsCount))] D2D1_GRADIENT_STOP[] gradientStops, uint gradientStopsCount, D2D1_GAMMA colorInterpolationGamma, D2D1_EXTEND_MODE extendMode, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1GradientStopCollection>))] out ID2D1GradientStopCollection gradientStopCollection);
+    void CreateGradientStopCollection([In][MarshalUsing(CountElementName = nameof(gradientStopsCount))] D2D1_GRADIENT_STOP[] gradientStops, uint gradientStopsCount, D2D1_GAMMA colorInterpolationGamma, D2D1_EXTEND_MODE extendMode, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1GradientStopCollection>))] out ID2D1GradientStopCollection gradientStopCollection);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-createlineargradientbrush
-    void CreateLinearGradientBrush(in D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES linearGradientBrushProperties, nint /* optional D2D1_BRUSH_PROPERTIES* */ brushProperties, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1GradientStopCollection>))] ID2D1GradientStopCollection gradientStopCollection, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1LinearGradientBrush>))] out ID2D1LinearGradientBrush linearGradientBrush);
+    void CreateLinearGradientBrush(in D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES linearGradientBrushProperties, nint /* optional D2D1_BRUSH_PROPERTIES* */ brushProperties, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1GradientStopCollection>))] ID2D1GradientStopCollection gradientStopCollection, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1LinearGradientBrush>))] out ID2D1LinearGradientBrush linearGradientBrush);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-createradialgradientbrush
-    void CreateRadialGradientBrush(in D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES radialGradientBrushProperties, nint /* optional D2D1_BRUSH_PROPERTIES* */ brushProperties, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1GradientStopCollection>))] ID2D1GradientStopCollection gradientStopCollection, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1RadialGradientBrush>))] out ID2D1RadialGradientBrush radialGradientBrush);
+    void CreateRadialGradientBrush(in D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES radialGradientBrushProperties, nint /* optional D2D1_BRUSH_PROPERTIES* */ brushProperties, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1GradientStopCollection>))] ID2D1GradientStopCollection gradientStopCollection, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1RadialGradientBrush>))] out ID2D1RadialGradientBrush radialGradientBrush);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-createcompatiblerendertarget
-    void CreateCompatibleRenderTarget(nint /* optional D2D_SIZE_F* */ desiredSize, nint /* optional D2D_SIZE_U* */ desiredPixelSize, nint /* optional D2D1_PIXEL_FORMAT* */ desiredFormat, D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS options, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1BitmapRenderTarget>))] out ID2D1BitmapRenderTarget bitmapRenderTarget);
+    void CreateCompatibleRenderTarget(nint /* optional D2D_SIZE_F* */ desiredSize, nint /* optional D2D_SIZE_U* */ desiredPixelSize, nint /* optional D2D1_PIXEL_FORMAT* */ desiredFormat, D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS options, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1BitmapRenderTarget>))] out ID2D1BitmapRenderTarget bitmapRenderTarget);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-createlayer
-    void CreateLayer(nint /* optional D2D_SIZE_F* */ size, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Layer>))] out ID2D1Layer layer);
+    void CreateLayer(nint /* optional D2D_SIZE_F* */ size, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Layer>))] out ID2D1Layer layer);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-createmesh
-    void CreateMesh([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Mesh>))] out ID2D1Mesh mesh);
+    void CreateMesh([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Mesh>))] out ID2D1Mesh mesh);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-drawline
     [PreserveSig]
-    void DrawLine(D2D_POINT_2F point0, D2D_POINT_2F point1, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, float strokeWidth, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1StrokeStyle?>))] ID2D1StrokeStyle? strokeStyle);
+    void DrawLine(D2D_POINT_2F point0, D2D_POINT_2F point1, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, float strokeWidth, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1StrokeStyle?>))] ID2D1StrokeStyle? strokeStyle);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-drawrectangle
     [PreserveSig]
-    void DrawRectangle(in D2D_RECT_F rect, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, float strokeWidth, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1StrokeStyle?>))] ID2D1StrokeStyle? strokeStyle);
+    void DrawRectangle(in D2D_RECT_F rect, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, float strokeWidth, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1StrokeStyle?>))] ID2D1StrokeStyle? strokeStyle);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-fillrectangle
     [PreserveSig]
-    void FillRectangle(in D2D_RECT_F rect, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush);
+    void FillRectangle(in D2D_RECT_F rect, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-drawroundedrectangle
     [PreserveSig]
-    void DrawRoundedRectangle(in D2D1_ROUNDED_RECT roundedRect, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, float strokeWidth, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1StrokeStyle?>))] ID2D1StrokeStyle? strokeStyle);
+    void DrawRoundedRectangle(in D2D1_ROUNDED_RECT roundedRect, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, float strokeWidth, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1StrokeStyle?>))] ID2D1StrokeStyle? strokeStyle);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-fillroundedrectangle
     [PreserveSig]
-    void FillRoundedRectangle(in D2D1_ROUNDED_RECT roundedRect, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush);
+    void FillRoundedRectangle(in D2D1_ROUNDED_RECT roundedRect, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-drawellipse
     [PreserveSig]
-    void DrawEllipse(in D2D1_ELLIPSE ellipse, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, float strokeWidth, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1StrokeStyle?>))] ID2D1StrokeStyle? strokeStyle);
+    void DrawEllipse(in D2D1_ELLIPSE ellipse, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, float strokeWidth, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1StrokeStyle?>))] ID2D1StrokeStyle? strokeStyle);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-fillellipse
     [PreserveSig]
-    void FillEllipse(in D2D1_ELLIPSE ellipse, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush);
+    void FillEllipse(in D2D1_ELLIPSE ellipse, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-drawgeometry
     [PreserveSig]
-    void DrawGeometry([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Geometry>))] ID2D1Geometry geometry, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, float strokeWidth, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1StrokeStyle?>))] ID2D1StrokeStyle? strokeStyle);
+    void DrawGeometry([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Geometry>))] ID2D1Geometry geometry, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, float strokeWidth, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1StrokeStyle?>))] ID2D1StrokeStyle? strokeStyle);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-fillgeometry
     [PreserveSig]
-    void FillGeometry([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Geometry>))] ID2D1Geometry geometry, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush?>))] ID2D1Brush? opacityBrush);
+    void FillGeometry([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Geometry>))] ID2D1Geometry geometry, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush?>))] ID2D1Brush? opacityBrush);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-fillmesh
     [PreserveSig]
-    void FillMesh([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Mesh>))] ID2D1Mesh mesh, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush);
+    void FillMesh([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Mesh>))] ID2D1Mesh mesh, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-fillopacitymask
     [PreserveSig]
-    void FillOpacityMask([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Bitmap>))] ID2D1Bitmap opacityMask, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, D2D1_OPACITY_MASK_CONTENT content, nint /* optional D2D_RECT_F* */ destinationRectangle, nint /* optional D2D_RECT_F* */ sourceRectangle);
+    void FillOpacityMask([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Bitmap>))] ID2D1Bitmap opacityMask, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush brush, D2D1_OPACITY_MASK_CONTENT content, nint /* optional D2D_RECT_F* */ destinationRectangle, nint /* optional D2D_RECT_F* */ sourceRectangle);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-drawbitmap
     [PreserveSig]
-    void DrawBitmap([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Bitmap>))] ID2D1Bitmap bitmap, in D2D_RECT_F /* optional D2D_RECT_F* */ destinationRectangle, float opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode, in D2D_RECT_F /* optional D2D_RECT_F* */ sourceRectangle);
+    void DrawBitmap([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Bitmap>))] ID2D1Bitmap bitmap, in D2D_RECT_F /* optional D2D_RECT_F* */ destinationRectangle, float opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode, in D2D_RECT_F /* optional D2D_RECT_F* */ sourceRectangle);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-drawtext
     [PreserveSig]
-    void DrawText([MarshalUsing(CountElementName = nameof(stringLength))] string? @string, uint stringLength, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteTextFormat>))] IDWriteTextFormat textFormat, in D2D_RECT_F layoutRect, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush defaultFillBrush, D2D1_DRAW_TEXT_OPTIONS options, DWRITE_MEASURING_MODE measuringMode);
+    void DrawText([MarshalUsing(CountElementName = nameof(stringLength))] string? @string, uint stringLength, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteTextFormat>))] IDWriteTextFormat textFormat, in D2D_RECT_F layoutRect, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush defaultFillBrush, D2D1_DRAW_TEXT_OPTIONS options, DWRITE_MEASURING_MODE measuringMode);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-drawtextlayout
     [PreserveSig]
-    void DrawTextLayout(D2D_POINT_2F origin, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteTextLayout>))] IDWriteTextLayout textLayout, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush defaultFillBrush, D2D1_DRAW_TEXT_OPTIONS options);
+    void DrawTextLayout(D2D_POINT_2F origin, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteTextLayout>))] IDWriteTextLayout textLayout, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush defaultFillBrush, D2D1_DRAW_TEXT_OPTIONS options);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-drawglyphrun
     [PreserveSig]
-    void DrawGlyphRun(D2D_POINT_2F baselineOrigin, in DWRITE_GLYPH_RUN glyphRun, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush foregroundBrush, DWRITE_MEASURING_MODE measuringMode);
+    void DrawGlyphRun(D2D_POINT_2F baselineOrigin, in DWRITE_GLYPH_RUN glyphRun, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Brush>))] ID2D1Brush foregroundBrush, DWRITE_MEASURING_MODE measuringMode);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-settransform
     [PreserveSig]
@@ -132,11 +132,11 @@ public partial interface ID2D1RenderTarget : ID2D1Resource
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-settextrenderingparams
     [PreserveSig]
-    void SetTextRenderingParams([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteRenderingParams?>))] IDWriteRenderingParams? textRenderingParams);
+    void SetTextRenderingParams([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteRenderingParams?>))] IDWriteRenderingParams? textRenderingParams);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-gettextrenderingparams
     [PreserveSig]
-    void GetTextRenderingParams([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteRenderingParams>))] out IDWriteRenderingParams textRenderingParams);
+    void GetTextRenderingParams([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteRenderingParams>))] out IDWriteRenderingParams textRenderingParams);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-settags
     [PreserveSig]
@@ -148,7 +148,7 @@ public partial interface ID2D1RenderTarget : ID2D1Resource
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-pushlayer(constd2d1_layer_parameters_id2d1layer)
     [PreserveSig]
-    void PushLayer(in D2D1_LAYER_PARAMETERS layerParameters, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Layer?>))] ID2D1Layer? layer);
+    void PushLayer(in D2D1_LAYER_PARAMETERS layerParameters, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Layer?>))] ID2D1Layer? layer);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-poplayer
     [PreserveSig]
@@ -159,11 +159,11 @@ public partial interface ID2D1RenderTarget : ID2D1Resource
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-savedrawingstate
     [PreserveSig]
-    void SaveDrawingState([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1DrawingStateBlock>))] ID2D1DrawingStateBlock drawingStateBlock);
+    void SaveDrawingState([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1DrawingStateBlock>))] ID2D1DrawingStateBlock drawingStateBlock);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1rendertarget-restoredrawingstate
     [PreserveSig]
-    void RestoreDrawingState([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1DrawingStateBlock>))] ID2D1DrawingStateBlock drawingStateBlock);
+    void RestoreDrawingState([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1DrawingStateBlock>))] ID2D1DrawingStateBlock drawingStateBlock);
 
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-pushaxisalignedclip
     [PreserveSig]

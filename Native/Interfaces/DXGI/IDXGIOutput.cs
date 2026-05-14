@@ -62,12 +62,12 @@ public partial interface IDXGIOutput : IDXGIObject
     // https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgioutput-setdisplaysurface
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult SetDisplaySurface([MarshalUsing(typeof(ComInterfaceMarshaller<IDXGISurface>))] IDXGISurface pScanoutSurface);
+    HResult SetDisplaySurface([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGISurface>))] IDXGISurface pScanoutSurface);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgioutput-getdisplaysurfacedata
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetDisplaySurfaceData([MarshalUsing(typeof(ComInterfaceMarshaller<IDXGISurface>))] IDXGISurface pDestination);
+    HResult GetDisplaySurfaceData([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGISurface>))] IDXGISurface pDestination);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgioutput-getframestatistics
     [PreserveSig]

@@ -29,7 +29,7 @@ public partial interface IDWriteTextFormat
     void SetIncrementalTabStop(float incrementalTabStop);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextformat-settrimming
-    void SetTrimming(in DWRITE_TRIMMING trimmingOptions, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteInlineObject?>))] IDWriteInlineObject? trimmingSign);
+    void SetTrimming(in DWRITE_TRIMMING trimmingOptions, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteInlineObject?>))] IDWriteInlineObject? trimmingSign);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextformat-setlinespacing
     void SetLineSpacing(DWRITE_LINE_SPACING_METHOD lineSpacingMethod, float lineSpacing, float baseline);
@@ -59,13 +59,13 @@ public partial interface IDWriteTextFormat
     float GetIncrementalTabStop();
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextformat-gettrimming
-    void GetTrimming(out DWRITE_TRIMMING trimmingOptions, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteInlineObject>))] out IDWriteInlineObject trimmingSign);
+    void GetTrimming(out DWRITE_TRIMMING trimmingOptions, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteInlineObject>))] out IDWriteInlineObject trimmingSign);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextformat-getlinespacing
     void GetLineSpacing(out DWRITE_LINE_SPACING_METHOD lineSpacingMethod, out float lineSpacing, out float baseline);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextformat-getfontcollection
-    void GetFontCollection([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFontCollection>))] out IDWriteFontCollection fontCollection);
+    void GetFontCollection([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFontCollection>))] out IDWriteFontCollection fontCollection);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextformat-getfontfamilynamelength
     [PreserveSig]

@@ -14,7 +14,7 @@ public partial interface IMFReadWriteClassFactory
 {
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult CreateInstanceFromURL(in Guid clsid, [MarshalUsing(typeof(Utf16StringMarshaller))] string? url, [MarshalUsing(typeof(ComInterfaceMarshaller<IMFAttributes>))] IMFAttributes? attributes, in Guid riid, out nint ppvObject);
+    HResult CreateInstanceFromURL(in Guid clsid, [MarshalUsing(typeof(Utf16StringMarshaller))] string? url, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IMFAttributes>))] IMFAttributes? attributes, in Guid riid, out nint ppvObject);
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]

@@ -1,6 +1,4 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.Interfaces;
-using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -33,98 +31,8 @@ namespace Hi3Helper.Win32.ManagedTools
         /// See more here: <see href="https://learn.microsoft.com/en-us/windows/win32/api/wtypesbase/ne-wtypesbase-clsctx"/>
         /// </param>
         /// <param name="comObjIid">The Class Identifier ID (IID) in which what kind of object to be created. The value in this argument MUST BE the same as its interface's GUID (or at least included from an interface in which implements its derivation).</param>
-        /// <param name="comObjResult">The reference of the created COM object. If you want to unwrap it to managed object, pass this value to <see cref="ComMarshal{TObjSource}.TryCreateComObjectFromReference"/>.</param>
-        /// <param name="exceptionIfFalse">This should be <see langword="null"/> if the <paramref name="comObjResult"/> is set.</param>
-        /// <returns>Returns <see langword="true"/> if the COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
-        public static bool TryCreateComObject(
-            in Guid  classFactoryId,
-            nint     pIUnknownController,
-            CLSCTX   classContext,
-            in  Guid comObjIid,
-            out nint comObjResult,
-
-            [NotNullWhen(false)] out Exception? exceptionIfFalse)
-        {
-            Unsafe.SkipInit(out comObjResult);
-            Unsafe.SkipInit(out exceptionIfFalse);
-
-            // Note for devs:
-            // Running these unmanaged codes are guaranteed to be exception-free.
-            // All the errors are handled from HResult so, don't worry about try-catch :D
-            HResult resultCreateObj = CoCreateInstance(in classFactoryId,
-                                                       pIUnknownController,
-                                                       classContext,
-                                                       in comObjIid,
-                                                       out comObjResult);
-
-            exceptionIfFalse = resultCreateObj.GetException();
-            return exceptionIfFalse == null;
-        }
-
-        /// <summary>
-        /// Try to create COM Object based on its Class Factory ID and its Class Identifier ID (IID).
-        /// This method utilizes <see cref="StrategyBasedComWrappers"/> to create the COM Object.
-        /// </summary>
-        /// <param name="classFactoryId">The <see cref="Guid"/> of the Class Factory used to create correspond COM Object based on Class Identifier ID (IID) passed from <paramref name="comObjIid"/>.</param>
-        /// <param name="classContext">
-        /// Context in which the code that manages the newly created object will run.<br/>
-        /// See more here: <see href="https://learn.microsoft.com/en-us/windows/win32/api/wtypesbase/ne-wtypesbase-clsctx"/>
-        /// </param>
-        /// <param name="comObjIid">The Class Identifier ID (IID) in which what kind of object to be created. The value in this argument MUST BE the same as its interface's GUID (or at least included from an interface in which implements its derivation).</param>
-        /// <param name="comObjResult">The reference of the created COM object. If you want to unwrap it to managed object, pass this value to <see cref="ComMarshal{TObjSource}.TryCreateComObjectFromReference"/>.</param>
-        /// <param name="exceptionIfFalse">This should be <see langword="null"/> if the <paramref name="comObjResult"/> is set.</param>
-        /// <returns>Returns <see langword="true"/> if the COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
-        public static bool TryCreateComObject(
-            in Guid classFactoryId,
-            CLSCTX classContext,
-            in Guid comObjIid,
-            out  nint comObjResult,
-
-            [NotNullWhen(false)] out Exception? exceptionIfFalse)
-            => TryCreateComObject(in classFactoryId,
-                                  nint.Zero,
-                                  classContext,
-                                  in comObjIid,
-                                  out comObjResult,
-                                  out exceptionIfFalse);
-
-        /// <summary>
-        /// Try to create COM Object based on its Class Factory ID and its Class Identifier ID (IID).
-        /// This method utilizes <see cref="StrategyBasedComWrappers"/> to create the COM Object.
-        /// </summary>
-        /// <param name="classFactoryId">The <see cref="Guid"/> of the Class Factory used to create correspond COM Object based on its Class Identifier ID (IID).</param>
-        /// <param name="classContext">
-        /// Context in which the code that manages the newly created object will run.<br/>
-        /// See more here: <see href="https://learn.microsoft.com/en-us/windows/win32/api/wtypesbase/ne-wtypesbase-clsctx"/>
-        /// </param>
-        /// <param name="comObjResult">The reference of the created COM object. If you want to unwrap it to managed object, pass this value to <see cref="ComMarshal{TObjSource}.TryCreateComObjectFromReference"/>.</param>
-        /// <param name="exceptionIfFalse">This should be <see langword="null"/> if the <paramref name="comObjResult"/> is set.</param>
-        /// <returns>Returns <see langword="true"/> if the COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
-        public static bool TryCreateComObject(
-            in Guid  classFactoryId,
-            CLSCTX   classContext,
-            out nint comObjResult,
-
-            [NotNullWhen(false)] out Exception? exceptionIfFalse)
-            => TryCreateComObject(in classFactoryId,
-                                  classContext,
-                                  in Nullable.GetValueRefOrDefaultRef(in ObjComIid),
-                                  out comObjResult,
-                                  out exceptionIfFalse);
-
-        /// <summary>
-        /// Try to create COM Object based on its Class Factory ID and its Class Identifier ID (IID).
-        /// This method utilizes <see cref="StrategyBasedComWrappers"/> to create the COM Object.
-        /// </summary>
-        /// <param name="classFactoryId">The <see cref="Guid"/> of the Class Factory used to create correspond COM Object based on Class Identifier ID (IID) passed from <paramref name="comObjIid"/>.</param>
-        /// <param name="pIUnknownController">The pointer of external IUnknown implementation used to manage the creation of the COM Object. It must be set to <see cref="nint.Zero"/> if you want to use the default IUnknown.</param>
-        /// <param name="classContext">
-        /// Context in which the code that manages the newly created object will run.<br/>
-        /// See more here: <see href="https://learn.microsoft.com/en-us/windows/win32/api/wtypesbase/ne-wtypesbase-clsctx"/>
-        /// </param>
-        /// <param name="comObjIid">The Class Identifier ID (IID) in which what kind of object to be created. The value in this argument MUST BE the same as its interface's GUID (or at least included from an interface in which implements its derivation).</param>
         /// <param name="comObjResult">The result of a COM Object which has been created.</param>
-        /// <param name="exceptionIfFalse">This should be <see langword="null"/> if the <paramref name="comObjResult"/> is set.</param>
+        /// <param name="exceptionIfFalse">This should be null if the <paramref name="comObjResult"/> is set.</param>
         /// <returns>Returns <see langword="true"/> if the COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
         public static bool TryCreateComObject(
             in Guid classFactoryId,
@@ -154,15 +62,20 @@ namespace Hi3Helper.Win32.ManagedTools
             // Note for devs:
             // Running these unmanaged codes are guaranteed to be exception-free.
             // All the errors are handled from HResult so, don't worry about try-catch :D
-            HResult resultCreateObj = CoCreateInstance(in classFactoryId,
-                                                       pIUnknownController,
-                                                       classContext,
-                                                       in comObjIid,
-                                                       out nint comObjPpv);
+            int resultCreateObj = CoCreateInstance(in classFactoryId,
+                                                   pIUnknownController,
+                                                   classContext,
+                                                   in comObjIid,
+                                                   out nint comObjPpv);
 
             // Get the exception if failed.
-            exceptionIfFalse = resultCreateObj.GetException();
-            return exceptionIfFalse == null && TryCreateComObjectFromReference(comObjPpv, out comObjResult, out exceptionIfFalse);
+            exceptionIfFalse = Marshal.GetExceptionForHR(resultCreateObj);
+            if (exceptionIfFalse != null)
+            {
+                return false;
+            }
+
+            return TryCreateComObjectFromReference(comObjPpv, out comObjResult, out exceptionIfFalse);
         }
 
         /// <summary>
@@ -176,7 +89,7 @@ namespace Hi3Helper.Win32.ManagedTools
         /// </param>
         /// <param name="comObjIid">The Class Identifier ID (IID) in which what kind of object to be created. The value in this argument MUST BE the same as its interface's GUID (or at least included from an interface in which implements its derivation).</param>
         /// <param name="comObjResult">The result of a COM Object which has been created.</param>
-        /// <param name="exceptionIfFalse">This should be <see langword="null"/> if the <paramref name="comObjResult"/> is set.</param>
+        /// <param name="exceptionIfFalse">This should be null if the <paramref name="comObjResult"/> is set.</param>
         /// <returns>Returns <see langword="true"/> if the COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
         public static bool TryCreateComObject(
             in Guid classFactoryId,
@@ -204,7 +117,7 @@ namespace Hi3Helper.Win32.ManagedTools
         /// See more here: <see href="https://learn.microsoft.com/en-us/windows/win32/api/wtypesbase/ne-wtypesbase-clsctx"/>
         /// </param>
         /// <param name="comObjResult">The result of a COM Object which has been created.</param>
-        /// <param name="exceptionIfFalse">This should be <see langword="null"/> if the <paramref name="comObjResult"/> is set.</param>
+        /// <param name="exceptionIfFalse">This should be null if the <paramref name="comObjResult"/> is set.</param>
         /// <returns>Returns <see langword="true"/> if the COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
         public static bool TryCreateComObject(
             in Guid classFactoryId,
@@ -232,7 +145,7 @@ namespace Hi3Helper.Win32.ManagedTools
         /// <param name="comObjSource">The COM Object source to be cast into.</param>
         /// <param name="comObjTargetIid">Reference Identifier ID of the target COM Object to cast.</param>
         /// <param name="comObjTarget">The result of the target COM Object.</param>
-        /// <param name="exceptionIfFalse">This should be <see langword="null"/> if the <paramref name="comObjTarget"/> is set.</param>
+        /// <param name="exceptionIfFalse">This should be null if the <paramref name="comObjTarget"/> is set.</param>
         /// <param name="isKeepAliveSource">Whether to keep the <typeparamref name="TObjSource"/> alive/valid or not.</param>
         /// <returns>Returns <see langword="true"/> if the target COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
         public static bool TryCastComObjectAs<TObjTarget>(
@@ -255,6 +168,11 @@ namespace Hi3Helper.Win32.ManagedTools
                     new InvalidCastException($"Cannot cast this instance of type: {typeof(TObjSource).Name} to {typeof(TObjTarget).Name} as " +
                                              $"the source instance doesn't have COM Object implementation which derived from {typeof(TObjTarget).Name} type.");
                 return false;
+                /*
+                ppvSource = DefaultComWrappersStatic
+                           .Default
+                           .GetOrCreateComInterfaceForObject(comObjSource, CreateComInterfaceFlags.None);
+                */
             }
 
             // Perform IUnknown::QueryInterface
@@ -280,16 +198,7 @@ namespace Hi3Helper.Win32.ManagedTools
                 Marshal.Release(ppvSource);
             }
 
-            if (!ComMarshal<TObjTarget>.TryCreateComObjectFromReference(ppvTarget,
-                                                                        out comObjTarget,
-                                                                        out exceptionIfFalse))
-            {
-                return false;
-            }
-
-            // Release managed wrapper.
-            Marshal.Release(ppvTarget);
-            return true;
+            return ComMarshal<TObjTarget>.TryCreateComObjectFromReference(ppvTarget, out comObjTarget, out exceptionIfFalse);
         }
 
         /// <summary>
@@ -303,7 +212,7 @@ namespace Hi3Helper.Win32.ManagedTools
         /// <typeparam name="TObjTarget">The type of COM Object (IUnknown) to cast into.</typeparam>
         /// <param name="comObjSource">The COM Object source to be cast into.</param>
         /// <param name="comObjTarget">The result of the target COM Object.</param>
-        /// <param name="exceptionIfFalse">This should be <see langword="null"/> if the <paramref name="comObjTarget"/> is set.</param>
+        /// <param name="exceptionIfFalse">This should be null if the <paramref name="comObjTarget"/> is set.</param>
         /// <param name="isKeepAliveSource">Whether to keep the <typeparamref name="TObjSource"/> alive/valid or not.</param>
         /// <returns>Returns <see langword="true"/> if the target COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
         public static bool TryCastComObjectAs<TObjTarget>(
@@ -329,22 +238,51 @@ namespace Hi3Helper.Win32.ManagedTools
         }
 
         /// <summary>
+        /// Try to release and invalidate COM Object reference.
+        /// </summary>
+        /// <param name="comObj">The COM Object to be released/invalidated.</param>
+        /// <param name="exceptionIfFalse">Exception if releasing the reference is failing.</param>
+        /// <returns>Returns <see langword="true"/> if the target COM Object has been successfully released/invalidated. Otherwise, <see langword="false"/>.</returns>
+        public static bool TryReleaseComObject(
+            TObjSource? comObj,
+
+            [NotNullWhen(false)]
+            out Exception?  exceptionIfFalse)
+        {
+            Unsafe.SkipInit(out exceptionIfFalse);
+
+            if (comObj == null)
+            {
+                exceptionIfFalse = new ArgumentNullException(nameof(comObj), $"{comObj} cannot be null!");
+                return false;
+            }
+
+            // Try to get the cached wrapper. If any, directly release the COM Object reference.
+            if (ComWrappers.TryGetComInstance(comObj, out nint ppv))
+            {
+                Marshal.Release(ppv);
+                return true;
+            }
+
+            // Otherwise, try to free the COM Object from tracked runtime wrapper.
+            int hResult = Marshal.ReleaseComObject(comObj);
+            // If fails, get the exception from the given HResult
+            return (exceptionIfFalse = Marshal.GetExceptionForHR(hResult)) == null;
+        }
+
+        /// <summary>
         /// Try to obtain COM Object Interface from a native pointer.
         /// </summary>
         /// <param name="comObjPpv">Pointer of the COM Object Interface which will be obtained from.</param>
         /// <param name="comObjResult">The resulting type <typeparamref name="TObjSource"/> of COM Object Interface from the native pointer.</param>
         /// <param name="exceptionIfFalse">Exception if obtaining the COM Object Interface is failing.</param>
         /// <param name="flags">The interface creation flags for the corresponding COM Object types. By default, this method only performs unwrapping using <see cref="CreateObjectFlags.Unwrap"/>.</param>
-        /// <param name="isKeepAliveSource">Whether to keep the <param name="comObjPpv"/> alive/valid or not.</param>
         /// <returns>Returns <see langword="true"/> if the target COM Object Interface has been successfully obtained. Otherwise, <see langword="false"/>.</returns>
         public static bool TryCreateComObjectFromReference(
-            nint comObjPpv,
-
-            [NotNullWhen(true)] out  TObjSource? comObjResult,
-            [NotNullWhen(false)] out Exception?  exceptionIfFalse,
-
-            CreateObjectFlags flags             = CreateObjectFlags.Unwrap,
-            bool              isKeepAliveSource = false)
+            nint          comObjPpv,
+            [NotNullWhen(true)] out TObjSource? comObjResult,
+            [NotNullWhen(false)] out Exception? exceptionIfFalse,
+            CreateObjectFlags flags = CreateObjectFlags.Unwrap)
         {
             Unsafe.SkipInit(out comObjResult);
             Unsafe.SkipInit(out exceptionIfFalse);
@@ -361,14 +299,10 @@ namespace Hi3Helper.Win32.ManagedTools
             {
                 Unsafe.SkipInit(out exceptionIfFalse);
                 comObjResult = (TObjSource)cachedWrappedObject;
-
-                if (!isKeepAliveSource)
-                {
-                    Marshal.Release(comObjPpv);
-                }
+                Marshal.Release(comObjPpv);
                 return true;
             }
-            
+
             try
             {
                 // Get or Create Object

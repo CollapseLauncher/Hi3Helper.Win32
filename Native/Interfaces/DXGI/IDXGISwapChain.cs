@@ -21,10 +21,10 @@ public unsafe partial interface IDXGISwapChain : IDXGIDeviceSubObject
     void Present(uint SyncInterval, DXGI_PRESENT Flags);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiswapchain-getbuffer
-    void GetBuffer(uint Buffer, in Guid riid, [MarshalUsing(typeof(ComInterfaceMarshaller<IDXGISurface?>))] out IDXGISurface? ppSurface);
+    void GetBuffer(uint Buffer, in Guid riid, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGISurface?>))] out IDXGISurface? ppSurface);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiswapchain-setfullscreenstate
-    void SetFullscreenState(BOOL Fullscreen, [MarshalUsing(typeof(ComInterfaceMarshaller<IDXGIOutput?>))] IDXGIOutput? pTarget);
+    void SetFullscreenState(BOOL Fullscreen, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGIOutput?>))] IDXGIOutput? pTarget);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiswapchain-getfullscreenstate
     void GetFullscreenState(nint /* optional BOOL* */ pFullscreen, nint /* optional IDXGIOutput* */ ppTarget);
@@ -41,7 +41,7 @@ public unsafe partial interface IDXGISwapChain : IDXGIDeviceSubObject
     void ResizeTarget(in DXGI_MODE_DESC pNewTargetParameters);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiswapchain-getcontainingoutput
-    void GetContainingOutput([MarshalUsing(typeof(ComInterfaceMarshaller<IDXGIOutput>))] out IDXGIOutput ppOutput);
+    void GetContainingOutput([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGIOutput>))] out IDXGIOutput ppOutput);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiswapchain-getframestatistics
     void GetFrameStatistics(out DXGI_FRAME_STATISTICS pStats);

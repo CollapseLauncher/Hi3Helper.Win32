@@ -40,14 +40,14 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("d2d1.dll", EntryPoint = "D2D1CreateDevice")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static unsafe partial HResult D2D1CreateDevice(
-            [MarshalUsing(typeof(ComInterfaceMarshaller<IDXGIDevice>))] IDXGIDevice dxgiDevice,
+            [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGIDevice>))] IDXGIDevice dxgiDevice,
             in D2D1_CREATION_PROPERTIES creationProperties,
             out nint d2dDevice);
 
         [LibraryImport("d2d1.dll", EntryPoint = "D2D1CreateDeviceContext")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static unsafe partial HResult D2D1CreateDeviceContext(
-            [MarshalUsing(typeof(ComInterfaceMarshaller<IDXGISurface>))] IDXGISurface dxgiSurface,
+            [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGISurface>))] IDXGISurface dxgiSurface,
             in D2D1_CREATION_PROPERTIES creationProperties,
             out nint d2dDeviceContext);
     }

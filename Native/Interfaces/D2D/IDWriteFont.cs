@@ -13,7 +13,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 public partial interface IDWriteFont
 {
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefont-getfontfamily
-    void GetFontFamily([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFontFamily>))] out IDWriteFontFamily fontFamily);
+    void GetFontFamily([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFontFamily>))] out IDWriteFontFamily fontFamily);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefont-getweight
     [PreserveSig]
@@ -33,10 +33,10 @@ public partial interface IDWriteFont
     BOOL IsSymbolFont();
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefont-getfacenames
-    void GetFaceNames([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteLocalizedStrings>))] out IDWriteLocalizedStrings names);
+    void GetFaceNames([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteLocalizedStrings>))] out IDWriteLocalizedStrings names);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefont-getinformationalstrings
-    void GetInformationalStrings(DWRITE_INFORMATIONAL_STRING_ID informationalStringID, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteLocalizedStrings>))] out IDWriteLocalizedStrings informationalStrings, out BOOL exists);
+    void GetInformationalStrings(DWRITE_INFORMATIONAL_STRING_ID informationalStringID, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteLocalizedStrings>))] out IDWriteLocalizedStrings informationalStrings, out BOOL exists);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefont-getsimulations
     [PreserveSig]
@@ -50,5 +50,5 @@ public partial interface IDWriteFont
     void HasCharacter(uint unicodeValue, out BOOL exists);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefont-createfontface
-    void CreateFontFace([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFontFace>))] out IDWriteFontFace fontFace);
+    void CreateFontFace([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFontFace>))] out IDWriteFontFace fontFace);
 }

@@ -17,7 +17,7 @@ public partial interface IStream : ISequentialStream
     void SetSize(ulong libNewSize);
 
     // https://learn.microsoft.com/windows/win32/api/objidl/nf-objidl-istream-copyto
-    void CopyTo([MarshalUsing(typeof(ComInterfaceMarshaller<IStream>))] IStream pstm, ulong cb, nint /* optional ulong* */ pcbRead, nint /* optional ulong* */ pcbWritten);
+    void CopyTo([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IStream>))] IStream pstm, ulong cb, nint /* optional ulong* */ pcbRead, nint /* optional ulong* */ pcbWritten);
 
     // https://learn.microsoft.com/windows/win32/api/objidl/nf-objidl-istream-commit
     void Commit(uint grfCommitFlags);
@@ -35,5 +35,5 @@ public partial interface IStream : ISequentialStream
     void Stat(out STATSTG pstatstg, uint grfStatFlag);
 
     // https://learn.microsoft.com/windows/win32/api/objidl/nf-objidl-istream-clone
-    void Clone([MarshalUsing(typeof(ComInterfaceMarshaller<IStream>))] out IStream ppstm);
+    void Clone([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IStream>))] out IStream ppstm);
 }

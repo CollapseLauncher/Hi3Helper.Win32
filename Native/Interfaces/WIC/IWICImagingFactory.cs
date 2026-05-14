@@ -14,7 +14,7 @@ public partial interface IWICImagingFactory
 {
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult CreateDecoderFromFilename([MarshalUsing(typeof(Utf16StringMarshaller))] string? wzFilename, nint pguidVendor, uint dwDesiredAccess, WICDecodeOptions metadataOptions, [MarshalUsing(typeof(ComInterfaceMarshaller<IWICBitmapDecoder>))] out IWICBitmapDecoder? ppIDecoder);
+    HResult CreateDecoderFromFilename([MarshalUsing(typeof(Utf16StringMarshaller))] string? wzFilename, nint pguidVendor, uint dwDesiredAccess, WICDecodeOptions metadataOptions, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IWICBitmapDecoder>))] out IWICBitmapDecoder? ppIDecoder);
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]

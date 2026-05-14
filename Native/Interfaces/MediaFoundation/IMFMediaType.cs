@@ -22,7 +22,7 @@ public partial interface IMFMediaType : IMFAttributes
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult IsEqual([MarshalUsing(typeof(ComInterfaceMarshaller<IMFMediaType>))] IMFMediaType? pIMediaType, out uint pdwFlags);
+    HResult IsEqual([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IMFMediaType>))] IMFMediaType? pIMediaType, out uint pdwFlags);
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]

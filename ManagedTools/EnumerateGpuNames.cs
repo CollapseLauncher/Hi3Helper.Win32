@@ -6,6 +6,7 @@ using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.DXGI;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.ManagedTools;
@@ -17,12 +18,11 @@ public static class EnumerateGpuNames
         uint index = 0;
 
     StartGo:
-        Guid adapterIid = new(DXGIClsId.IDXGIAdapter1);
-        HResult result = factory
-           .EnumAdapterByGpuPreference(index,
-                                       DXGI_GPU_PREFERENCE.HighPerformance,
-                                       adapterIid,
-                                       out nint adapterPp);
+        Guid adapterIid = new Guid(DXGIClsId.IDXGIAdapter1);
+        HResult result = factory.EnumAdapterByGpuPreference(index,
+                                                            DXGI_GPU_PREFERENCE.HighPerformance,
+                                                            adapterIid,
+                                                            out nint adapterPp);
 
         index++;
 
@@ -51,7 +51,8 @@ public static class EnumerateGpuNames
         uint index = 0;
 
     StartGo:
-        HResult result = adapter.EnumOutputs(index, out nint outputPp);
+        HResult result = adapter.EnumOutputs(index,
+                                             out nint outputPp);
         index++;
 
         if (!result.Succeeded)
@@ -76,20 +77,34 @@ public static class EnumerateGpuNames
 
     public static IEnumerable<string> GetEnumerateGpuNames()
     {
-        Guid adapterFactoryIid = new(DXGIClsId.IDXGIFactory6);
-        PInvoke.CreateDXGIFactory2(0, in adapterFactoryIid, out IDXGIFactory2? factory)
+        Guid adapterFactoryIid = new Guid(DXGIClsId.IDXGIFactory6);
+        PInvoke.CreateDXGIFactory2(0, in adapterFactoryIid, out nint factoryPp)
                .ThrowOnFailure();
 
-        if (!ComMarshal<IDXGIFactory2>.TryCastComObjectAs(factory!,
-                                                          out IDXGIFactory6? factory6,
-                                                          out Exception? ex))
+        Unsafe.SkipInit(out IDXGIFactory6? factory);
+        try
         {
-            throw ex;
+            if (!ComMarshal<IDXGIFactory6>.TryCreateComObjectFromReference(factoryPp,
+                                                                           out factory,
+                                                                           out Exception? factoryError))
+            {
+                throw factoryError;
+            }
+
+            foreach (IDXGIAdapter1 adapter in EnumerateGpuAdapters(factory))
+            {
+                yield return GetDescriptionString(adapter);
+                ComMarshal<IDXGIAdapter1>.TryReleaseComObject(adapter,
+                                                              out _);
+            }
         }
-        
-        foreach (IDXGIAdapter1 adapter in EnumerateGpuAdapters(factory6))
+        finally
         {
-            yield return GetDescriptionString(adapter);
+            if (factory != null)
+            {
+                ComMarshal<IDXGIFactory6>.TryReleaseComObject(factory,
+                                                              out _);
+            }
         }
 
         yield break;

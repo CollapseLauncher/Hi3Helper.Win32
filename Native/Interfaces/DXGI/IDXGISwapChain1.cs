@@ -35,7 +35,7 @@ public partial interface IDXGISwapChain1 : IDXGISwapChain
     BOOL IsTemporaryMonoSupported();
 
     // https://learn.microsoft.com/windows/win32/api/dxgi1_2/nf-dxgi1_2-idxgiswapchain1-getrestricttooutput
-    void GetRestrictToOutput([MarshalUsing(typeof(ComInterfaceMarshaller<IDXGIOutput>))] out IDXGIOutput ppRestrictToOutput);
+    void GetRestrictToOutput([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGIOutput>))] out IDXGIOutput ppRestrictToOutput);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi1_2/nf-dxgi1_2-idxgiswapchain1-setbackgroundcolor
     void SetBackgroundColor(in DXGI_RGBA pColor);

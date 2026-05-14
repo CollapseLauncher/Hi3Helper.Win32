@@ -21,5 +21,5 @@ public partial interface IDWriteTextRenderer : IDWritePixelSnapping
     void DrawStrikethrough(nint /* optional void* */ clientDrawingContext, float baselineOriginX, float baselineOriginY, in DWRITE_STRIKETHROUGH strikethrough, nint clientDrawingEffect);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextrenderer-drawinlineobject
-    void DrawInlineObject(nint /* optional void* */ clientDrawingContext, float originX, float originY, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteInlineObject>))] IDWriteInlineObject inlineObject, BOOL isSideways, BOOL isRightToLeft, nint clientDrawingEffect);
+    void DrawInlineObject(nint /* optional void* */ clientDrawingContext, float originX, float originY, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteInlineObject>))] IDWriteInlineObject inlineObject, BOOL isSideways, BOOL isRightToLeft, nint clientDrawingEffect);
 }

@@ -34,7 +34,7 @@ public partial interface IMFTransform
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetAttributes([MarshalUsing(typeof(ComInterfaceMarshaller<IMFAttributes>))] out IMFAttributes? pAttributes); // Dummy
+    HResult GetAttributes([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IMFAttributes>))] out IMFAttributes? pAttributes); // Dummy
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
@@ -54,11 +54,11 @@ public partial interface IMFTransform
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetInputAvailableType(uint dwInputStreamID, uint dwTypeIndex, [MarshalUsing(typeof(ComInterfaceMarshaller<IMFMediaType>))] out IMFMediaType? ppType); // Dummy
+    HResult GetInputAvailableType(uint dwInputStreamID, uint dwTypeIndex, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IMFMediaType>))] out IMFMediaType? ppType); // Dummy
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetOutputAvailableType(uint dwInputStreamID, uint dwTypeIndex, [MarshalUsing(typeof(ComInterfaceMarshaller<IMFMediaType>))] out IMFMediaType? ppType); // Dummy
+    HResult GetOutputAvailableType(uint dwInputStreamID, uint dwTypeIndex, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IMFMediaType>))] out IMFMediaType? ppType); // Dummy
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]

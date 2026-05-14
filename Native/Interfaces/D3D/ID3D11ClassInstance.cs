@@ -13,7 +13,7 @@ public partial interface ID3D11ClassInstance : ID3D11DeviceChild
 {
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11classinstance-getclasslinkage
     [PreserveSig]
-    void GetClassLinkage([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11ClassLinkage>))] out ID3D11ClassLinkage ppLinkage);
+    void GetClassLinkage([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11ClassLinkage>))] out ID3D11ClassLinkage ppLinkage);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11classinstance-getdesc
     [PreserveSig]

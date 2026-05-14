@@ -49,6 +49,6 @@ public static partial class PInvoke
     [LibraryImport("Mfplat.dll", EntryPoint = "MFCreateDXGIDeviceManager")]
     public static partial HResult MFCreateDXGIDeviceManager(
         out uint                   resetToken,
-        [MarshalUsing(typeof(ComInterfaceMarshaller<IMFDXGIDeviceManager>))]
+        [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IMFDXGIDeviceManager>))]
         out IMFDXGIDeviceManager?  ppDeviceManager);
 }

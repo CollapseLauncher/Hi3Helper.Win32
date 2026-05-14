@@ -13,25 +13,25 @@ namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 public partial interface ID3D11DeviceContext2 : ID3D11DeviceContext1
 {
     // https://learn.microsoft.com/windows/win32/api/d3d11_2/nf-d3d11_2-id3d11devicecontext2-updatetilemappings
-    void UpdateTileMappings([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pTiledResource, uint NumTiledResourceRegions, nint /* optional D3D11_TILED_RESOURCE_COORDINATE* */ pTiledResourceRegionStartCoordinates, nint /* optional D3D11_TILE_REGION_SIZE* */ pTiledResourceRegionSizes, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Buffer?>))] ID3D11Buffer? pTilePool, uint NumRanges, nint /* optional uint* */ pRangeFlags, nint /* optional uint* */ pTilePoolStartOffsets, nint /* optional uint* */ pRangeTileCounts, uint Flags);
+    void UpdateTileMappings([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pTiledResource, uint NumTiledResourceRegions, nint /* optional D3D11_TILED_RESOURCE_COORDINATE* */ pTiledResourceRegionStartCoordinates, nint /* optional D3D11_TILE_REGION_SIZE* */ pTiledResourceRegionSizes, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Buffer?>))] ID3D11Buffer? pTilePool, uint NumRanges, nint /* optional uint* */ pRangeFlags, nint /* optional uint* */ pTilePoolStartOffsets, nint /* optional uint* */ pRangeTileCounts, uint Flags);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11_2/nf-d3d11_2-id3d11devicecontext2-copytilemappings
-    void CopyTileMappings([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pDestTiledResource, in D3D11_TILED_RESOURCE_COORDINATE pDestRegionStartCoordinate, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pSourceTiledResource, in D3D11_TILED_RESOURCE_COORDINATE pSourceRegionStartCoordinate, in D3D11_TILE_REGION_SIZE pTileRegionSize, uint Flags);
+    void CopyTileMappings([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pDestTiledResource, in D3D11_TILED_RESOURCE_COORDINATE pDestRegionStartCoordinate, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pSourceTiledResource, in D3D11_TILED_RESOURCE_COORDINATE pSourceRegionStartCoordinate, in D3D11_TILE_REGION_SIZE pTileRegionSize, uint Flags);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11_2/nf-d3d11_2-id3d11devicecontext2-copytiles
     [PreserveSig]
-    void CopyTiles([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pTiledResource, in D3D11_TILED_RESOURCE_COORDINATE pTileRegionStartCoordinate, in D3D11_TILE_REGION_SIZE pTileRegionSize, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Buffer>))] ID3D11Buffer pBuffer, ulong BufferStartOffsetInBytes, uint Flags);
+    void CopyTiles([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pTiledResource, in D3D11_TILED_RESOURCE_COORDINATE pTileRegionStartCoordinate, in D3D11_TILE_REGION_SIZE pTileRegionSize, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Buffer>))] ID3D11Buffer pBuffer, ulong BufferStartOffsetInBytes, uint Flags);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11_2/nf-d3d11_2-id3d11devicecontext2-updatetiles
     [PreserveSig]
-    void UpdateTiles([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pDestTiledResource, in D3D11_TILED_RESOURCE_COORDINATE pDestTileRegionStartCoordinate, in D3D11_TILE_REGION_SIZE pDestTileRegionSize, nint pSourceTileData, uint Flags);
+    void UpdateTiles([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pDestTiledResource, in D3D11_TILED_RESOURCE_COORDINATE pDestTileRegionStartCoordinate, in D3D11_TILE_REGION_SIZE pDestTileRegionSize, nint pSourceTileData, uint Flags);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11_2/nf-d3d11_2-id3d11devicecontext2-resizetilepool
-    void ResizeTilePool([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Buffer>))] ID3D11Buffer pTilePool, ulong NewSizeInBytes);
+    void ResizeTilePool([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Buffer>))] ID3D11Buffer pTilePool, ulong NewSizeInBytes);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11_2/nf-d3d11_2-id3d11devicecontext2-tiledresourcebarrier
     [PreserveSig]
-    void TiledResourceBarrier([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11DeviceChild?>))] ID3D11DeviceChild? pTiledResourceOrViewAccessBeforeBarrier, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11DeviceChild?>))] ID3D11DeviceChild? pTiledResourceOrViewAccessAfterBarrier);
+    void TiledResourceBarrier([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11DeviceChild?>))] ID3D11DeviceChild? pTiledResourceOrViewAccessBeforeBarrier, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11DeviceChild?>))] ID3D11DeviceChild? pTiledResourceOrViewAccessAfterBarrier);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11_2/nf-d3d11_2-id3d11devicecontext2-isannotationenabled
     [PreserveSig]

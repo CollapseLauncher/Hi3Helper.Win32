@@ -18,7 +18,7 @@ public partial interface IDWriteTextLayout : IDWriteTextFormat
     void SetMaxHeight(float maxHeight);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-setfontcollection
-    void SetFontCollection([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFontCollection>))] IDWriteFontCollection fontCollection, DWRITE_TEXT_RANGE textRange);
+    void SetFontCollection([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFontCollection>))] IDWriteFontCollection fontCollection, DWRITE_TEXT_RANGE textRange);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-setfontfamilyname
     void SetFontFamilyName(string? fontFamilyName, DWRITE_TEXT_RANGE textRange);
@@ -45,10 +45,10 @@ public partial interface IDWriteTextLayout : IDWriteTextFormat
     void SetDrawingEffect(nint drawingEffect, DWRITE_TEXT_RANGE textRange);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-setinlineobject
-    void SetInlineObject([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteInlineObject>))] IDWriteInlineObject inlineObject, DWRITE_TEXT_RANGE textRange);
+    void SetInlineObject([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteInlineObject>))] IDWriteInlineObject inlineObject, DWRITE_TEXT_RANGE textRange);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-settypography
-    void SetTypography([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteTypography>))] IDWriteTypography typography, DWRITE_TEXT_RANGE textRange);
+    void SetTypography([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteTypography>))] IDWriteTypography typography, DWRITE_TEXT_RANGE textRange);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-setlocalename
     void SetLocaleName(string? localeName, DWRITE_TEXT_RANGE textRange);
@@ -62,7 +62,7 @@ public partial interface IDWriteTextLayout : IDWriteTextFormat
     float GetMaxHeight();
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-getfontcollection
-    void GetFontCollection(uint currentPosition, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFontCollection>))] out IDWriteFontCollection fontCollection, nint /* optional DWRITE_TEXT_RANGE* */ textRange);
+    void GetFontCollection(uint currentPosition, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFontCollection>))] out IDWriteFontCollection fontCollection, nint /* optional DWRITE_TEXT_RANGE* */ textRange);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-getfontfamilynamelength
     void GetFontFamilyNameLength(uint currentPosition, out uint nameLength, nint /* optional DWRITE_TEXT_RANGE* */ textRange);
@@ -92,10 +92,10 @@ public partial interface IDWriteTextLayout : IDWriteTextFormat
     void GetDrawingEffect(uint currentPosition, out nint drawingEffect, nint /* optional DWRITE_TEXT_RANGE* */ textRange);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-getinlineobject
-    void GetInlineObject(uint currentPosition, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteInlineObject>))] out IDWriteInlineObject inlineObject, nint /* optional DWRITE_TEXT_RANGE* */ textRange);
+    void GetInlineObject(uint currentPosition, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteInlineObject>))] out IDWriteInlineObject inlineObject, nint /* optional DWRITE_TEXT_RANGE* */ textRange);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-gettypography
-    void GetTypography(uint currentPosition, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteTypography>))] out IDWriteTypography typography, nint /* optional DWRITE_TEXT_RANGE* */ textRange);
+    void GetTypography(uint currentPosition, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteTypography>))] out IDWriteTypography typography, nint /* optional DWRITE_TEXT_RANGE* */ textRange);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-getlocalenamelength
     void GetLocaleNameLength(uint currentPosition, out uint nameLength, nint /* optional DWRITE_TEXT_RANGE* */ textRange);
@@ -104,7 +104,7 @@ public partial interface IDWriteTextLayout : IDWriteTextFormat
     void GetLocaleName(uint currentPosition, [MarshalUsing(CountElementName = nameof(nameSize))] string? localeName, uint nameSize, nint /* optional DWRITE_TEXT_RANGE* */ textRange);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-draw
-    void Draw(nint /* optional void* */ clientDrawingContext, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteTextRenderer>))] IDWriteTextRenderer renderer, float originX, float originY);
+    void Draw(nint /* optional void* */ clientDrawingContext, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteTextRenderer>))] IDWriteTextRenderer renderer, float originX, float originY);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextlayout-getlinemetrics
     void GetLineMetrics(nint /* optional DWRITE_LINE_METRICS* */ lineMetrics, uint maxLineCount, out uint actualLineCount);

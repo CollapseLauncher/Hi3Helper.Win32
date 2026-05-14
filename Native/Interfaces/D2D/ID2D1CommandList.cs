@@ -9,7 +9,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 public partial interface ID2D1CommandList : ID2D1Image
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1commandlist-stream
-    void Stream([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1CommandSink>))] ID2D1CommandSink sink);
+    void Stream([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1CommandSink>))] ID2D1CommandSink sink);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1commandlist-close
     void Close();

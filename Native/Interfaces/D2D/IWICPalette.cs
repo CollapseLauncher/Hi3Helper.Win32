@@ -17,10 +17,10 @@ public partial interface IWICPalette
     void InitializeCustom([In][MarshalUsing(CountElementName = nameof(cCount))] uint[] pColors, uint cCount);
 
     // https://learn.microsoft.com/windows/win32/api/wincodec/nf-wincodec-iwicpalette-initializefrombitmap
-    void InitializeFromBitmap([MarshalUsing(typeof(ComInterfaceMarshaller<IWICBitmapSource>))] IWICBitmapSource pISurface, uint cCount, BOOL fAddTransparentColor);
+    void InitializeFromBitmap([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IWICBitmapSource>))] IWICBitmapSource pISurface, uint cCount, BOOL fAddTransparentColor);
 
     // https://learn.microsoft.com/windows/win32/api/wincodec/nf-wincodec-iwicpalette-initializefrompalette
-    void InitializeFromPalette([MarshalUsing(typeof(ComInterfaceMarshaller<IWICPalette>))] IWICPalette pIPalette);
+    void InitializeFromPalette([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IWICPalette>))] IWICPalette pIPalette);
 
     // https://learn.microsoft.com/windows/win32/api/wincodec/nf-wincodec-iwicpalette-gettype
     void GetType(out WICBitmapPaletteType pePaletteType);
