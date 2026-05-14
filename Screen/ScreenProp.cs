@@ -11,21 +11,18 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable InconsistentNaming
 
 namespace Hi3Helper.Win32.Screen;
 
 public static class ScreenProp
 {
-    public static Size CurrentResolution { get => GetScreenSize(); }
+    public static Size CurrentResolution => GetScreenSize();
 
     public static IEnumerable<Size> EnumerateScreenSizes()
     {
         int index = 0;
         int found = 0;
-        int sizeOfDevMode = Marshal.SizeOf<DEVMODEW>();
 
         int lastWidth = 0;
         int lastHeight = 0;
@@ -38,7 +35,7 @@ public static class ScreenProp
             }
 
             ++found;
-            lastWidth = (int)mode.dmPelsWidth;
+            lastWidth  = (int)mode.dmPelsWidth;
             lastHeight = (int)mode.dmPelsHeight;
             yield return new Size(lastWidth, lastHeight);
         }
@@ -64,55 +61,30 @@ public static class ScreenProp
         nint currentMonitor = PInvoke.MonitorFromWindow(hwnd, 2);
 
         Guid adapterFactoryIid = new(DXGIClsId.IDXGIFactory6);
-        PInvoke.CreateDXGIFactory2(0, in adapterFactoryIid, out nint factoryPp)
+        PInvoke.CreateDXGIFactory2(0, in adapterFactoryIid, out IDXGIFactory2? factory2)
                .ThrowOnFailure();
 
-        Unsafe.SkipInit(out IDXGIFactory6? factory);
-        try
+        if (!ComMarshal<IDXGIFactory2>.TryCastComObjectAs(factory2!,
+                                                          out IDXGIFactory6? factory,
+                                                          out Exception? factoryError))
         {
-            if (!ComMarshal<IDXGIFactory6>.TryCreateComObjectFromReference(factoryPp,
-                                                                           out factory,
-                                                                           out Exception? factoryError))
-            {
-                throw factoryError;
-            }
-
-            foreach (IDXGIAdapter1 adapter in EnumerateGpuNames.EnumerateGpuAdapters(factory))
-            {
-                try
-                {
-                    foreach (IDXGIOutput output in EnumerateGpuNames.EnumerateOutputs(adapter))
-                    {
-                        try
-                        {
-                            if (!output.GetDesc(out DXGI_OUTPUT_DESC desc) ||
-                                desc.Monitor != currentMonitor)
-                            {
-                                continue;
-                            }
-
-                            if (GetRefreshRateFromDXGIOutputDesc(output, ref desc, out double refreshRate, out monitorPath))
-                            {
-                                return refreshRate;
-                            }
-                        }
-                        finally
-                        {
-                            ComMarshal<IDXGIOutput>.TryReleaseComObject(output, out _);
-                        }
-                    }
-                }
-                finally
-                {
-                    ComMarshal<IDXGIAdapter1>.TryReleaseComObject(adapter, out _);
-                }
-            }
+            throw factoryError;
         }
-        finally
+
+        foreach (IDXGIAdapter1 adapter in EnumerateGpuNames.EnumerateGpuAdapters(factory))
         {
-            if (factory != null)
+            foreach (IDXGIOutput output in EnumerateGpuNames.EnumerateOutputs(adapter))
             {
-                ComMarshal<IDXGIFactory6>.TryReleaseComObject(factory, out _);
+                if (!output.GetDesc(out DXGI_OUTPUT_DESC desc) ||
+                    desc.Monitor != currentMonitor)
+                {
+                    continue;
+                }
+
+                if (GetRefreshRateFromDXGIOutputDesc(output, ref desc, out double refreshRate, out monitorPath))
+                {
+                    return refreshRate;
+                }
             }
         }
 
@@ -143,13 +115,13 @@ public static class ScreenProp
         bool useDefaultRefreshRate = mode.dmDisplayFrequency is 1 or 0;
 
         DXGI_MODE_DESC requestDesc = default;
-        requestDesc.Width = mode.dmPelsWidth;
-        requestDesc.Height = mode.dmPelsHeight;
-        requestDesc.RefreshRate.Numerator = useDefaultRefreshRate ? 0 : mode.dmDisplayFrequency;
+        requestDesc.Width                   = mode.dmPelsWidth;
+        requestDesc.Height                  = mode.dmPelsHeight;
+        requestDesc.RefreshRate.Numerator   = useDefaultRefreshRate ? 0 : mode.dmDisplayFrequency;
         requestDesc.RefreshRate.Denominator = useDefaultRefreshRate ? 0u : 1u;
-        requestDesc.Format = DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM;
-        requestDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER.DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-        requestDesc.Scaling = DXGI_MODE_SCALING.DXGI_MODE_SCALING_UNSPECIFIED;
+        requestDesc.Format                  = DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM;
+        requestDesc.ScanlineOrdering        = DXGI_MODE_SCANLINE_ORDER.DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+        requestDesc.Scaling                 = DXGI_MODE_SCALING.DXGI_MODE_SCALING_UNSPECIFIED;
 
         if (!output.FindClosestMatchingMode(in requestDesc, out DXGI_MODE_DESC availableDesc, nint.Zero))
         {

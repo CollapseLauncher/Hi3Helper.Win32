@@ -32,7 +32,7 @@ public unsafe partial interface IDXGIAdapter : IDXGIObject
     /// <para><see href="https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiadapter-enumoutputs#">Read more on learn.microsoft.com</see>.</para>
     /// </remarks>
     [PreserveSig]
-    int EnumOutputs(uint output, out nint ppOutput);
+    int EnumOutputs(uint output, [MarshalUsing(typeof(ComInterfaceMarshaller<IDXGIOutput>))] out IDXGIOutput? ppOutput);
 
     /// <summary>Gets a DXGI 1.0 description of an adapter (or video card).</summary>
     /// <param name="pDesc">

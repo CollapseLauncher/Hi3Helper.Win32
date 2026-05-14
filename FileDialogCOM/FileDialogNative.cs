@@ -112,7 +112,7 @@ namespace Hi3Helper.Win32.FileDialogCOM
 
             object? Impl()
             {
-                if (!ComMarshal2<IFileOpenDialog>.TryCreateComObject(in FileOpenDialogGuid,
+                if (!ComMarshal<IFileOpenDialog>.TryCreateComObject(in FileOpenDialogGuid,
                                                                      CLSCTX.CLSCTX_INPROC_SERVER,
                                                                      out IFileOpenDialog? dialog,
                                                                      out Exception? exception))

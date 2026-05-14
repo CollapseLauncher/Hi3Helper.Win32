@@ -29,14 +29,14 @@ public class ShellLink
     /// </summary>
     public ShellLink()
     {
-        if (!ComMarshal2<IShellLinkW>.TryCreateComObject(ShellLinkClsId.ClsId_ShellLink,
+        if (!ComMarshal<IShellLinkW>.TryCreateComObject(ShellLinkClsId.ClsId_ShellLink,
                                                          CLSCTX.CLSCTX_INPROC_SERVER,
                                                          out _linkW,
                                                          out Exception? exception) ||
-            !ComMarshal2<IShellLinkW>.TryCastComObjectAs(_linkW,
+            !ComMarshal<IShellLinkW>.TryCastComObjectAs(_linkW,
                                                          out _persistFileW,
                                                          out exception) ||
-            !ComMarshal2<IShellLinkW>.TryCastComObjectAs(_linkW,
+            !ComMarshal<IShellLinkW>.TryCastComObjectAs(_linkW,
                                                          out _propertyStoreW,
                                                          out exception))
         {

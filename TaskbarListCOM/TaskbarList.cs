@@ -12,7 +12,7 @@ public class TaskbarList
     {
         try
         {
-            if (!ComMarshal2<ITaskbarList3>.TryCreateComObject(new Guid(CLSIDGuid.CLSID_TaskbarList),
+            if (!ComMarshal<ITaskbarList3>.TryCreateComObject(new Guid(CLSIDGuid.CLSID_TaskbarList),
                                                                CLSCTX.CLSCTX_INPROC_SERVER,
                                                                out _taskbarList,
                                                                out Exception? exception))

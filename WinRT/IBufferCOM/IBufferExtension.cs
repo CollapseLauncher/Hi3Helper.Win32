@@ -19,7 +19,7 @@ public static class BufferExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IBufferByteAccess AsBufferByteAccess()
         {
-            return !ComMarshal2<IBuffer>
+            return !ComMarshal<IBuffer>
                .TryCastComObjectAs(buffer,
                                    out IBufferByteAccess? asByteAccess,
                                    out Exception? ex)

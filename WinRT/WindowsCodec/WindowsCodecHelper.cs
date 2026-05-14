@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 
 // ReSharper disable InconsistentNaming
@@ -59,11 +58,9 @@ public static class WindowsCodecHelper
     private const           string VP9TransformExtensionName = "VP9VideoExtensionDecoder";
 
     private static void GetCodecTypeToHashSet(HashSet<Guid> hashSet,
-                                                     in Guid       categoryGuid,
-                                                     in Guid       mediaTypeGuid)
+                                              in Guid       categoryGuid,
+                                              in Guid       mediaTypeGuid)
     {
-        Unsafe.SkipInit(out nint mftActivatesPpv);
-
         try
         {
             const MFT_ENUM_FLAG flags = MFT_ENUM_FLAG.MFT_ENUM_FLAG_ASYNCMFT |
@@ -87,8 +84,16 @@ public static class WindowsCodecHelper
             Guid iidImfTransform = typeof(IMFTransform).GUID;
             foreach (IMFActivate activate in mftActivates)
             {
-                hr = activate.ActivateObject(iidImfTransform, out IMFTransform? transform);
-                if (!hr || transform == null)
+                Unsafe.SkipInit(out IMFTransform? transform);
+                try
+                {
+                    hr = activate.ActivateObject(iidImfTransform, out transform);
+                    if (!hr || transform == null)
+                    {
+                        continue;
+                    }
+                }
+                catch
                 {
                     continue;
                 }
@@ -131,14 +136,7 @@ public static class WindowsCodecHelper
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[StaticCtor::WindowsCodecHelper] {ex}");
-        }
-        finally
-        {
-            if (mftActivatesPpv != nint.Zero)
-            {
-                Marshal.FreeCoTaskMem(mftActivatesPpv);
-            }
+            Console.WriteLine($"[WindowsCodecHelper::GetCodecTypeToHashSet] {ex}");
         }
     }
 
@@ -167,7 +165,7 @@ public static class WindowsCodecHelper
     /// <returns><see langword="true"/> if whether the file is supported as an image file. Otherwise, <see langword="false"/>.</returns>
     public static bool IsFileSupportedImage(string filePath)
     {
-        if (!ComMarshal2<IWICImagingFactory>.TryCreateComObject(in CLSID_WICImagingFactory,
+        if (!ComMarshal<IWICImagingFactory>.TryCreateComObject(in CLSID_WICImagingFactory,
                                                                 CLSCTX.CLSCTX_INPROC_SERVER,
                                                                 out IWICImagingFactory? factory,
                                                                 out _))
@@ -234,7 +232,7 @@ public static class WindowsCodecHelper
 
         try
         {
-            if (!ComMarshal2<IMFReadWriteClassFactory>
+            if (!ComMarshal<IMFReadWriteClassFactory>
                    .TryCreateComObject(in CLSID_MFReadWriteClassFactory,
                                        CLSCTX.CLSCTX_INPROC_SERVER,
                                        out factory,
@@ -247,17 +245,17 @@ public static class WindowsCodecHelper
             HResult hr = factory.CreateInstanceFromURL(in CLSID_MFSourceReader, filePath, null, in readerIid, out nint readerPpv);
 
             if (!hr ||
-                !ComMarshal2<IMFSourceReader>.TryCreateComObjectFromReference(readerPpv, out reader, out _))
+                !ComMarshal<IMFSourceReader>.TryCreateComObjectFromReference(readerPpv, out reader, out _))
             {
                 return false;
             }
 
             reader.GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, out nint videoMediaTypePpv);
             reader.GetNativeMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, 0, out nint audioMediaTypePpv);
-            ComMarshal2<IMFMediaType>.TryCreateComObjectFromReference(videoMediaTypePpv,
+            ComMarshal<IMFMediaType>.TryCreateComObjectFromReference(videoMediaTypePpv,
                                                                       out videoMediaType,
                                                                       out _);
-            ComMarshal2<IMFMediaType>.TryCreateComObjectFromReference(audioMediaTypePpv,
+            ComMarshal<IMFMediaType>.TryCreateComObjectFromReference(audioMediaTypePpv,
                                                                       out audioMediaType,
                                                                       out _);
 

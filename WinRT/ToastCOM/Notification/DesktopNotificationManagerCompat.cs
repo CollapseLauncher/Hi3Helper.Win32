@@ -90,7 +90,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
                 shortcutPath += ".lnk";
             }
 
-            if (!ComMarshal2<IShellLinkW>.TryCreateComObject(ShellLinkClsId.ClsId_ShellLink,
+            if (!ComMarshal<IShellLinkW>.TryCreateComObject(ShellLinkClsId.ClsId_ShellLink,
                                                              CLSCTX.CLSCTX_INPROC_SERVER,
                                                              out IShellLinkW? shellLink,
                                                              out Exception? exception))
@@ -119,11 +119,11 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 
             try
             {
-                if (!ComMarshal2<IShellLinkW>.TryCastComObjectAs(shellLink,
+                if (!ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
                                                                  in ShellLinkClsId.IGuid_IPersistFile,
                                                                  out persistFileW,
                                                                  out exception) ||
-                    !ComMarshal2<IShellLinkW>.TryCastComObjectAs(shellLink,
+                    !ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
                                                                  in ShellLinkClsId.IGuid_IPropertyStore,
                                                                  out propertyStoreW,
                                                                  out exception))

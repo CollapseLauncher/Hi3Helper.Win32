@@ -6,7 +6,6 @@ using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.DXGI;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.ManagedTools;
@@ -18,11 +17,12 @@ public static class EnumerateGpuNames
         uint index = 0;
 
     StartGo:
-        Guid adapterIid = new Guid(DXGIClsId.IDXGIAdapter1);
-        HResult result = factory.EnumAdapterByGpuPreference(index,
-                                                            DXGI_GPU_PREFERENCE.HighPerformance,
-                                                            adapterIid,
-                                                            out nint adapterPp);
+        Guid adapterIid = new(DXGIClsId.IDXGIAdapter1);
+        HResult result = factory
+           .EnumAdapterByGpuPreference(index,
+                                       DXGI_GPU_PREFERENCE.HighPerformance,
+                                       adapterIid,
+                                       out nint adapterPp);
 
         index++;
 
@@ -34,7 +34,7 @@ public static class EnumerateGpuNames
             goto StartGo;
         }
 
-        if (!ComMarshal<IDXGIAdapter1>
+        if (!ComMarshal2<IDXGIAdapter1>
                .TryCreateComObjectFromReference(adapterPp,
                                                 out IDXGIAdapter1? adapter,
                                                 out Exception? adapterError))
@@ -51,24 +51,15 @@ public static class EnumerateGpuNames
         uint index = 0;
 
     StartGo:
-        HResult result = adapter.EnumOutputs(index,
-                                             out nint outputPp);
+        HResult result = adapter.EnumOutputs(index, out IDXGIOutput? output);
         index++;
 
         if (!result.Succeeded)
             yield break;
 
-        if (outputPp == nint.Zero)
+        if (output == null)
         {
             goto StartGo;
-        }
-
-        if (!ComMarshal<IDXGIOutput>
-               .TryCreateComObjectFromReference(outputPp,
-                                                out IDXGIOutput? output,
-                                                out Exception? outputError))
-        {
-            throw outputError;
         }
 
         yield return output;
@@ -77,34 +68,20 @@ public static class EnumerateGpuNames
 
     public static IEnumerable<string> GetEnumerateGpuNames()
     {
-        Guid adapterFactoryIid = new Guid(DXGIClsId.IDXGIFactory6);
-        PInvoke.CreateDXGIFactory2(0, in adapterFactoryIid, out nint factoryPp)
+        Guid adapterFactoryIid = new(DXGIClsId.IDXGIFactory6);
+        PInvoke.CreateDXGIFactory2(0, in adapterFactoryIid, out IDXGIFactory2? factory2)
                .ThrowOnFailure();
 
-        Unsafe.SkipInit(out IDXGIFactory6? factory);
-        try
+        if (!ComMarshal2<IDXGIFactory2>.TryCastComObjectAs(factory2!,
+                                                           out IDXGIFactory6? factory,
+                                                           out Exception? factoryError))
         {
-            if (!ComMarshal<IDXGIFactory6>.TryCreateComObjectFromReference(factoryPp,
-                                                                           out factory,
-                                                                           out Exception? factoryError))
-            {
-                throw factoryError;
-            }
-
-            foreach (IDXGIAdapter1 adapter in EnumerateGpuAdapters(factory))
-            {
-                yield return GetDescriptionString(adapter);
-                ComMarshal<IDXGIAdapter1>.TryReleaseComObject(adapter,
-                                                              out _);
-            }
+            throw factoryError;
         }
-        finally
+
+        foreach (IDXGIAdapter1 adapter in EnumerateGpuAdapters(factory))
         {
-            if (factory != null)
-            {
-                ComMarshal<IDXGIFactory6>.TryReleaseComObject(factory,
-                                                              out _);
-            }
+            yield return GetDescriptionString(adapter);
         }
 
         yield break;
