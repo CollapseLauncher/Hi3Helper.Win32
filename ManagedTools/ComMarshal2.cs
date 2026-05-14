@@ -194,5 +194,54 @@ public static class ComMarshal2<TComObject>
         return false;
     }
 
+    /// <summary>
+    /// Try to obtain COM Object Interface from a native pointer.
+    /// </summary>
+    /// <param name="comObjPpv">Pointer of the COM Object Interface which will be obtained from.</param>
+    /// <param name="comObjResult">The resulting type <typeparamref name="TComObject"/> of COM Object Interface from the native pointer.</param>
+    /// <param name="exceptionIfFalse">Exception if obtaining the COM Object Interface is failing.</param>
+    /// <returns>Returns <see langword="true"/> if the target COM Object Interface has been successfully obtained. Otherwise, <see langword="false"/>.</returns>
+    public static unsafe bool TryCreateComObjectFromReference(
+        nint comObjPpv,
+
+        [NotNullWhen(true)] out  TComObject? comObjResult,
+        [NotNullWhen(false)] out Exception?  exceptionIfFalse)
+    {
+        Unsafe.SkipInit(out comObjResult);
+        Unsafe.SkipInit(out exceptionIfFalse);
+
+        // Return null exception if comObjPpv is null
+        if (comObjPpv == nint.Zero)
+        {
+            exceptionIfFalse = new NullReferenceException($"Cannot obtain ComObject of type: {typeof(TComObject)} due to invalid Class factory ID, invalid COM object IID or invalid Class Context");
+            return false;
+        }
+
+        try
+        {
+            // Get or Create Object
+            comObjResult = ComInterfaceMarshaller<TComObject>.ConvertToManaged((void*)comObjPpv);
+        }
+        catch (Exception ex)
+        {
+            exceptionIfFalse = ex;
+            return false;
+        }
+
+        // Fail-safe: Ensure the object is not null.
+        // If null, then back to GetEnsureCreation with ppv set to null.
+        // If not, then return true.
+        if (comObjResult != null)
+        {
+            Marshal.Release(comObjPpv);
+            return true;
+        }
+
+        // Fail-safe: Back to GetEnsureCreation with null ppv.
+        comObjPpv = nint.Zero;
+        // ReSharper disable once TailRecursiveCall
+        return TryCreateComObjectFromReference(comObjPpv, out comObjResult, out exceptionIfFalse);
+    }
+
     private static InvalidCastException ThrowNoGuidDefined<TObjTarget>() => new($"Type of {typeof(TObjTarget).Name} has no Class Identifier ID (IID)");
 }

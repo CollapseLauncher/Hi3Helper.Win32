@@ -51,7 +51,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 
             // Get the state whether the current process is being run by elevated user.
             WindowsIdentity  currentUserIdentity  = WindowsIdentity.GetCurrent();
-            WindowsPrincipal currentUserPrincipal = new WindowsPrincipal(currentUserIdentity);
+            WindowsPrincipal currentUserPrincipal = new(currentUserIdentity);
             bool             asElevatedUser       = currentUserPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
 
             CreateAumidShortcut(currentInstance, aumId, executablePath, shortcutPath, applicationId, asElevatedUser);
@@ -90,10 +90,10 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
                 shortcutPath += ".lnk";
             }
 
-            if (!ComMarshal<IShellLinkW>.TryCreateComObject(ShellLinkClsId.ClsId_ShellLink,
-                                                            CLSCTX.CLSCTX_INPROC_SERVER,
-                                                            out IShellLinkW? shellLink,
-                                                            out Exception? exception))
+            if (!ComMarshal2<IShellLinkW>.TryCreateComObject(ShellLinkClsId.ClsId_ShellLink,
+                                                             CLSCTX.CLSCTX_INPROC_SERVER,
+                                                             out IShellLinkW? shellLink,
+                                                             out Exception? exception))
             {
                 currentInstance.Logger?.LogError(exception, $"An error has occurred while trying to create COM Instance of {nameof(IShellLinkW)}");
                 return;
@@ -119,14 +119,14 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 
             try
             {
-                if (!ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
-                                                                in ShellLinkClsId.IGuid_IPersistFile,
-                                                                out persistFileW,
-                                                                out exception) ||
-                    !ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
-                                                                in ShellLinkClsId.IGuid_IPropertyStore,
-                                                                out propertyStoreW,
-                                                                out exception))
+                if (!ComMarshal2<IShellLinkW>.TryCastComObjectAs(shellLink,
+                                                                 in ShellLinkClsId.IGuid_IPersistFile,
+                                                                 out persistFileW,
+                                                                 out exception) ||
+                    !ComMarshal2<IShellLinkW>.TryCastComObjectAs(shellLink,
+                                                                 in ShellLinkClsId.IGuid_IPropertyStore,
+                                                                 out propertyStoreW,
+                                                                 out exception))
                 {
                     currentInstance.Logger?.LogError(exception, $"An error has occurred while trying to cast COM Instance from {nameof(IShellLinkW)} to {nameof(IPersistFile)} or {nameof(IPropertyStore)}");
                     return;
@@ -156,21 +156,6 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             }
             finally
             {
-                if (!ComMarshal<IShellLinkW>.TryReleaseComObject(shellLink, out exception))
-                {
-                    currentInstance.Logger?.LogError(exception, $"Cannot release COM Object: {nameof(IShellLinkW)}");
-                }
-
-                if (!ComMarshal<IPersistFile>.TryReleaseComObject(persistFileW, out exception))
-                {
-                    currentInstance.Logger?.LogError(exception, $"Cannot release COM Object: {nameof(IPersistFile)}");
-                }
-
-                if (!ComMarshal<IPropertyStore>.TryReleaseComObject(propertyStoreW, out exception))
-                {
-                    currentInstance.Logger?.LogError(exception, $"Cannot release COM Object: {nameof(IPropertyStore)}");
-                }
-
                 aumId.Clear();
                 toastId.Clear();
             }
@@ -345,7 +330,8 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
         /// <summary>
         /// Gets a boolean representing whether http images can be used within toasts. This is true if running under Desktop Bridge.
         /// </summary>
-        public static bool CanUseHttpImages { get { return DesktopBridgeHelpers.IsRunningAsUwp(); } }
+        public static bool CanUseHttpImages => DesktopBridgeHelpers.IsRunningAsUwp();
+
         #endregion
     }
 }

@@ -15,7 +15,7 @@ public partial interface IMFActivate : IMFAttributes
 {
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult ActivateObject(in Guid riid, out nint ppv);
+    HResult ActivateObject(in Guid riid, [MarshalUsing(typeof(ComInterfaceMarshaller<IMFTransform>))] out IMFTransform? ppv);
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]

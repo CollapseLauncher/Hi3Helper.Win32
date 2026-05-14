@@ -33,7 +33,7 @@ public static partial class PInvoke
 
         [MarshalUsing(CountElementName = nameof(pnumMFTActivate))]
         out IMFActivate[] pppMFTActivate,
-        out int           pnumMFTActivate);
+        out int pnumMFTActivate);
 
     [LibraryImport("Mfplat.dll", EntryPoint = "MFTEnum2")]
     public static partial HResult MFTEnum2(
@@ -41,9 +41,12 @@ public static partial class PInvoke
         MFT_ENUM_FLAG             flags,
         in MFT_REGISTER_TYPE_INFO pInputType,
         in MFT_REGISTER_TYPE_INFO pOutputType,
+
+        [MarshalUsing(typeof(ComInterfaceMarshaller<IMFAttributes>))]
         IMFAttributes?            pAttributes,
 
-        out nint pppMFTActivate,
+        [MarshalUsing(CountElementName = nameof(pnumMFTActivate))]
+        out IMFActivate[] pppMFTActivate,
         out int pnumMFTActivate);
 
     [LibraryImport("Mfplat.dll", EntryPoint = "MFCreateDXGIDeviceManager")]

@@ -15,16 +15,14 @@ public static class BufferExtensions
         /// <summary>
         /// Cast <see cref="IBuffer"/> to <see cref="IBufferByteAccess"/>.
         /// </summary>
-        /// <param name="isKeepAlive">Whether to keep the source <see cref="IBuffer"/> COM instance alive or not.</param>
         /// <returns>An <see cref="IBufferByteAccess"/> instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IBufferByteAccess AsBufferByteAccess(bool isKeepAlive = true)
+        public IBufferByteAccess AsBufferByteAccess()
         {
-            return !ComMarshal<IBuffer>
+            return !ComMarshal2<IBuffer>
                .TryCastComObjectAs(buffer,
                                    out IBufferByteAccess? asByteAccess,
-                                   out Exception? ex,
-                                   isKeepAlive)
+                                   out Exception? ex)
                 ? throw ex
                 : asByteAccess;
         }

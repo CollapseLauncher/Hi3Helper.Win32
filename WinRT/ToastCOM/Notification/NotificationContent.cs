@@ -23,10 +23,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
         public bool?                    UseButtonStyle          { get; set; }
 
         private XmlDocument? _xml;
-        public XmlDocument Xml
-        {
-            get => _xml ??= GenerateXmlDocument();
-        }
+        public  XmlDocument  Xml => _xml ??= GenerateXmlDocument();
 
         public static NotificationContent Create() => new();
 
