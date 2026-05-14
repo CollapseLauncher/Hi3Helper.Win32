@@ -14,11 +14,11 @@ public partial interface IDWriteFontCollection
     uint GetFontFamilyCount();
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontcollection-getfontfamily
-    void GetFontFamily(uint index, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFontFamily>))] out IDWriteFontFamily fontFamily);
+    void GetFontFamily(uint index, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFontFamily>))] out IDWriteFontFamily fontFamily);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontcollection-findfamilyname
     void FindFamilyName(string? familyName, out uint index, out BOOL exists);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontcollection-getfontfromfontface
-    void GetFontFromFontFace([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFontFace>))] IDWriteFontFace fontFace, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFont>))] out IDWriteFont font);
+    void GetFontFromFontFace([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFontFace>))] IDWriteFontFace fontFace, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFont>))] out IDWriteFont font);
 }

@@ -13,14 +13,14 @@ public partial interface ID2D1Bitmap1 : ID2D1Bitmap
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1bitmap1-getcolorcontext
     [PreserveSig]
-    void GetColorContext([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1ColorContext>))] out ID2D1ColorContext colorContext);
+    void GetColorContext([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1ColorContext>))] out ID2D1ColorContext colorContext);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1bitmap1-getoptions
     [PreserveSig]
     D2D1_BITMAP_OPTIONS GetOptions();
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1bitmap1-getsurface
-    void GetSurface([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGISurface>))] out IDXGISurface dxgiSurface);
+    void GetSurface([MarshalUsing(typeof(ComInterfaceMarshaller<IDXGISurface>))] out IDXGISurface dxgiSurface);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1bitmap1-map
     void Map(D2D1_MAP_OPTIONS options, out D2D1_MAPPED_RECT mappedRect);

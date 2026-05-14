@@ -17,5 +17,5 @@ public partial interface ID2D1Device1 : ID2D1Device
     [PreserveSig]
     void SetRenderingPriority(D2D1_RENDERING_PRIORITY renderingPriority);
 
-    void CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS options, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1DeviceContext1>))] out ID2D1DeviceContext1 deviceContext1);
+    void CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS options, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1DeviceContext1>))] out ID2D1DeviceContext1 deviceContext1);
 }

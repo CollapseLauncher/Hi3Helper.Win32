@@ -10,5 +10,5 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 public partial interface ID2D1Factory2 : ID2D1Factory1
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_2/nf-d2d1_2-id2d1factory2-createdevice
-    void CreateDevice([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGIDevice>))] IDXGIDevice dxgiDevice, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Device1>))] out ID2D1Device1 d2dDevice1);
+    void CreateDevice([MarshalUsing(typeof(ComInterfaceMarshaller<IDXGIDevice>))] IDXGIDevice dxgiDevice, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Device1>))] out ID2D1Device1 d2dDevice1);
 }

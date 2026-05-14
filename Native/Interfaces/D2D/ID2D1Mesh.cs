@@ -9,5 +9,5 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 public partial interface ID2D1Mesh : ID2D1Resource
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1mesh-open
-    void Open([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1TessellationSink>))] out ID2D1TessellationSink tessellationSink);
+    void Open([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1TessellationSink>))] out ID2D1TessellationSink tessellationSink);
 }

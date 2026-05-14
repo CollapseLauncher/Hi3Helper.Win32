@@ -26,8 +26,6 @@ namespace Hi3Helper.Win32.TaskbarListCOM
             }
         }
 
-        ~TaskbarList() => ComMarshal<ITaskbarList3>.TryReleaseComObject(_taskbarList, out _);
-
         public int SetProgressState(nint windowHandle, TaskbarState state)
         {
             try

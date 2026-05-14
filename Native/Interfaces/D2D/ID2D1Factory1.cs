@@ -15,22 +15,22 @@ public delegate nint PD2D1_EFFECT_FACTORY(nint effectImpl);
 public partial interface ID2D1Factory1 : ID2D1Factory
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1factory1-createdevice
-    void CreateDevice([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGIDevice>))] IDXGIDevice dxgiDevice, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Device>))] out ID2D1Device d2dDevice);
+    void CreateDevice([MarshalUsing(typeof(ComInterfaceMarshaller<IDXGIDevice>))] IDXGIDevice dxgiDevice, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Device>))] out ID2D1Device d2dDevice);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1factory1-createstrokestyle(constd2d1_stroke_style_properties1_constfloat_uint32_id2d1strokestyle1)
-    void CreateStrokeStyle(in D2D1_STROKE_STYLE_PROPERTIES1 strokeStyleProperties, nint /* optional float* */ dashes, uint dashesCount, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1StrokeStyle1>))] out ID2D1StrokeStyle1 strokeStyle);
+    void CreateStrokeStyle(in D2D1_STROKE_STYLE_PROPERTIES1 strokeStyleProperties, nint /* optional float* */ dashes, uint dashesCount, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1StrokeStyle1>))] out ID2D1StrokeStyle1 strokeStyle);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1factory1-createpathgeometry
-    void CreatePathGeometry([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1PathGeometry1>))] out ID2D1PathGeometry1 pathGeometry);
+    void CreatePathGeometry([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1PathGeometry1>))] out ID2D1PathGeometry1 pathGeometry);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1factory1-createdrawingstateblock(constd2d1_drawing_state_description1_idwriterenderingparams_id2d1drawingstateblock1)
-    void CreateDrawingStateBlock(nint /* optional D2D1_DRAWING_STATE_DESCRIPTION1* */ drawingStateDescription, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteRenderingParams?>))] IDWriteRenderingParams? textRenderingParams, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1DrawingStateBlock1>))] out ID2D1DrawingStateBlock1 drawingStateBlock);
+    void CreateDrawingStateBlock(nint /* optional D2D1_DRAWING_STATE_DESCRIPTION1* */ drawingStateDescription, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteRenderingParams?>))] IDWriteRenderingParams? textRenderingParams, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1DrawingStateBlock1>))] out ID2D1DrawingStateBlock1 drawingStateBlock);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1factory1-creategdimetafile
-    void CreateGdiMetafile([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IStream>))] IStream metafileStream, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1GdiMetafile>))] out ID2D1GdiMetafile metafile);
+    void CreateGdiMetafile([MarshalUsing(typeof(ComInterfaceMarshaller<IStream>))] IStream metafileStream, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1GdiMetafile>))] out ID2D1GdiMetafile metafile);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1factory1-registereffectfromstream
-    void RegisterEffectFromStream(in Guid classId, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IStream>))] IStream propertyXml, nint /* optional D2D1_PROPERTY_BINDING* */ bindings, uint bindingsCount, PD2D1_EFFECT_FACTORY effectFactory);
+    void RegisterEffectFromStream(in Guid classId, [MarshalUsing(typeof(ComInterfaceMarshaller<IStream>))] IStream propertyXml, nint /* optional D2D1_PROPERTY_BINDING* */ bindings, uint bindingsCount, PD2D1_EFFECT_FACTORY effectFactory);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1factory1-registereffectfromstring
     void RegisterEffectFromString(in Guid classId, string? propertyXml, nint /* optional D2D1_PROPERTY_BINDING* */ bindings, uint bindingsCount, PD2D1_EFFECT_FACTORY effectFactory);
@@ -42,5 +42,5 @@ public partial interface ID2D1Factory1 : ID2D1Factory
     void GetRegisteredEffects(nint /* optional Guid* */ effects, uint effectsCount, nint /* optional uint* */ effectsReturned, nint /* optional uint* */ effectsRegistered);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1factory1-geteffectproperties
-    void GetEffectProperties(in Guid effectId, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1Properties>))] out ID2D1Properties properties);
+    void GetEffectProperties(in Guid effectId, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1Properties>))] out ID2D1Properties properties);
 }

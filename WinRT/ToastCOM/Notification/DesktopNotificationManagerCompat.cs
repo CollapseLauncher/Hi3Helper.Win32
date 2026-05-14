@@ -13,21 +13,19 @@ using System.Security.Principal;
 using Windows.UI.Notifications;
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
-// ReSharper disable RedundantStringInterpolation
 // ReSharper disable CommentTypo
-// ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 {
     internal class DesktopNotificationManagerCompat
     {
         #region Properties
-        public const string ToastActivatedLaunchArg = "-ToastActivated";
-        private static readonly Guid ToastG = new("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3");
+        public const            string ToastActivatedLaunchArg = "-ToastActivated";
+        private static readonly Guid   ToastG                  = new("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3");
 
-        private static bool _registeredAumIdAndComServer;
+        private static bool    _registeredAumIdAndComServer;
         private static string? _aumId;
-        private static bool _registeredActivator;
+        private static bool    _registeredActivator;
         #endregion
 
         #region Methods
@@ -114,18 +112,15 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
 
             bool isShortcutExist = File.Exists(shortcutPath);
 
-            IPersistFile?   persistFileW   = null;
-            IPropertyStore? propertyStoreW = null;
-
             try
             {
                 if (!ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
                                                                 in ShellLinkClsId.IGuid_IPersistFile,
-                                                                out persistFileW,
+                                                                out IPersistFile? persistFileW,
                                                                 out exception) ||
                     !ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
                                                                 in ShellLinkClsId.IGuid_IPropertyStore,
-                                                                out propertyStoreW,
+                                                                out IPropertyStore? propertyStoreW,
                                                                 out exception))
                 {
                     currentInstance.Logger?.LogError(exception, $"An error has occurred while trying to cast COM Instance from {nameof(IShellLinkW)} to {nameof(IPersistFile)} or {nameof(IPropertyStore)}");
@@ -156,21 +151,6 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             }
             finally
             {
-                if (!ComMarshal<IShellLinkW>.TryReleaseComObject(shellLink, out exception))
-                {
-                    currentInstance.Logger?.LogError(exception, $"Cannot release COM Object: {nameof(IShellLinkW)}");
-                }
-
-                if (!ComMarshal<IPersistFile>.TryReleaseComObject(persistFileW, out exception))
-                {
-                    currentInstance.Logger?.LogError(exception, $"Cannot release COM Object: {nameof(IPersistFile)}");
-                }
-
-                if (!ComMarshal<IPropertyStore>.TryReleaseComObject(propertyStoreW, out exception))
-                {
-                    currentInstance.Logger?.LogError(exception, $"Cannot release COM Object: {nameof(IPropertyStore)}");
-                }
-
                 aumId.Clear();
                 toastId.Clear();
             }
@@ -345,7 +325,8 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
         /// <summary>
         /// Gets a boolean representing whether http images can be used within toasts. This is true if running under Desktop Bridge.
         /// </summary>
-        public static bool CanUseHttpImages { get { return DesktopBridgeHelpers.IsRunningAsUwp(); } }
+        public static bool CanUseHttpImages => DesktopBridgeHelpers.IsRunningAsUwp();
+
         #endregion
     }
 }

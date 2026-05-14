@@ -10,7 +10,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 public partial interface ID2D1GdiMetafile : ID2D1Resource
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1gdimetafile-stream
-    void Stream([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1GdiMetafileSink>))] ID2D1GdiMetafileSink sink);
+    void Stream([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1GdiMetafileSink>))] ID2D1GdiMetafileSink sink);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1gdimetafile-getbounds
     void GetBounds(out D2D_RECT_F bounds);

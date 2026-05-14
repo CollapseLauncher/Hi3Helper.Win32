@@ -10,10 +10,10 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 public partial interface IWICBitmap : IWICBitmapSource
 {
     // https://learn.microsoft.com/windows/win32/api/wincodec/nf-wincodec-iwicbitmap-lock
-    void Lock(in WICRect prcLock, uint flags, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IWICBitmapLock>))] out IWICBitmapLock ppILock);
+    void Lock(in WICRect prcLock, uint flags, [MarshalUsing(typeof(ComInterfaceMarshaller<IWICBitmapLock>))] out IWICBitmapLock ppILock);
 
     // https://learn.microsoft.com/windows/win32/api/wincodec/nf-wincodec-iwicbitmap-setpalette
-    void SetPalette([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IWICPalette>))] IWICPalette pIPalette);
+    void SetPalette([MarshalUsing(typeof(ComInterfaceMarshaller<IWICPalette>))] IWICPalette pIPalette);
 
     // https://learn.microsoft.com/windows/win32/api/wincodec/nf-wincodec-iwicbitmap-setresolution
     void SetResolution(double dpiX, double dpiY);

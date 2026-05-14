@@ -161,7 +161,6 @@ namespace Hi3Helper.Win32.FileDialogCOM
                 }
                 finally
                 {
-                    _ = ComMarshal<IFileOpenDialog>.TryReleaseComObject(dialog, out _);
                     FreeRefCoTaskMem(ref filterArray);
                 }
             }
@@ -215,7 +214,6 @@ namespace Hi3Helper.Win32.FileDialogCOM
                 }
                 finally
                 {
-                    _ = ComMarshal<IFileSaveDialog>.TryReleaseComObject(dialog, out _);
                     FreeRefCoTaskMem(ref filterArray);
                 }
             }

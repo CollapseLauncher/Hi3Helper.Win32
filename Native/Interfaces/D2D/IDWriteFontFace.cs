@@ -54,10 +54,10 @@ public partial interface IDWriteFontFace
     void ReleaseFontTable(nint tableContext);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontface-getglyphrunoutline
-    void GetGlyphRunOutline(float emSize, [In][MarshalUsing(CountElementName = nameof(glyphCount))] ushort[] glyphIndices, nint /* optional float* */ glyphAdvances, nint /* optional DWRITE_GLYPH_OFFSET* */ glyphOffsets, uint glyphCount, BOOL isSideways, BOOL isRightToLeft, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1SimplifiedGeometrySink>))] ID2D1SimplifiedGeometrySink geometrySink);
+    void GetGlyphRunOutline(float emSize, [In][MarshalUsing(CountElementName = nameof(glyphCount))] ushort[] glyphIndices, nint /* optional float* */ glyphAdvances, nint /* optional DWRITE_GLYPH_OFFSET* */ glyphOffsets, uint glyphCount, BOOL isSideways, BOOL isRightToLeft, [MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1SimplifiedGeometrySink>))] ID2D1SimplifiedGeometrySink geometrySink);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontface-getrecommendedrenderingmode
-    void GetRecommendedRenderingMode(float emSize, float pixelsPerDip, DWRITE_MEASURING_MODE measuringMode, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteRenderingParams>))] IDWriteRenderingParams renderingParams, out DWRITE_RENDERING_MODE renderingMode);
+    void GetRecommendedRenderingMode(float emSize, float pixelsPerDip, DWRITE_MEASURING_MODE measuringMode, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteRenderingParams>))] IDWriteRenderingParams renderingParams, out DWRITE_RENDERING_MODE renderingMode);
 
     // https://learn.microsoft.com/windows/win32/DirectWrite/idwritefontface-getgdicompatiblemetrics
     void GetGdiCompatibleMetrics(float emSize, float pixelsPerDip, nint /* optional DWRITE_MATRIX* */ transform, out DWRITE_FONT_METRICS fontFaceMetrics);

@@ -9,10 +9,10 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 public partial interface ID2D1PathGeometry : ID2D1Geometry
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1pathgeometry-open
-    void Open([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1GeometrySink>))] out ID2D1GeometrySink geometrySink);
+    void Open([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1GeometrySink>))] out ID2D1GeometrySink geometrySink);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1pathgeometry-stream
-    void Stream([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID2D1GeometrySink>))] ID2D1GeometrySink geometrySink);
+    void Stream([MarshalUsing(typeof(ComInterfaceMarshaller<ID2D1GeometrySink>))] ID2D1GeometrySink geometrySink);
 
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1pathgeometry-getsegmentcount
     void GetSegmentCount(out uint count);
