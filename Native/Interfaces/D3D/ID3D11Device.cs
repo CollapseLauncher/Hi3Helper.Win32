@@ -24,43 +24,43 @@ public partial interface ID3D11Device
     void CreateTexture3D(in D3D11_TEXTURE3D_DESC pDesc, nint /* optional D3D11_SUBRESOURCE_DATA* */ pInitialData, nint /* optional ID3D11Texture3D* */ ppTexture3D);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createshaderresourceview
-    void CreateShaderResourceView([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pResource, nint /* optional D3D11_SHADER_RESOURCE_VIEW_DESC* */ pDesc, nint /* optional ID3D11ShaderResourceView* */ ppSRView);
+    void CreateShaderResourceView([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pResource, nint /* optional D3D11_SHADER_RESOURCE_VIEW_DESC* */ pDesc, nint /* optional ID3D11ShaderResourceView* */ ppSRView);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createunorderedaccessview
-    void CreateUnorderedAccessView([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pResource, nint /* optional D3D11_UNORDERED_ACCESS_VIEW_DESC* */ pDesc, nint /* optional ID3D11UnorderedAccessView* */ ppUAView);
+    void CreateUnorderedAccessView([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pResource, nint /* optional D3D11_UNORDERED_ACCESS_VIEW_DESC* */ pDesc, nint /* optional ID3D11UnorderedAccessView* */ ppUAView);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createrendertargetview
-    void CreateRenderTargetView([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pResource, nint /* optional D3D11_RENDER_TARGET_VIEW_DESC* */ pDesc, nint /* optional ID3D11RenderTargetView* */ ppRTView);
+    void CreateRenderTargetView([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pResource, nint /* optional D3D11_RENDER_TARGET_VIEW_DESC* */ pDesc, nint /* optional ID3D11RenderTargetView* */ ppRTView);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createdepthstencilview
-    void CreateDepthStencilView([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pResource, nint /* optional D3D11_DEPTH_STENCIL_VIEW_DESC* */ pDesc, nint /* optional ID3D11DepthStencilView* */ ppDepthStencilView);
+    void CreateDepthStencilView([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pResource, nint /* optional D3D11_DEPTH_STENCIL_VIEW_DESC* */ pDesc, nint /* optional ID3D11DepthStencilView* */ ppDepthStencilView);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createinputlayout
     void CreateInputLayout([In][MarshalUsing(CountElementName = nameof(NumElements))] D3D11_INPUT_ELEMENT_DESC[] pInputElementDescs, uint NumElements, nint pShaderBytecodeWithInputSignature, nuint BytecodeLength, nint /* optional ID3D11InputLayout* */ ppInputLayout);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createvertexshader
-    void CreateVertexShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11VertexShader* */ ppVertexShader);
+    void CreateVertexShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11VertexShader* */ ppVertexShader);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-creategeometryshader
-    void CreateGeometryShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11GeometryShader* */ ppGeometryShader);
+    void CreateGeometryShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11GeometryShader* */ ppGeometryShader);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-creategeometryshaderwithstreamoutput
-    void CreateGeometryShaderWithStreamOutput(nint pShaderBytecode, nuint BytecodeLength, nint /* optional D3D11_SO_DECLARATION_ENTRY* */ pSODeclaration, uint NumEntries, nint /* optional uint* */ pBufferStrides, uint NumStrides, uint RasterizedStream, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11GeometryShader* */ ppGeometryShader);
+    void CreateGeometryShaderWithStreamOutput(nint pShaderBytecode, nuint BytecodeLength, nint /* optional D3D11_SO_DECLARATION_ENTRY* */ pSODeclaration, uint NumEntries, nint /* optional uint* */ pBufferStrides, uint NumStrides, uint RasterizedStream, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11GeometryShader* */ ppGeometryShader);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createpixelshader
-    void CreatePixelShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11PixelShader* */ ppPixelShader);
+    void CreatePixelShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11PixelShader* */ ppPixelShader);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createhullshader
-    void CreateHullShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11HullShader* */ ppHullShader);
+    void CreateHullShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11HullShader* */ ppHullShader);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createdomainshader
-    void CreateDomainShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11DomainShader* */ ppDomainShader);
+    void CreateDomainShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11DomainShader* */ ppDomainShader);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createcomputeshader
-    void CreateComputeShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11ComputeShader* */ ppComputeShader);
+    void CreateComputeShader(nint pShaderBytecode, nuint BytecodeLength, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11ClassLinkage?>))] ID3D11ClassLinkage? pClassLinkage, nint /* optional ID3D11ComputeShader* */ ppComputeShader);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createclasslinkage
-    void CreateClassLinkage([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11ClassLinkage>))] out ID3D11ClassLinkage ppLinkage);
+    void CreateClassLinkage([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11ClassLinkage>))] out ID3D11ClassLinkage ppLinkage);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-createblendstate
     void CreateBlendState(in D3D11_BLEND_DESC pBlendStateDesc, nint /* optional ID3D11BlendState* */ ppBlendState);
@@ -127,7 +127,7 @@ public partial interface ID3D11Device
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-getimmediatecontext
     [PreserveSig]
-    void GetImmediateContext([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11DeviceContext>))] out ID3D11DeviceContext ppImmediateContext);
+    void GetImmediateContext([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11DeviceContext>))] out ID3D11DeviceContext ppImmediateContext);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-setexceptionmode
     void SetExceptionMode(uint RaiseFlags);

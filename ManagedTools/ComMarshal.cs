@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -14,6 +15,7 @@ namespace Hi3Helper.Win32.ManagedTools
     {
         public static readonly StrategyBasedComWrappers Default = new();
     }
+
 
     public static class ComMarshal<TObjSource>
         where TObjSource : class
@@ -34,7 +36,7 @@ namespace Hi3Helper.Win32.ManagedTools
         /// <param name="comObjResult">The result of a COM Object which has been created.</param>
         /// <param name="exceptionIfFalse">This should be null if the <paramref name="comObjResult"/> is set.</param>
         /// <returns>Returns <see langword="true"/> if the COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
-        public static bool TryCreateComObject(
+        public static unsafe bool TryCreateComObject(
             in Guid classFactoryId,
             nint    pIUnknownController,
             CLSCTX  classContext,
@@ -62,20 +64,18 @@ namespace Hi3Helper.Win32.ManagedTools
             // Note for devs:
             // Running these unmanaged codes are guaranteed to be exception-free.
             // All the errors are handled from HResult so, don't worry about try-catch :D
-            int resultCreateObj = CoCreateInstance(in classFactoryId,
-                                                   pIUnknownController,
-                                                   classContext,
-                                                   in comObjIid,
-                                                   out nint comObjPpv);
+            HResult resultCreateObj = CoCreateInstance(in classFactoryId,
+                                                       pIUnknownController,
+                                                       classContext,
+                                                       in comObjIid,
+                                                       out nint comObjPpv);
+
+            comObjResult = ComInterfaceMarshaller<TObjSource>.ConvertToManaged((void*)comObjPpv);
 
             // Get the exception if failed.
-            exceptionIfFalse = Marshal.GetExceptionForHR(resultCreateObj);
-            if (exceptionIfFalse != null)
-            {
-                return false;
-            }
-
-            return TryCreateComObjectFromReference(comObjPpv, out comObjResult, out exceptionIfFalse);
+            exceptionIfFalse = resultCreateObj.GetException();
+            return exceptionIfFalse == null &&
+                   TryCreateComObjectFromReference(comObjPpv, out comObjResult, out exceptionIfFalse);
         }
 
         /// <summary>

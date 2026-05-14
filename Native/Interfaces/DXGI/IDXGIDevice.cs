@@ -14,7 +14,7 @@ public unsafe partial interface IDXGIDevice : IDXGIObject
 {
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult GetAdapter([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGIAdapter>))] out IDXGIAdapter pAdapter); [PreserveSig]
+    HResult GetAdapter([MarshalUsing(typeof(ComInterfaceMarshaller<IDXGIAdapter>))] out IDXGIAdapter pAdapter); [PreserveSig]
 
     [return: MarshalAs(UnmanagedType.Error)]
     HResult CreateSurface(in DXGI_SURFACE_DESC pDesc, uint NumSurfaces, DXGI_USAGE Usage, nint /* optional DXGI_SHARED_RESOURCE* */ pSharedResource, [In][Out][MarshalUsing(CountElementName = nameof(NumSurfaces))] nint[] ppSurface);

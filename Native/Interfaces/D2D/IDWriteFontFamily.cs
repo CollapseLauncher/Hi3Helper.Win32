@@ -9,11 +9,11 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 public partial interface IDWriteFontFamily : IDWriteFontList
 {
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontfamily-getfamilynames
-    void GetFamilyNames([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteLocalizedStrings>))] out IDWriteLocalizedStrings names);
+    void GetFamilyNames([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteLocalizedStrings>))] out IDWriteLocalizedStrings names);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontfamily-getfirstmatchingfont
-    void GetFirstMatchingFont(DWRITE_FONT_WEIGHT weight, DWRITE_FONT_STRETCH stretch, DWRITE_FONT_STYLE style, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFont>))] out IDWriteFont matchingFont);
+    void GetFirstMatchingFont(DWRITE_FONT_WEIGHT weight, DWRITE_FONT_STRETCH stretch, DWRITE_FONT_STYLE style, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFont>))] out IDWriteFont matchingFont);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontfamily-getmatchingfonts
-    void GetMatchingFonts(DWRITE_FONT_WEIGHT weight, DWRITE_FONT_STRETCH stretch, DWRITE_FONT_STYLE style, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFontList>))] out IDWriteFontList matchingFonts);
+    void GetMatchingFonts(DWRITE_FONT_WEIGHT weight, DWRITE_FONT_STRETCH stretch, DWRITE_FONT_STYLE style, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFontList>))] out IDWriteFontList matchingFonts);
 }

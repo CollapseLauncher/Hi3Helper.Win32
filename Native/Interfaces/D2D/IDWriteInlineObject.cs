@@ -12,7 +12,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 public partial interface IDWriteInlineObject
 {
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwriteinlineobject-draw
-    void Draw(nint /* optional void* */ clientDrawingContext, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteTextRenderer>))] IDWriteTextRenderer renderer, float originX, float originY, BOOL isSideways, BOOL isRightToLeft, nint clientDrawingEffect);
+    void Draw(nint /* optional void* */ clientDrawingContext, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteTextRenderer>))] IDWriteTextRenderer renderer, float originX, float originY, BOOL isSideways, BOOL isRightToLeft, nint clientDrawingEffect);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwriteinlineobject-getmetrics
     void GetMetrics(out DWRITE_INLINE_OBJECT_METRICS metrics);

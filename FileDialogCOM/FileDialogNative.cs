@@ -30,10 +30,10 @@ namespace Hi3Helper.Win32.FileDialogCOM
     public static class FileDialogNative
     {
         private static          nint          _parentHandler = nint.Zero;
-        private static readonly SemaphoreSlim Semaphore      = new SemaphoreSlim(1, 1);
+        private static readonly SemaphoreSlim Semaphore      = new(1, 1);
 
-        private static readonly Guid FileOpenDialogGuid = new Guid(CLSIDGuid.FileOpenDialog);
-        private static readonly Guid FileSaveDialogGuid = new Guid(CLSIDGuid.FileSaveDialog);
+        private static readonly Guid FileOpenDialogGuid = new(CLSIDGuid.FileOpenDialog);
+        private static readonly Guid FileSaveDialogGuid = new(CLSIDGuid.FileSaveDialog);
 
         public static void InitHandlerPointer(nint handle) => _parentHandler = handle;
 
@@ -112,10 +112,10 @@ namespace Hi3Helper.Win32.FileDialogCOM
 
             object? Impl()
             {
-                if (!ComMarshal<IFileOpenDialog>.TryCreateComObject(in FileOpenDialogGuid,
-                                                                    CLSCTX.CLSCTX_INPROC_SERVER,
-                                                                    out IFileOpenDialog? dialog,
-                                                                    out Exception? exception))
+                if (!ComMarshal2<IFileOpenDialog>.TryCreateComObject(in FileOpenDialogGuid,
+                                                                     CLSCTX.CLSCTX_INPROC_SERVER,
+                                                                     out IFileOpenDialog? dialog,
+                                                                     out Exception? exception))
                 {
                     throw exception;
                 }
@@ -161,7 +161,6 @@ namespace Hi3Helper.Win32.FileDialogCOM
                 }
                 finally
                 {
-                    _ = ComMarshal<IFileOpenDialog>.TryReleaseComObject(dialog, out _);
                     FreeRefCoTaskMem(ref filterArray);
                 }
             }

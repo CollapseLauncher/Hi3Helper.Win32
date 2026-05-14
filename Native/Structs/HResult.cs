@@ -47,6 +47,14 @@ namespace Hi3Helper.Win32.Native.Structs
             return this;
         }
 
+        /// <summary>
+        /// Gets an <see cref="Exception"/> from the <see cref="HResult"/> value.
+        /// </summary>
+        /// <returns>
+        /// It returns <see langword="null"/> if no unsuccessful value was returned. If so, returns the represented <see cref="Exception"/>.
+        /// </returns>
+        public Exception? GetException() => Marshal.GetExceptionForHR(Value);
+
         public string ToString(string format, IFormatProvider formatProvider) => ((uint)Value).ToString(format, formatProvider);
     }
 }

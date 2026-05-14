@@ -9,12 +9,12 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 public partial interface IDWriteFontList
 {
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontlist-getfontcollection
-    void GetFontCollection([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFontCollection>))] out IDWriteFontCollection fontCollection);
+    void GetFontCollection([MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFontCollection>))] out IDWriteFontCollection fontCollection);
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontlist-getfontcount
     [PreserveSig]
     uint GetFontCount();
 
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontlist-getfont
-    void GetFont(uint index, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDWriteFont>))] out IDWriteFont font);
+    void GetFont(uint index, [MarshalUsing(typeof(ComInterfaceMarshaller<IDWriteFont>))] out IDWriteFont font);
 }

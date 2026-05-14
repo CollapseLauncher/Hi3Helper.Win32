@@ -19,7 +19,7 @@ public partial interface IWICBitmapSource
     void GetResolution(out double pDpiX, out double pDpiY);
 
     // https://learn.microsoft.com/windows/win32/api/wincodec/nf-wincodec-iwicbitmapsource-copypalette
-    void CopyPalette([MarshalUsing(typeof(UniqueComInterfaceMarshaller<IWICPalette>))] IWICPalette pIPalette);
+    void CopyPalette([MarshalUsing(typeof(ComInterfaceMarshaller<IWICPalette>))] IWICPalette pIPalette);
 
     // https://learn.microsoft.com/windows/win32/api/wincodec/nf-wincodec-iwicbitmapsource-copypixels
     void CopyPixels(in WICRect prc, uint cbStride, uint cbBufferSize, nint /* byte array */ pbBuffer);
