@@ -355,12 +355,23 @@ namespace Hi3Helper.Win32.ManagedTools
                 exceptionIfFalse = new NullReferenceException($"Cannot obtain ComObject of type: {typeof(TObjSource)} due to invalid Class factory ID, invalid COM object IID or invalid Class Context");
                 return false;
             }
+
+            // If the runtime has already cached the wrapped object, use one instead.
+            if (ComWrappers.TryGetObject(comObjPpv, out object? cachedWrappedObject))
+            {
+                Unsafe.SkipInit(out exceptionIfFalse);
+                comObjResult = (TObjSource)cachedWrappedObject;
+
+                if (!isKeepAliveSource)
+                {
+                    Marshal.Release(comObjPpv);
+                }
+                return true;
+            }
             
             try
             {
-                // Try to get or create object from reference.
-                // 2026/05/14: StrategyBasedComWrappers already has internal caching mechanism.
-                //             So previously, the use of ComWrappers.TryGetObject is redundant.
+                // Get or Create Object
                 comObjResult = (TObjSource)DefaultComWrappersStatic
                                           .Default
                                           .GetOrCreateObjectForComInstance(comObjPpv, flags);
