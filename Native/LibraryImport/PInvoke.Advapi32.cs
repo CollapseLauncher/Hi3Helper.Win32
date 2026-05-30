@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Enums.Registry;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices;
 // ReSharper disable StringLiteralTypo
@@ -10,10 +11,10 @@ namespace Hi3Helper.Win32.Native.LibraryImport
     {
         [LibraryImport("advapi32.dll", EntryPoint = "RegOpenKeyExW", StringMarshalling = StringMarshalling.Utf16)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static partial int RegOpenKeyEx(HKEYCLASS hKey,
+        public static partial int RegOpenKeyEx(HKEY      hKey,
                                                string    subKey,
-                                               uint      options,
-                                               uint      samDesired,
+                                               RegOption options,
+                                               RegSAM    samDesired,
                                                out nint  phkResult);
 
         [LibraryImport("advapi32.dll", EntryPoint = "RegNotifyChangeKeyValue")]
