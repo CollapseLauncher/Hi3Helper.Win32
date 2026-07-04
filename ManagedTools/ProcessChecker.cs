@@ -3,6 +3,7 @@ using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Buffers;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 
 // ReSharper disable RedundantUnsafeContext
@@ -26,6 +28,8 @@ namespace Hi3Helper.Win32.ManagedTools
 
         private const int SystemProcessInformation = 5;
         private const int QueryLimitedInformation  = 0x1000;
+        private const int ProcessVirtualMemoryRead = 0x0010;
+        private const int ProcessBasicInformation  = 0x0;
 
         private const  int    DefaultNtQueryChangedLen        = 4 << 17;
         private const  nint   InvalidHandleValue              = -1;
@@ -140,7 +144,7 @@ namespace Hi3Helper.Win32.ManagedTools
 
                 // Use the struct buffer into the ReadOnlySpan<char> to be compared with
                 // the input from "processName" argument.
-                ReadOnlySpan<char> imageNameSpan = new(unicodeString->Buffer, unicodeString->Length / 2);
+                ReadOnlySpan<char> imageNameSpan = new((void*)unicodeString->Buffer, unicodeString->Length / 2);
                 bool isMatchedExecutable = !useStartsWithMatch
                     ? imageNameSpan.Equals(processName, StringComparison.OrdinalIgnoreCase)
                     : imageNameSpan.StartsWith(processName, StringComparison.OrdinalIgnoreCase);
@@ -210,6 +214,99 @@ namespace Hi3Helper.Win32.ManagedTools
 
             return false;
         }
+
+        public static bool TryGetProcessCommandString(
+            int                             processId,
+            [NotNullWhen(true)] out string? arguments)
+        {
+            nint processHandle = PInvoke.OpenProcess(QueryLimitedInformation | ProcessVirtualMemoryRead,
+                                                     false,
+                                                     processId);
+
+            try
+            {
+                return TryGetProcessCommandString(processHandle, out arguments);
+            }
+            finally
+            {
+                if (processHandle != nint.Zero)
+                {
+                    PInvoke.CloseHandle(processHandle);
+                }
+            }
+        }
+
+        private static unsafe bool TryGetProcessCommandString(
+            nint                            procHandle,
+            [NotNullWhen(true)] out string? arguments)
+        {
+            Unsafe.SkipInit(out arguments);
+
+            if (procHandle == nint.Zero)
+            {
+                return false;
+            }
+
+            PROCESS_BASIC_INFORMATION pbi = default;
+            if (PInvoke.NtQueryInformationProcess(procHandle, ProcessBasicInformation, ref pbi, out _) != 0)
+            {
+                return false;
+            }
+
+            bool is64Bit = nint.Size == 8;
+            nint processParametersAddressPtr =
+                pbi.PebBaseAddress + (is64Bit ? 0x20 : 0x10);
+
+            if (!TryRead(procHandle, processParametersAddressPtr, out nint processParametersAddress))
+            {
+                return false;
+            }
+
+            nint commandLineUnicodeStringAddress = processParametersAddress + (is64Bit ? 0x70 : 0x40);
+            if (!TryRead(procHandle, commandLineUnicodeStringAddress, out UNICODE_STRING unicodeString))
+            {
+                return false;
+            }
+
+            if (unicodeString.Length == 0)
+            {
+                arguments = string.Empty;
+            }
+
+            if (unicodeString.Buffer != nint.Zero)
+            {
+                byte[]? strBuffer = unicodeString.Length > 1 << 10 ? ArrayPool<byte>.Shared.Rent(unicodeString.Length)
+                    : null;
+                Span<byte> strBufferSpan = strBuffer ?? stackalloc byte[unicodeString.Length];
+
+                if (!TryReadBytes(procHandle, unicodeString.Buffer, strBufferSpan))
+                {
+                    return false;
+                }
+
+                arguments = Encoding.Unicode.GetString(strBufferSpan);
+            }
+
+            return arguments != null;
+        }
+
+        private static unsafe bool TryRead<T>(nint processHandle, nint address, out T result)
+            where T : unmanaged
+        {
+            Unsafe.SkipInit(out result);
+
+            Span<byte> buffer = stackalloc byte[sizeof(T)];
+            if (!TryReadBytes(processHandle, address, buffer))
+            {
+                return false;
+            }
+
+            return MemoryMarshal.TryRead(buffer, out result);
+        }
+
+        private static unsafe bool TryReadBytes(nint processHandle, nint address, scoped Span<byte> buffer)
+            => PInvoke.ReadProcessMemory(processHandle, address, ref buffer[0], buffer.Length, out nint bytesRead) &&
+               bytesRead == buffer.Length;
 
         private static bool TryGetProcessCommandLineString(
             nint                            procHandle,

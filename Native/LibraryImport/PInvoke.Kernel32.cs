@@ -1,7 +1,6 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable IdentifierTypo
@@ -232,5 +231,14 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("kernel32.dll", EntryPoint = "RemoveDllDirectory", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool RemoveDllDirectory(nint cookie);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "ReadProcessMemory", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool ReadProcessMemory(
+            nint     hProcess,
+            nint     lpBaseAddress,
+            ref byte lpBuffer,
+            int      nSize,
+            out nint lpNumberOfBytesRead);
     }
 }

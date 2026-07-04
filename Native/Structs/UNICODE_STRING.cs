@@ -6,7 +6,7 @@ namespace Hi3Helper.Win32.Native.Structs
     // https://msdn.microsoft.com/en-us/library/windows/desktop/aa380518.aspx
     // https://msdn.microsoft.com/en-us/library/windows/hardware/ff564879.aspx
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct UNICODE_STRING
+    public struct UNICODE_STRING
     {
         /// <summary>
         /// Length in bytes, not including the null terminator, if any.
@@ -17,6 +17,6 @@ namespace Hi3Helper.Win32.Native.Structs
         /// Max size of the buffer in bytes
         /// </summary>
         public ushort MaximumLength;
-        public void* Buffer;
+        public nint Buffer;
     }
 }
