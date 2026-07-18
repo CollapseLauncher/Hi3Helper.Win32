@@ -1,6 +1,7 @@
 ﻿using Hi3Helper.Win32.Native.ClassIds;
 using Hi3Helper.Win32.Native.LibraryImport;
 using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 // ReSharper disable UnusedType.Global
 // ReSharper disable CommentTypo
@@ -190,5 +191,25 @@ public static class PathUtil
 
         // Fallback logic if SHGetKnownFolderPath failed (nanoserver)
         return fallbackEnv != null ? Environment.GetEnvironmentVariable(fallbackEnv) ?? string.Empty : string.Empty;
+    }
+
+    public static long GetVolumeFreeSpace(string path)
+    {
+        if (PInvoke.GetDiskFreeSpaceEx(path, out _, out _, out long freeBytes))
+            return freeBytes;
+
+        return new DriveInfo(Path.GetPathRoot(path)!).TotalFreeSpace;
+    }
+
+    public static string GetPathVolumeName(string path)
+    {
+        char[] buffer = new char[260];
+        if (PInvoke.GetVolumePathName(path, buffer, buffer.Length))
+        {
+            int len = Array.IndexOf(buffer, '\0');
+            return len >= 0 ? new string(buffer, 0, len) : new string(buffer);
+        }
+
+        return Path.GetPathRoot(path) ?? path;
     }
 }

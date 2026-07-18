@@ -240,5 +240,23 @@ namespace Hi3Helper.Win32.Native.LibraryImport
             ref byte lpBuffer,
             int      nSize,
             out nint lpNumberOfBytesRead);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "GetDiskFreeSpaceExW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool GetDiskFreeSpaceEx(
+            string lpDirectoryName,
+            out long lpFreeBytesAvailableToCaller,
+            out long lpTotalNumberOfBytes,
+            out long lpTotalNumberOfFreeBytes);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "GetVolumePathNameW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool GetVolumePathName(
+            string lpszFileName,
+            char[] lpszVolumePathName,
+            int cchBufferLength);
+
     }
 }
