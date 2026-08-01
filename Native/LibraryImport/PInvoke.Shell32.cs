@@ -1,6 +1,7 @@
 ﻿using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Runtime.InteropServices;
+
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMethodReturnValue.Global
@@ -33,5 +34,22 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("shell32.dll", EntryPoint = "SHGetKnownFolderPath", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         public static partial int SHGetKnownFolderPath(in Guid rfid, uint dwFlags, nint hToken, out string? ppszPath);
+
+        [LibraryImport("shell32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial void DragAcceptFiles(nint windowHandle, [MarshalAs(UnmanagedType.Bool)] bool acceptFiles);
+
+        [LibraryImport("shell32.dll", EntryPoint = "DragQueryFileW")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial uint DragQueryFile(nint dropHandle, uint fileIndex, nint filePathP, uint filePathLength);
+
+        [LibraryImport("shell32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool DragQueryPoint(nint dropHandle, out POINTL dropPoint);
+
+        [LibraryImport("shell32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial void DragFinish(nint dropHandle);
     }
 }

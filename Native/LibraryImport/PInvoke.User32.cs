@@ -149,12 +149,6 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("user32.dll", EntryPoint = "GetSysColor")]
         public static partial uint GetSysColor(SYS_COLOR_INDEX nIndex);
 
-        [LibraryImport("user32.dll", EntryPoint = "ScreenToClient")]
-        public static partial HResult ScreenToClient(nint hwnd, ref POINTL lpPoint);
-
-        [LibraryImport("user32.dll", EntryPoint = "GetCursorPos")]
-        public static partial HResult GetCursorPos(out POINTL lpPoint);
-
         [LibraryImport("user32.dll", EntryPoint = "SetWinEventHook")]
         public static partial nint SetWinEventHook(uint eventMin,
                                                    uint eventMax,
@@ -179,5 +173,24 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 
         [LibraryImport("user32.dll", EntryPoint = "RegisterClipboardFormatW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         public static partial uint RegisterClipboardFormat(string? lpszFormat);
+
+        [LibraryImport("user32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool ChangeWindowMessageFilterEx(nint windowHandle, uint message, uint action, nint changeFilterStruct);
+
+        [LibraryImport("user32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial short GetAsyncKeyState(int virtualKey);
+
+        [LibraryImport("user32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool GetCursorPos(out POINTL cursorPosition);
+
+        [LibraryImport("user32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool ScreenToClient(nint windowHandle, ref POINTL cursorPosition);
     }
 }
