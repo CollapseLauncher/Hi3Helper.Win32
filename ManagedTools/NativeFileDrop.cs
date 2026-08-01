@@ -2,6 +2,7 @@
 using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Buffers;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -80,9 +81,14 @@ public static class NativeFileDrop
                                                         index,
                                                         (nint)Unsafe.AsPointer(ref filePathBufferRef),
                                                         (uint)filePathBuffer.Length);
-                if (returnCode != 0)
+                if (returnCode == 0)
                 {
-                    Marshal.ThrowExceptionForHR(unchecked((int)returnCode));
+                    int win32Error = Marshal.GetLastWin32Error();
+                    if (win32Error != 0)
+                    {
+                        throw new Win32Exception(win32Error);
+                    }
+
                     // For fallback, in case ThrowExceptionForHR cannot obtain HReturn related exception.
                     throw new InvalidOperationException("Failed to create string due to unknown error");
                 }
