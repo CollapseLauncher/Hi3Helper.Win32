@@ -55,6 +55,7 @@ public static class NativeFileDrop
             PInvoke.DragFinish(dropHandle);
         }
 
+        [SkipLocalsInit]
         static unsafe bool TryCreateString(uint index,
                                            nint dropHandle,
                                            [NotNullWhen(true)]
@@ -69,19 +70,19 @@ public static class NativeFileDrop
             uint filePathBufferLen = filePathLength + 1;
 
             char[]? filePathBufferRent =
-                filePathBufferLen > 512
+                filePathBufferLen <= 512
                     ? null
                     : ArrayPool<char>.Shared.Rent((int)filePathBufferLen);
-            Span<char> filePathBuffer = (filePathBufferRent ?? stackalloc char[(int)filePathBufferLen])[..(int)filePathBufferLen];
-            ref char filePathBufferRef = ref MemoryMarshal.GetReference(filePathBuffer);
+            Span<char> filePathBuffer    = filePathBufferRent ?? stackalloc char[(int)filePathBufferLen];
+            ref char   filePathBufferRef = ref MemoryMarshal.GetReference(filePathBuffer);
 
             try
             {
-                uint returnCode = PInvoke.DragQueryFile(dropHandle,
-                                                        index,
-                                                        (nint)Unsafe.AsPointer(ref filePathBufferRef),
-                                                        (uint)filePathBuffer.Length);
-                if (returnCode == 0)
+                uint lengthOrError = PInvoke.DragQueryFile(dropHandle,
+                                                           index,
+                                                           (nint)Unsafe.AsPointer(ref filePathBufferRef),
+                                                           (uint)filePathBuffer.Length);
+                if (lengthOrError == 0)
                 {
                     int win32Error = Marshal.GetLastWin32Error();
                     if (win32Error != 0)
@@ -89,11 +90,11 @@ public static class NativeFileDrop
                         throw new Win32Exception(win32Error);
                     }
 
-                    // For fallback, in case ThrowExceptionForHR cannot obtain HReturn related exception.
+                    // For fallback, in case ThrowExceptionForHR cannot obtain Win32 related exception.
                     throw new InvalidOperationException("Failed to create string due to unknown error");
                 }
 
-                result = new string(filePathBuffer[..(int)filePathLength]);
+                result = new string(filePathBuffer[..(int)lengthOrError]);
                 return true;
             }
             catch (Exception ex)
