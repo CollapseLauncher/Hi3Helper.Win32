@@ -89,9 +89,6 @@ public static class NativeFileDrop
                     {
                         throw new Win32Exception(win32Error);
                     }
-
-                    // For fallback, in case ThrowExceptionForHR cannot obtain Win32 related exception.
-                    throw new InvalidOperationException("Failed to create string due to unknown error");
                 }
 
                 result = new string(filePathBuffer[..(int)lengthOrError]);
