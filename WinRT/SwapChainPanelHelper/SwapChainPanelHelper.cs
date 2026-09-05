@@ -59,12 +59,12 @@ public static class SwapChainPanelHelper
         in Rect                                                                    updateWinRect)
     {
         // -- CanvasImageSource.CreateDrawingSession(Color, Rect);
-        Marshal.ThrowExceptionForHR(s_beginDraw(imageSourceP, DefaultDummyColor, in updateWinRect, out nint drawingSessionPpv));
+        ThrowOrIgnoreNull(s_beginDraw(imageSourceP, DefaultDummyColor, in updateWinRect, out nint drawingSessionPpv));
 
         // -- CanvasDrawingSession.DrawImage(ICanvasBitmap, Rect);
         //    This method is the shortest based on the implementation source at:
         //    https://github.com/microsoft/Win2D/blob/65e90b29055de64b02e7f2a3d3f042b7fa36326c/winrt/lib/drawing/CanvasDrawingSession.cpp#L254
-        Marshal.ThrowExceptionForHR(s_drawImage(drawingSessionPpv, renderTargetP, in updateWinRect));
+        ThrowOrIgnoreNull(s_drawImage(drawingSessionPpv, renderTargetP, in updateWinRect));
 
         return drawingSessionPpv;
     }
@@ -79,7 +79,7 @@ public static class SwapChainPanelHelper
         QueryInterfaceShort(drawingSessionPpv, in IDisposableWinRTObj_IID, out nint disposablePpv);
 
         // -- CanvasDrawingSession.Dispose()
-        Marshal.ThrowExceptionForHR(s_dispose(disposablePpv));
+        ThrowOrIgnoreNull(s_dispose(disposablePpv));
 
         // -- Release object
         ReleaseShort(drawingSessionPpv);
@@ -112,4 +112,13 @@ public static class SwapChainPanelHelper
     private static unsafe int ReleaseShort(nint pUnk)
         => ((delegate* unmanaged<nint, int>)
             (*(*(void***)pUnk + 2)))(pUnk);
+
+    private static void ThrowOrIgnoreNull(int hr)
+    {
+        if (hr == unchecked((int)0x80004003))
+            return;
+
+        if (hr != 0)
+            Marshal.ThrowExceptionForHR(hr);
+    }
 }
