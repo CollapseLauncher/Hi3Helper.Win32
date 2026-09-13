@@ -21,7 +21,7 @@ public unsafe partial interface IMonthlyTrigger : ITrigger
 
     void SetRunOnLastDayOfMonth([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool lastDay);
 
-    void GetRandomDelay([MarshalUsing(typeof(Utf16StringMarshaller))] out string? pRandomDelay);
+    void GetRandomDelay([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? pRandomDelay);
 
     void SetRandomDelay([MarshalUsing(typeof(Utf16StringMarshaller))] string? randomDelay);
 }

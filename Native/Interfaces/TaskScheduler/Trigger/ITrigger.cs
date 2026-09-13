@@ -12,7 +12,7 @@ public unsafe partial interface ITrigger : IDispatch
 {
     void Type(out TASK_TRIGGER_TYPE2 type);
 
-    void GetId([MarshalUsing(typeof(Utf16StringMarshaller))] out string? id);
+    void GetId([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? id);
 
     void SetId([MarshalUsing(typeof(Utf16StringMarshaller))] string? id);
 
@@ -20,15 +20,15 @@ public unsafe partial interface ITrigger : IDispatch
 
     void SetRepetition([MarshalUsing(typeof(ComInterfaceMarshaller<IRepetitionPattern>))] IRepetitionPattern repeat);
 
-    void GetExecutionTimeLimit([MarshalUsing(typeof(Utf16StringMarshaller))] out string? limit);
+    void GetExecutionTimeLimit([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? limit);
 
     void SetExecutionTimeLimit([MarshalUsing(typeof(Utf16StringMarshaller))] string? limit);
 
-    void GetStartBoundary([MarshalUsing(typeof(Utf16StringMarshaller))] out string? start);
+    void GetStartBoundary([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? start);
 
     void SetStartBoundary([MarshalUsing(typeof(Utf16StringMarshaller))] string? start);
 
-    void GetEndBoundary([MarshalUsing(typeof(Utf16StringMarshaller))] out string? end);
+    void GetEndBoundary([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? end);
 
     void SetEndBoundary([MarshalUsing(typeof(Utf16StringMarshaller))] string? end);
 

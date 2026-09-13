@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using Hi3Helper.Win32.ManagedTools;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
 namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler.Trigger;
@@ -8,11 +9,11 @@ namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler.Trigger;
 [Guid(TaskSchedulerIIDConst.IID_IEventTrigger)]
 public unsafe partial interface IEventTrigger : ITrigger
 {
-    void GetSubscription([MarshalUsing(typeof(Utf16StringMarshaller))] out string? pQuery);
+    void GetSubscription([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? pQuery);
 
     void SetSubscription([MarshalUsing(typeof(Utf16StringMarshaller))] string? query);
 
-    void GetDelay([MarshalUsing(typeof(Utf16StringMarshaller))] out string? pDelay);
+    void GetDelay([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? pDelay);
 
     void SetDelay([MarshalUsing(typeof(Utf16StringMarshaller))] string? delay);
 

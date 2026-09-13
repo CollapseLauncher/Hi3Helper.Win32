@@ -14,7 +14,7 @@ public unsafe partial interface ITaskSettings : IDispatch
     
     void SetAllowDemandStart([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool allow);
 
-    void GetRestartInterval([MarshalUsing(typeof(Utf16StringMarshaller))] out string? interval);
+    void GetRestartInterval([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? interval);
 
     void SetRestartInterval([MarshalUsing(typeof(Utf16StringMarshaller))] string? interval);
 
@@ -42,7 +42,7 @@ public unsafe partial interface ITaskSettings : IDispatch
 
     void SetStartWhenAvailable([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool start);
 
-    void GetXmlText([MarshalUsing(typeof(Utf16StringMarshaller))] out string? xml);
+    void GetXmlText([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? xml);
 
     void SetXmlText([MarshalUsing(typeof(Utf16StringMarshaller))] string? xml);
 
@@ -50,7 +50,7 @@ public unsafe partial interface ITaskSettings : IDispatch
 
     void SetRunOnlyIfNetworkAvailable([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool run);
 
-    void GetExecutionTimeLimit([MarshalUsing(typeof(Utf16StringMarshaller))] out string? limit);
+    void GetExecutionTimeLimit([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? limit);
 
     void SetExecutionTimeLimit([MarshalUsing(typeof(Utf16StringMarshaller))] string? limit);
 
@@ -58,7 +58,7 @@ public unsafe partial interface ITaskSettings : IDispatch
 
     void SetEnabled([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool enabled);
 
-    void GetDeleteExpiredTaskAfter([MarshalUsing(typeof(Utf16StringMarshaller))] out string? delay);
+    void GetDeleteExpiredTaskAfter([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? delay);
 
     void SetDeleteExpiredTaskAfter([MarshalUsing(typeof(Utf16StringMarshaller))] string? delay);
 

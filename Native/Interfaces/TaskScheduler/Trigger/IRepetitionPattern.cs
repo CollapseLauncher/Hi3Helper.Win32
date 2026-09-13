@@ -9,11 +9,11 @@ namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler.Trigger;
 [Guid(TaskSchedulerIIDConst.IID_IRepetitionPattern)]
 public unsafe partial interface IRepetitionPattern : IDispatch
 {
-    void GetInterval([MarshalUsing(typeof(Utf16StringMarshaller))] out string? interval);
+    void GetInterval([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? interval);
 
     void SetInterval([MarshalUsing(typeof(Utf16StringMarshaller))] string? interval);
 
-    void GetDuration([MarshalUsing(typeof(Utf16StringMarshaller))] out string? duration);
+    void GetDuration([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? duration);
 
     void SetDuration([MarshalUsing(typeof(Utf16StringMarshaller))] string? duration);
 

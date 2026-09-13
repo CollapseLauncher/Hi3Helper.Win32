@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using Hi3Helper.Win32.ManagedTools;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
 namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler.Trigger;
@@ -16,7 +17,7 @@ public unsafe partial interface IWeeklyTrigger : ITrigger
 
     void SetWeeksInterval(short weeks);
 
-    void GetRandomDelay([MarshalUsing(typeof(Utf16StringMarshaller))] out string? pRandomDelay);
+    void GetRandomDelay([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? pRandomDelay);
 
     void SetRandomDelay([MarshalUsing(typeof(Utf16StringMarshaller))] string? randomDelay);
 }

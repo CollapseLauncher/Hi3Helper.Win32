@@ -1,15 +1,16 @@
-﻿using Hi3Helper.Win32.Native.Enums;
+﻿using Hi3Helper.Win32.ManagedTools;
+using Hi3Helper.Win32.Native.Enums;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
-namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler;
+namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler.Action;
 
 [GeneratedComInterface]
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 [Guid(TaskSchedulerIIDConst.IID_IAction)]
 public unsafe partial interface IAction : IDispatch
 {
-    void GetId([MarshalUsing(typeof(Utf16StringMarshaller))] out string? id);
+    void GetId([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? id);
 
     void SetId([MarshalUsing(typeof(Utf16StringMarshaller))] string? id);
 

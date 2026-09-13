@@ -11,9 +11,9 @@ namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler;
 [Guid(TaskSchedulerIIDConst.IID_IRegisteredTask)]
 public unsafe partial interface IRegisteredTask : IDispatch
 {
-    void Name(out string? name);
+    void Name([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? name);
 
-    void Path(out string? path);
+    void Path([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? path);
 
     void State(out TASK_STATE state);
 
@@ -38,11 +38,11 @@ public unsafe partial interface IRegisteredTask : IDispatch
 
     void Definition(out ITaskDefinition? task);
 
-    void Xml(out string? xml);
+    void Xml([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? xml);
 
-    void GetSecurityDescriptor(int info, out string? sddl);
+    void GetSecurityDescriptor(int info, [MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? sddl);
 
-    void SetSecurityDescriptor(string? sddl, int flags);
+    void SetSecurityDescriptor([MarshalUsing(typeof(Utf16StringMarshaller))] string? sddl, int flags);
 
     void Stop(int flags);
 

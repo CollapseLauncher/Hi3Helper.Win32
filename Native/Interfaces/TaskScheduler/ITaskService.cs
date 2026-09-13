@@ -25,11 +25,11 @@ public unsafe partial interface ITaskService : IDispatch
 
     void get_Connected(out ComVariant connected);
 
-    void get_TargetServer([MarshalUsing(typeof(Utf16StringMarshaller))] out string? server);
+    void get_TargetServer([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? server);
 
-    void get_ConnectedUser([MarshalUsing(typeof(Utf16StringMarshaller))] out string? user);
+    void get_ConnectedUser([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? user);
 
-    void get_ConnectedDomain([MarshalUsing(typeof(Utf16StringMarshaller))] out string? domain);
+    void get_ConnectedDomain([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? domain);
 
     void get_HighestVersion(out int version);
 }

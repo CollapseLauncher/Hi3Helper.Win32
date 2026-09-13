@@ -1,4 +1,5 @@
-﻿using Hi3Helper.Win32.Native.Enums;
+﻿using Hi3Helper.Win32.ManagedTools;
+using Hi3Helper.Win32.Native.Enums;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
@@ -9,15 +10,15 @@ namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler;
 [Guid(TaskSchedulerIIDConst.IID_IRunningTask)]
 public unsafe partial interface IRunningTask : IDispatch
 {
-    void Name([MarshalUsing(typeof(Utf16StringMarshaller))] out string? name);
+    void Name([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? name);
 
-    void InstanceGuid([MarshalUsing(typeof(Utf16StringMarshaller))] out string? guid);
+    void InstanceGuid([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? guid);
 
-    void Path([MarshalUsing(typeof(Utf16StringMarshaller))] out string? path);
+    void Path([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? path);
 
     void State(out TASK_STATE state);
 
-    void CurrentAction([MarshalUsing(typeof(Utf16StringMarshaller))] out string? name);
+    void CurrentAction([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? name);
 
     void Stop(void* p);
 

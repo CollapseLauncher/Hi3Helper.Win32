@@ -10,9 +10,9 @@ namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler;
 [Guid(TaskSchedulerIIDConst.IID_ITaskFolder)]
 public unsafe partial interface ITaskFolder : IDispatch
 {
-    void Name([MarshalUsing(typeof(Utf16StringMarshaller))] out string? name);
+    void Name([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? name);
 
-    void Path([MarshalUsing(typeof(Utf16StringMarshaller))] out string? path);
+    void Path([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? path);
 
     void GetFolder(string?                                                                      path,
                    [MarshalUsing(typeof(ComInterfaceMarshaller<ITaskFolder>))] out ITaskFolder? folder);
@@ -51,11 +51,11 @@ public unsafe partial interface ITaskFolder : IDispatch
                                 [MarshalUsing(typeof(TypedComVariantMarshaller<string>))] string? user,
                                 [MarshalUsing(typeof(TypedComVariantMarshaller<string>))] string? password,
                                 TASK_LOGON_TYPE logon,
-                                ComVariant sddl,
+                                [MarshalUsing(typeof(TypedComVariantMarshaller<string>))] string? sddl,
                                 [MarshalUsing(typeof(ComInterfaceMarshaller<IRegisteredTask>))] out IRegisteredTask task);
 
     void GetSecurityDescriptor(int                                                       info,
-                               [MarshalUsing(typeof(Utf16StringMarshaller))] out string? sddl);
+                               [MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? sddl);
 
     void SetSecurityDescriptor([MarshalUsing(typeof(Utf16StringMarshaller))] string? sddl,
                                int                                                   flags);

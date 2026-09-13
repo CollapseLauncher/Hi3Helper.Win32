@@ -26,6 +26,7 @@ public static class TaskSchedulerIIDConst
 
 
     public const string IID_IAction           = "bae54997-48b1-4cbe-9965-d6be263ebea4";
+    public const string IID_IExecAction       = "4c3d624d-fd6b-49a3-b9b7-09cb3cd3f047";
     public const string IID_IActionCollection = "02820e19-7b98-4ed2-b2e8-fdccceff619b";
 
     public const string IID_ITrigger                   = "09941815-ea89-4b5b-89e0-2a773801fac3";

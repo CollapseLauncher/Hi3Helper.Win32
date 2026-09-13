@@ -1,4 +1,5 @@
-﻿using Hi3Helper.Win32.Native.Interfaces.TaskScheduler.Trigger;
+﻿using Hi3Helper.Win32.ManagedTools;
+using Hi3Helper.Win32.Native.Interfaces.TaskScheduler.Trigger;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
@@ -21,7 +22,7 @@ public unsafe partial interface ITaskDefinition : IDispatch
 
     void SetSettings([MarshalUsing(typeof(ComInterfaceMarshaller<ITaskSettings>))] ITaskSettings? settings);
 
-    void GetData([MarshalUsing(typeof(Utf16StringMarshaller))] out string? data);
+    void GetData([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? data);
 
     void SetData([MarshalUsing(typeof(Utf16StringMarshaller))] string? data);
 
@@ -29,11 +30,11 @@ public unsafe partial interface ITaskDefinition : IDispatch
 
     void SetPrincipal([MarshalUsing(typeof(ComInterfaceMarshaller<IPrincipal>))] IPrincipal? principal);
 
-    void GetActions([MarshalUsing(typeof(ComInterfaceMarshaller<IActionCollection>))] out IActionCollection? actions);
+    void GetActions([MarshalUsing(typeof(ComInterfaceMarshaller<Action.IActionCollection>))] out Action.IActionCollection? actions);
 
-    void SetActions([MarshalUsing(typeof(ComInterfaceMarshaller<IActionCollection>))] IActionCollection? actions);
+    void SetActions([MarshalUsing(typeof(ComInterfaceMarshaller<Action.IActionCollection>))] Action.IActionCollection? actions);
 
-    void GetXmlText([MarshalUsing(typeof(Utf16StringMarshaller))] out string? xml);
+    void GetXmlText([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? xml);
 
     void SetXmlText([MarshalUsing(typeof(Utf16StringMarshaller))] string? xml);
 }
