@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.ManagedTools;
+using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
@@ -17,7 +18,7 @@ public unsafe partial interface IRepetitionPattern : IDispatch
 
     void SetDuration([MarshalUsing(typeof(Utf16StringMarshaller))] string? duration);
 
-    void GetStopAtDurationEnd([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool stop);
+    void GetStopAtDurationEnd(out VARIANT_BOOL stop);
 
-    void SetStopAtDurationEnd([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool sop);
+    void SetStopAtDurationEnd(VARIANT_BOOL sop);
 }

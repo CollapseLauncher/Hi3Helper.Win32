@@ -1,5 +1,6 @@
 ﻿using Hi3Helper.Win32.ManagedTools;
 using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
@@ -10,9 +11,9 @@ namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler;
 [Guid(TaskSchedulerIIDConst.IID_ITaskSettings)]
 public unsafe partial interface ITaskSettings : IDispatch
 {
-    void GetAllowDemandStart([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool allow);
+    void GetAllowDemandStart(out VARIANT_BOOL allow);
     
-    void SetAllowDemandStart([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool allow);
+    void SetAllowDemandStart(VARIANT_BOOL allow);
 
     void GetRestartInterval([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? interval);
 
@@ -26,37 +27,37 @@ public unsafe partial interface ITaskSettings : IDispatch
 
     void SetMultipleInstances(TASK_INSTANCES_POLICY policy);
 
-    void GetStopIfGoingOnBatteries([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool stop);
+    void GetStopIfGoingOnBatteries(out VARIANT_BOOL stop);
 
-    void SetStopIfGoingOnBatteries([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool stop);
+    void SetStopIfGoingOnBatteries(VARIANT_BOOL stop);
 
-    void GetDisallowStartIfOnBatteries([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool disallow);
+    void GetDisallowStartIfOnBatteries(out VARIANT_BOOL disallow);
 
-    void SetDisallowStartIfOnBatteries([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool disallow);
+    void SetDisallowStartIfOnBatteries(VARIANT_BOOL disallow);
 
-    void GetAllowHardTerminate([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool allow);
+    void GetAllowHardTerminate(out VARIANT_BOOL allow);
 
-    void SetAllowHardTerminate([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool allow);
+    void SetAllowHardTerminate(VARIANT_BOOL allow);
 
-    void GetStartWhenAvailable([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool start);
+    void GetStartWhenAvailable(out VARIANT_BOOL start);
 
-    void SetStartWhenAvailable([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool start);
+    void SetStartWhenAvailable(VARIANT_BOOL start);
 
     void GetXmlText([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? xml);
 
     void SetXmlText([MarshalUsing(typeof(Utf16StringMarshaller))] string? xml);
 
-    void GetRunOnlyIfNetworkAvailable([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool run);
+    void GetRunOnlyIfNetworkAvailable(out VARIANT_BOOL run);
 
-    void SetRunOnlyIfNetworkAvailable([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool run);
+    void SetRunOnlyIfNetworkAvailable(VARIANT_BOOL run);
 
     void GetExecutionTimeLimit([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? limit);
 
     void SetExecutionTimeLimit([MarshalUsing(typeof(Utf16StringMarshaller))] string? limit);
 
-    void GetEnabled([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool enabled);
+    void GetEnabled(out VARIANT_BOOL enabled);
 
-    void SetEnabled([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool enabled);
+    void SetEnabled(VARIANT_BOOL enabled);
 
     void GetDeleteExpiredTaskAfter([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? delay);
 
@@ -70,21 +71,21 @@ public unsafe partial interface ITaskSettings : IDispatch
 
     void SetCompatibility(TASK_COMPATIBILITY level);
 
-    void GetHidden([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool hidden);
+    void GetHidden(out VARIANT_BOOL hidden);
 
-    void SetHidden([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool hidden);
+    void SetHidden(VARIANT_BOOL hidden);
 
     void GetIdleSettings([MarshalUsing(typeof(ComInterfaceMarshaller<IIdleSettings>))] out IIdleSettings? settings);
 
     void SetIdleSettings([MarshalUsing(typeof(ComInterfaceMarshaller<IIdleSettings>))] IIdleSettings? settings);
 
-    void GetRunOnlyIfIdle([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool run);
+    void GetRunOnlyIfIdle(out VARIANT_BOOL run);
 
-    void SetRunOnlyIfIdle([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool run);
+    void SetRunOnlyIfIdle(VARIANT_BOOL run);
 
-    void GetWakeToRun([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool wake);
+    void GetWakeToRun(out VARIANT_BOOL wake);
 
-    void SetWakeToRun([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool wake);
+    void SetWakeToRun(VARIANT_BOOL wake);
 
     void GetNetworkSettings([MarshalUsing(typeof(ComInterfaceMarshaller<INetworkSettings>))] out INetworkSettings? settings);
 

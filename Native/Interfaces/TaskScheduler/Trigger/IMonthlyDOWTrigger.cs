@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.ManagedTools;
+using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
@@ -23,9 +24,9 @@ public unsafe partial interface IMonthlyDOWTrigger : ITrigger
 
     void SetMonthsOfYear(short months);
 
-    void GetRunOnLastDayOfMonth([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool pLastDay);
+    void GetRunOnLastDayOfMonth(out VARIANT_BOOL pLastDay);
 
-    void SetRunOnLastDayOfMonth([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool lastDay);
+    void SetRunOnLastDayOfMonth(VARIANT_BOOL lastDay);
 
     void GetRandomDelay([MarshalUsing(typeof(Utf16BorrowStringMarshaller))] out string? pRandomDelay);
 

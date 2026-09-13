@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.ManagedTools;
+using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
@@ -17,11 +18,11 @@ public unsafe partial interface IIdleSettings : IDispatch
 
     void SetWaitTimeout([MarshalUsing(typeof(Utf16StringMarshaller))] string? timeout);
 
-    void GetStopOnIdleEnd([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool stop);
+    void GetStopOnIdleEnd(out VARIANT_BOOL stop);
 
-    void SetStopOnIdleEnd([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool stop);
+    void SetStopOnIdleEnd(VARIANT_BOOL stop);
 
-    void GetRestartOnIdle([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool restart);
+    void GetRestartOnIdle(out VARIANT_BOOL restart);
 
-    void SetRestartOnIdle([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool restart);
+    void SetRestartOnIdle(VARIANT_BOOL restart);
 }

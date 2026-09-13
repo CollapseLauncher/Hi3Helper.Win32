@@ -17,9 +17,9 @@ public unsafe partial interface IRegisteredTask : IDispatch
 
     void State(out TASK_STATE state);
 
-    void GetEnabled([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool enabled);
+    void GetEnabled(out VARIANT_BOOL enabled);
 
-    void SetEnabled([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool enabled);
+    void SetEnabled(VARIANT_BOOL enabled);
 
     void Run(ComVariant parameters, out IRunningTask? task);
 

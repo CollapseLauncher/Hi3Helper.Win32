@@ -1,5 +1,6 @@
 ﻿using Hi3Helper.Win32.ManagedTools;
 using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
@@ -32,7 +33,7 @@ public unsafe partial interface ITrigger : IDispatch
 
     void SetEndBoundary([MarshalUsing(typeof(Utf16StringMarshaller))] string? end);
 
-    void GetEnabled([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] out bool enabled);
+    void GetEnabled(out VARIANT_BOOL enabled);
 
-    void SetEnabled([MarshalUsing(typeof(TypedComVariantMarshaller<bool>))] bool enabled);
+    void SetEnabled(VARIANT_BOOL enabled);
 }

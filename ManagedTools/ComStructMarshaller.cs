@@ -14,7 +14,7 @@ public static class TypedComVariantMarshaller<T>
     public static ComVariant ConvertToUnmanaged(T managed) =>
         ComVariantMarshaller.ConvertToUnmanaged(managed);
 
-    public static T ConvertToManaged(ComVariant unmanaged) =>
+    public static T? ConvertToManaged(ComVariant unmanaged) => !Enum.IsDefined(unmanaged.VarType) ? default :
         Cast(ComVariantMarshaller.ConvertToManaged(unmanaged));
 
     public static void Free(ComVariant unmanaged) =>
