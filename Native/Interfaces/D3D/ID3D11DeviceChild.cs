@@ -1,9 +1,8 @@
-﻿using Hi3Helper.Win32.Native.Interfaces.D3D;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
-namespace Hi3Helper.Win32.Native.Interfaces.DXGI;
+namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 
 [GeneratedComInterface]
 [Guid("1841e5c8-16b0-489b-bcc8-44cfb0d5deae")]

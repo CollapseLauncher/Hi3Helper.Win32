@@ -2,12 +2,14 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
+
 // ReSharper disable CommentTypo
 
 namespace Hi3Helper.Win32.ShellLinkCOM
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct PropVariant
+    public struct PropVariant : IDisposable
     {
         public short variantType;
         public short Reserved1, Reserved2, Reserved3;
@@ -35,6 +37,14 @@ namespace Hi3Helper.Win32.ShellLinkCOM
             Marshal.Copy(bytes, 0, pv.pointerValue, bytes.Length);
 
             return pv;
+        }
+
+        public void Dispose()
+        {
+            if (pointerValue != nint.Zero)
+            {
+                Marshal.FreeCoTaskMem(Interlocked.Exchange(ref pointerValue, 0));
+            }
         }
 
         /// <summary>

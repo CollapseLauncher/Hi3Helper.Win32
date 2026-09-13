@@ -1,0 +1,10 @@
+﻿namespace Hi3Helper.Win32.Native.Enums;
+
+public enum TASK_STATE
+{
+    TASK_STATE_UNKNOWN,
+    TASK_STATE_DISABLED,
+    TASK_STATE_QUEUED,
+    TASK_STATE_READY,
+    TASK_STATE_RUNNING
+}
