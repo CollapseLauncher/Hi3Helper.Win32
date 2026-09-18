@@ -51,6 +51,43 @@ public static class SwapChainPanelHelper
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SkipLocalsInit]
+    public static unsafe void GetDirectNativeDelegateForDrawRoutine(
+        nint                                                                           imageSourceP,
+        nint                                                                           renderTargetP,
+        nint                                                                           mediaPlayerP,
+        out delegate* unmanaged[Stdcall]<nint, uint, ref readonly Rect, out nint, int> s_beginDraw,
+        out delegate* unmanaged[Stdcall]<nint, nint, ref readonly Rect, int>           s_drawImage,
+        out delegate* unmanaged[Stdcall]<nint, nint, int>                              s_copyFrameToSurface,
+        out delegate* unmanaged[Stdcall]<nint, int>                                    s_dispose,
+        in  Rect                                                                       updateWinRect)
+    {
+        // -- CanvasImageSource.CreateDrawingSession(Color, Rect);
+        s_beginDraw = (delegate* unmanaged[Stdcall]<nint, uint, ref readonly Rect, out nint, int>)(*(*(void***)imageSourceP + 7));
+        Marshal.ThrowExceptionForHR(s_beginDraw(imageSourceP, DefaultDummyColor, in updateWinRect, out nint drawingSessionPpv));
+
+        // -- CanvasDrawingSession.DrawImage(ICanvasBitmap, Rect);
+        //    This method is the shortest based on the implementation source at:
+        //    https://github.com/microsoft/Win2D/blob/65e90b29055de64b02e7f2a3d3f042b7fa36326c/winrt/lib/drawing/CanvasDrawingSession.cpp#L254
+        s_drawImage = (delegate* unmanaged[Stdcall]<nint, nint, ref readonly Rect, int>)(*(*(void***)drawingSessionPpv + 12));
+        Marshal.ThrowExceptionForHR(s_drawImage(drawingSessionPpv, renderTargetP, in updateWinRect));
+
+        // -- MediaPlayer.CopyFrameToVideoSurface(IDirect3DSurface)
+        s_copyFrameToSurface = (delegate* unmanaged[Stdcall]<nint, nint, int>)(*(*(void***)mediaPlayerP + 10));
+
+        // -- Query to WinRT's IDisposable
+        QueryInterfaceShort(drawingSessionPpv, in IDisposableWinRTObj_IID, out nint disposablePpv);
+
+        // -- CanvasDrawingSession.Dispose()
+        s_dispose = (delegate* unmanaged[Stdcall]<nint, int>)(*(*(void***)disposablePpv + 6));
+        Marshal.ThrowExceptionForHR(s_dispose(disposablePpv));
+
+        // -- Release object
+        ReleaseShort(drawingSessionPpv);
+        ReleaseShort(disposablePpv);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [SkipLocalsInit]
     public static unsafe nint CanvasSessionDrawUnsafe(
         nint                                                                       imageSourceP,
         nint                                                                       renderTargetP,
@@ -91,15 +128,7 @@ public static class SwapChainPanelHelper
     public static unsafe void MediaPlayerCopyFrameUnsafe(
         nint              playerP,
         nint              surfaceP)
-        => Marshal.ThrowExceptionForHR(((delegate* unmanaged[Stdcall]<nint, nint, int>)(*(*(void***)playerP + 10)))(playerP, surfaceP)); // +10 == .CopyFrameToVideoSurface(IDirect3DSurface)
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [SkipLocalsInit]
-    public static unsafe void MediaPlayerCopyFrameUnsafe(
-        nint              playerP,
-        nint              surfaceP,
-        ref readonly Rect updateWinRect)
-        => Marshal.ThrowExceptionForHR(((delegate* unmanaged[Stdcall]<nint, nint, ref readonly Rect, int>)(*(*(void***)playerP + 11)))(playerP, surfaceP, in updateWinRect)); // +11 == .CopyFrameToVideoSurface(IDirect3DSurface, Rect)
+        => ThrowOrIgnoreNull(((delegate* unmanaged[Stdcall]<nint, nint, int>)(*(*(void***)playerP + 10)))(playerP, surfaceP)); // +10 == .CopyFrameToVideoSurface(IDirect3DSurface)
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SkipLocalsInit]
