@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Windows.Foundation;
@@ -61,29 +61,50 @@ public static class SwapChainPanelHelper
         out delegate* unmanaged[Stdcall]<nint, int>                                    s_dispose,
         in  Rect                                                                       updateWinRect)
     {
-        // -- CanvasImageSource.CreateDrawingSession(Color, Rect);
-        s_beginDraw = (delegate* unmanaged[Stdcall]<nint, uint, ref readonly Rect, out nint, int>)(*(*(void***)imageSourceP + 7));
-        Marshal.ThrowExceptionForHR(s_beginDraw(imageSourceP, DefaultDummyColor, in updateWinRect, out nint drawingSessionPpv));
+        string operation = "CanvasVirtualImageSource.CreateDrawingSession";
+        nint drawingSessionPpv = 0;
+        nint disposablePpv = 0;
+        bool closeAttempted = false;
+        try
+        {
+            // -- CanvasImageSource.CreateDrawingSession(Color, Rect);
+            s_beginDraw = (delegate* unmanaged[Stdcall]<nint, uint, ref readonly Rect, out nint, int>)(*(*(void***)imageSourceP + 7));
+            Marshal.ThrowExceptionForHR(s_beginDraw(imageSourceP, DefaultDummyColor, in updateWinRect, out drawingSessionPpv));
 
-        // -- CanvasDrawingSession.DrawImage(ICanvasBitmap, Rect);
-        //    This method is the shortest based on the implementation source at:
-        //    https://github.com/microsoft/Win2D/blob/65e90b29055de64b02e7f2a3d3f042b7fa36326c/winrt/lib/drawing/CanvasDrawingSession.cpp#L254
-        s_drawImage = (delegate* unmanaged[Stdcall]<nint, nint, ref readonly Rect, int>)(*(*(void***)drawingSessionPpv + 12));
-        Marshal.ThrowExceptionForHR(s_drawImage(drawingSessionPpv, renderTargetP, in updateWinRect));
+            operation = "CanvasDrawingSession.QueryInterface(IClosable)";
+            Marshal.ThrowExceptionForHR(QueryInterfaceShort(drawingSessionPpv, in IDisposableWinRTObj_IID, out disposablePpv));
+            s_dispose = (delegate* unmanaged[Stdcall]<nint, int>)(*(*(void***)disposablePpv + 6));
 
-        // -- MediaPlayer.CopyFrameToVideoSurface(IDirect3DSurface)
-        s_copyFrameToSurface = (delegate* unmanaged[Stdcall]<nint, nint, int>)(*(*(void***)mediaPlayerP + 10));
+            // -- CanvasDrawingSession.DrawImage(ICanvasBitmap, Rect);
+            //    This method is the shortest based on the implementation source at:
+            //    https://github.com/microsoft/Win2D/blob/65e90b29055de64b02e7f2a3d3f042b7fa36326c/winrt/lib/drawing/CanvasDrawingSession.cpp#L254
+            operation = "CanvasDrawingSession.DrawImageToRect";
+            s_drawImage = (delegate* unmanaged[Stdcall]<nint, nint, ref readonly Rect, int>)(*(*(void***)drawingSessionPpv + 12));
+            Marshal.ThrowExceptionForHR(s_drawImage(drawingSessionPpv, renderTargetP, in updateWinRect));
 
-        // -- Query to WinRT's IDisposable
-        QueryInterfaceShort(drawingSessionPpv, in IDisposableWinRTObj_IID, out nint disposablePpv);
+            // -- MediaPlayer.CopyFrameToVideoSurface(IDirect3DSurface)
+            s_copyFrameToSurface = (delegate* unmanaged[Stdcall]<nint, nint, int>)(*(*(void***)mediaPlayerP + 10));
 
-        // -- CanvasDrawingSession.Dispose()
-        s_dispose = (delegate* unmanaged[Stdcall]<nint, int>)(*(*(void***)disposablePpv + 6));
-        Marshal.ThrowExceptionForHR(s_dispose(disposablePpv));
-
-        // -- Release object
-        ReleaseShort(drawingSessionPpv);
-        ReleaseShort(disposablePpv);
+            // -- CanvasDrawingSession.Dispose()
+            operation = "CanvasDrawingSession.Close";
+            closeAttempted = true;
+            Marshal.ThrowExceptionForHR(s_dispose(disposablePpv));
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"{operation} failed (HRESULT 0x{ex.HResult:X8}, rectangle {updateWinRect}).", ex);
+        }
+        finally
+        {
+            if (disposablePpv != 0)
+            {
+                // Close a partially initialized session without masking the original failure.
+                if (!closeAttempted)
+                    ((delegate* unmanaged[Stdcall]<nint, int>)(*(*(void***)disposablePpv + 6)))(disposablePpv);
+                ReleaseShort(disposablePpv);
+            }
+            if (drawingSessionPpv != 0) ReleaseShort(drawingSessionPpv);
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
