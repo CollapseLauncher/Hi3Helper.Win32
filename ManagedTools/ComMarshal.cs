@@ -230,13 +230,16 @@ public static class ComMarshal<TComObject>
             exceptionIfFalse = ex;
             return false;
         }
+        finally
+        {
+            if (releaseReference && comObjPpv != nint.Zero) Marshal.Release(comObjPpv);
+        }
 
         // Fail-safe: Ensure the object is not null.
         // If null, then back to GetEnsureCreation with ppv set to null.
         // If not, then return true.
         if (comObjResult != null)
         {
-            if (releaseReference) Marshal.Release(comObjPpv);
             return true;
         }
 
