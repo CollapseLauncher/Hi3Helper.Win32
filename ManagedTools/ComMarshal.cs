@@ -201,12 +201,14 @@ public static class ComMarshal<TComObject>
     /// <param name="comObjPpv">Pointer of the COM Object Interface which will be obtained from.</param>
     /// <param name="comObjResult">The resulting type <typeparamref name="TComObject"/> of COM Object Interface from the native pointer.</param>
     /// <param name="exceptionIfFalse">Exception if obtaining the COM Object Interface is failing.</param>
+    /// <param name="releaseReference">Let the method release the reference if successful. If you happened to use a borrowed reference, we suggest to set <paramref name="releaseReference"/> to <see langword="false"/>.</param>
     /// <returns>Returns <see langword="true"/> if the target COM Object Interface has been successfully obtained. Otherwise, <see langword="false"/>.</returns>
     public static unsafe bool TryCreateComObjectFromReference(
         nint comObjPpv,
 
         [NotNullWhen(true)] out  TComObject? comObjResult,
-        [NotNullWhen(false)] out Exception?  exceptionIfFalse)
+        [NotNullWhen(false)] out Exception?  exceptionIfFalse,
+        bool releaseReference = true)
     {
         Unsafe.SkipInit(out comObjResult);
         Unsafe.SkipInit(out exceptionIfFalse);
@@ -234,11 +236,9 @@ public static class ComMarshal<TComObject>
         // If not, then return true.
         if (comObjResult != null)
         {
-            Marshal.Release(comObjPpv);
+            if (releaseReference) Marshal.Release(comObjPpv);
             return true;
         }
-
-        // Try use QueryInterface before converting into the 
 
         // Fail-safe: Back to GetEnsureCreation with null ppv.
         comObjPpv = nint.Zero;
