@@ -75,7 +75,7 @@ public struct DXGI_SWAP_CHAIN_DESC1
     private DXGI_SWAP_CHAIN_FLAG _flags;
 
     // ReSharper disable once ConvertToAutoProperty
-    internal DXGI_SWAP_CHAIN_FLAG Flags
+    public DXGI_SWAP_CHAIN_FLAG Flags
     {
         get => _flags;
         set => _flags = value;

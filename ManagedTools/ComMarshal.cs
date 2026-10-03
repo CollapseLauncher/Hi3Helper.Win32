@@ -1,4 +1,5 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using System;
@@ -236,6 +237,8 @@ public static class ComMarshal<TComObject>
             Marshal.Release(comObjPpv);
             return true;
         }
+
+        // Try use QueryInterface before converting into the 
 
         // Fail-safe: Back to GetEnsureCreation with null ppv.
         comObjPpv = nint.Zero;

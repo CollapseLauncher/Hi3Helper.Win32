@@ -2,6 +2,7 @@
 using Hi3Helper.Win32.Native.Interfaces.DXGI;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.D2D;
+using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable InconsistentNaming
@@ -14,16 +15,16 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("d3d11.dll", EntryPoint = "D3D11CreateDevice")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static unsafe partial HResult D3D11CreateDevice(
-            nint pAdapter,
-            D3D_DRIVER_TYPE driverType,
-            nint software,
+            nint                     pAdapter,
+            D3D_DRIVER_TYPE          driverType,
+            nint                     software,
             D3D11_CREATE_DEVICE_FLAG flags,
-            in D3D_FEATURE_LEVEL pFeatureLevels,
-            int featureLevels,
-            uint sdkVersion,
-            out nint ppDevice,
-            ref D3D_FEATURE_LEVEL featureLevel,
-            out nint ppImmediateContext);
+            Span<D3D_FEATURE_LEVEL>  pFeatureLevels,
+            int                      featureLevels,
+            uint                     sdkVersion,
+            out nint                 ppDevice,
+            ref D3D_FEATURE_LEVEL    featureLevel,
+            out nint                 ppImmediateContext);
 
         [LibraryImport("d3d11.dll", EntryPoint = "CreateDirect3DSurface")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
