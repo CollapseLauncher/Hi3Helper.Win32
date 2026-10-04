@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 
@@ -9,5 +10,9 @@ namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 [GeneratedComInterface]
 public partial interface IDirect3DDxgiInterfaceAccess
 {
-    void GetInterface(in Guid iid, out nint ppv);
+    [PreserveSig]
+    [return: MarshalAs(UnmanagedType.Error)]
+    HResult GetInterface(
+        in  Guid iid,
+        out nint ppv);
 }
