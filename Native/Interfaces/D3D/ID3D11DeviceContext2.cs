@@ -1,10 +1,10 @@
-﻿using Hi3Helper.Win32.Native.Interfaces.DXGI;
-using Hi3Helper.Win32.Native.Structs;
-using Hi3Helper.Win32.Native.Structs.D3D;
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Interfaces.DXGI;
+using Hi3Helper.Win32.Native.Structs;
+using Hi3Helper.Win32.Native.Structs.D3D;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 

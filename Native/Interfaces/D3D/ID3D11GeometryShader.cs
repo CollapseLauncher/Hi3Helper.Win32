@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.Native.Interfaces.DXGI;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Interfaces.DXGI;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 
