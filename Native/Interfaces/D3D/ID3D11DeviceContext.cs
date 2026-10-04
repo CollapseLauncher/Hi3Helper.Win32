@@ -168,7 +168,15 @@ public partial interface ID3D11DeviceContext : ID3D11DeviceChild
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11devicecontext-copysubresourceregion
     [PreserveSig]
-    void CopySubresourceRegion([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pDstResource, uint DstSubresource, uint DstX, uint DstY, uint DstZ, [MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource pSrcResource, uint SrcSubresource, nint /* optional D3D11_BOX* */ pSrcBox);
+    void CopySubresourceRegion(
+        /*[MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource?*/ nint pDstResource,
+            uint                          DstSubresource,
+            uint                          DstX,
+            uint                          DstY,
+            uint                          DstZ,
+            /*[MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11Resource>))] ID3D11Resource*/ nint pSrcResource,
+            uint                          SrcSubresource,
+            nint /* optional D3D11_BOX* */pSrcBox);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11devicecontext-copyresource
     [PreserveSig]
