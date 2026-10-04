@@ -1,5 +1,4 @@
 ﻿using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using System;
@@ -28,15 +27,18 @@ public static class ComMarshal<TComObject>
     /// <param name="comObjIid">The Class Identifier ID (IID) in which what kind of object to be created. The value in this argument MUST BE the same as its interface's GUID (or at least included from an interface in which implements its derivation).</param>
     /// <param name="comObjResult">The result of a COM Object which has been created.</param>
     /// <param name="exceptionIfFalse">This should be null if the <paramref name="comObjResult"/> is set.</param>
+    /// <param name="useUnique">If <see langword="true"/>, marshalling will use <see cref="UniqueComInterfaceMarshaller{T}"/> instead of <see cref="ComInterfaceMarshaller{T}"/>.</param>
     /// <returns>Returns <see langword="true"/> if the COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
     public static unsafe bool TryCreateComObject(
         in Guid classFactoryId,
-        nint pIUnknownController,
-        CLSCTX classContext,
+        nint    pIUnknownController,
+        CLSCTX  classContext,
         in Guid comObjIid,
 
-        [NotNullWhen(true)] out TComObject? comObjResult,
-        [NotNullWhen(false)] out Exception? exceptionIfFalse)
+        [NotNullWhen(true)] out  TComObject? comObjResult,
+        [NotNullWhen(false)] out Exception?  exceptionIfFalse,
+
+        bool useUnique = false)
     {
         Unsafe.SkipInit(out comObjResult);
 
@@ -61,7 +63,10 @@ public static class ComMarshal<TComObject>
                                                            in comObjIid,
                                                            out nint comObjPpv);
 
-        comObjResult = ComInterfaceMarshaller<TComObject>.ConvertToManaged((void*)comObjPpv);
+        comObjResult = useUnique
+            ? UniqueComInterfaceMarshaller<TComObject>.ConvertToManaged((void*)comObjPpv)
+            : ComInterfaceMarshaller<TComObject>.ConvertToManaged((void*)comObjPpv);
+
         if (comObjPpv != nint.Zero)
         {
             Marshal.Release(comObjPpv);
@@ -84,20 +89,24 @@ public static class ComMarshal<TComObject>
     /// <param name="comObjIid">The Class Identifier ID (IID) in which what kind of object to be created. The value in this argument MUST BE the same as its interface's GUID (or at least included from an interface in which implements its derivation).</param>
     /// <param name="comObjResult">The result of a COM Object which has been created.</param>
     /// <param name="exceptionIfFalse">This should be null if the <paramref name="comObjResult"/> is set.</param>
+    /// <param name="useUnique">If <see langword="true"/>, marshalling will use <see cref="UniqueComInterfaceMarshaller{T}"/> instead of <see cref="ComInterfaceMarshaller{T}"/>.</param>
     /// <returns>Returns <see langword="true"/> if the COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
     public static bool TryCreateComObject(
         in Guid classFactoryId,
-        CLSCTX classContext,
+        CLSCTX  classContext,
         in Guid comObjIid,
 
         [NotNullWhen(true)] out TComObject? comObjResult,
-        [NotNullWhen(false)] out Exception? exceptionIfFalse)
+        [NotNullWhen(false)] out Exception? exceptionIfFalse,
+
+        bool useUnique = false)
         => TryCreateComObject(in classFactoryId,
                               nint.Zero,
                               classContext,
                               in comObjIid,
                               out comObjResult,
-                              out exceptionIfFalse);
+                              out exceptionIfFalse,
+                              useUnique);
 
     /// <summary>
     /// Try to create COM Object based on its Class Factory ID and its Class Identifier ID (IID).
@@ -110,18 +119,22 @@ public static class ComMarshal<TComObject>
     /// </param>
     /// <param name="comObjResult">The result of a COM Object which has been created.</param>
     /// <param name="exceptionIfFalse">This should be null if the <paramref name="comObjResult"/> is set.</param>
+    /// <param name="useUnique">If <see langword="true"/>, marshalling will use <see cref="UniqueComInterfaceMarshaller{T}"/> instead of <see cref="ComInterfaceMarshaller{T}"/>.</param>
     /// <returns>Returns <see langword="true"/> if the COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
     public static bool TryCreateComObject(
         in Guid classFactoryId,
-        CLSCTX classContext,
+        CLSCTX  classContext,
 
-        [NotNullWhen(true)] out TComObject? comObjResult,
-        [NotNullWhen(false)] out Exception? exceptionIfFalse)
+        [NotNullWhen(true)] out  TComObject? comObjResult,
+        [NotNullWhen(false)] out Exception?  exceptionIfFalse,
+
+        bool useUnique = false)
         => TryCreateComObject(in classFactoryId,
                               classContext,
                               in Nullable.GetValueRefOrDefaultRef(in ObjComIid),
                               out comObjResult,
-                              out exceptionIfFalse);
+                              out exceptionIfFalse,
+                              useUnique);
 
 
 
@@ -133,18 +146,24 @@ public static class ComMarshal<TComObject>
     /// <param name="comObjTargetIid">Reference Identifier ID of the target COM Object to cast.</param>
     /// <param name="comObjTarget">The result of the target COM Object.</param>
     /// <param name="exceptionIfFalse">This should be null if the <paramref name="comObjTarget"/> is set.</param>
+    /// <param name="useUnique">If <see langword="true"/>, marshalling will use <see cref="UniqueComInterfaceMarshaller{T}"/> instead of <see cref="ComInterfaceMarshaller{T}"/>.</param>
     /// <returns>Returns <see langword="true"/> if the target COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
     public static unsafe bool TryCastComObjectAs<TComCastTo>(
         TComObject comObjSource,
-        in Guid comObjTargetIid,
+        in Guid    comObjTargetIid,
 
-        [NotNullWhen(true)] out TComCastTo? comObjTarget,
-        [NotNullWhen(false)] out Exception? exceptionIfFalse)
+        [NotNullWhen(true)] out  TComCastTo? comObjTarget,
+        [NotNullWhen(false)] out Exception?  exceptionIfFalse,
+
+        bool useUnique = false)
         where TComCastTo : class
     {
         Unsafe.SkipInit(out comObjTarget);
 
-        nint ppvToCast = (nint)ComInterfaceMarshaller<TComObject>.ConvertToUnmanaged(comObjSource);
+        nint ppvToCast = (nint)(useUnique
+            ? UniqueComInterfaceMarshaller<TComObject>.ConvertToUnmanaged(comObjSource)
+            : ComInterfaceMarshaller<TComObject>.ConvertToUnmanaged(comObjSource));
+
         if (ppvToCast == nint.Zero)
         {
             exceptionIfFalse = new COMException($"Cannot get the reference of the object: {typeof(TComObject).Name} as it might not be a COM Object");
@@ -156,7 +175,10 @@ public static class ComMarshal<TComObject>
 
         if (ppvCasted != nint.Zero)
         {
-            comObjTarget = ComInterfaceMarshaller<TComCastTo>.ConvertToManaged((void*)ppvCasted);
+            comObjTarget = useUnique
+                ? UniqueComInterfaceMarshaller<TComCastTo>.ConvertToManaged((void*)ppvCasted)
+                : ComInterfaceMarshaller<TComCastTo>.ConvertToManaged((void*)ppvCasted);
+
             Marshal.Release(ppvCasted);
         }
 
@@ -175,12 +197,15 @@ public static class ComMarshal<TComObject>
     /// <param name="comObjSource">The COM Object source to be cast into.</param>
     /// <param name="comObjTarget">The result of the target COM Object.</param>
     /// <param name="exceptionIfFalse">This should be null if the <paramref name="comObjTarget"/> is set.</param>
+    /// <param name="useUnique">If <see langword="true"/>, marshalling will use <see cref="UniqueComInterfaceMarshaller{T}"/> instead of <see cref="ComInterfaceMarshaller{T}"/>.</param>
     /// <returns>Returns <see langword="true"/> if the target COM Object has been successfully created. Otherwise, <see langword="false"/>.</returns>
     public static bool TryCastComObjectAs<TComCastTo>(
         TComObject comObjSource,
 
         [NotNullWhen(true)] out TComCastTo? comObjTarget,
-        [NotNullWhen(false)] out Exception? exceptionIfFalse)
+        [NotNullWhen(false)] out Exception? exceptionIfFalse,
+
+        bool useUnique = false)
         where TComCastTo : class
     {
         Unsafe.SkipInit(out comObjTarget);
@@ -188,7 +213,11 @@ public static class ComMarshal<TComObject>
         ref readonly Guid comObjTargetIid = ref Nullable.GetValueRefOrDefaultRef(in ComMarshal<TComCastTo>.ObjComIid);
         if (!Unsafe.IsNullRef(in comObjTargetIid))
         {
-            return TryCastComObjectAs(comObjSource, in comObjTargetIid, out comObjTarget, out exceptionIfFalse);
+            return TryCastComObjectAs(comObjSource,
+                                      in comObjTargetIid,
+                                      out comObjTarget,
+                                      out exceptionIfFalse,
+                                      useUnique);
         }
 
         exceptionIfFalse = ThrowNoGuidDefined<TComCastTo>();
@@ -201,17 +230,20 @@ public static class ComMarshal<TComObject>
     /// <param name="comObjPpv">Pointer of the COM Object Interface which will be obtained from.</param>
     /// <param name="comObjResult">The resulting type <typeparamref name="TComObject"/> of COM Object Interface from the native pointer.</param>
     /// <param name="exceptionIfFalse">Exception if obtaining the COM Object Interface is failing.</param>
-    /// <param name="releaseReference">Let the method release the reference if successful. If you happened to use a borrowed reference, we suggest to set <paramref name="releaseReference"/> to <see langword="false"/>.</param>
+    /// <param name="releaseReference">Release the input reference after marshalling, including on failure. Set to <see langword="false"/> for a borrowed reference or when the caller releases it.</param>
+    /// <param name="useUnique">If <see langword="true"/>, marshalling will use <see cref="UniqueComInterfaceMarshaller{T}"/> instead of <see cref="ComInterfaceMarshaller{T}"/>. Call <see cref="ComObject.FinalRelease"/> on the resulting unique wrapper for deterministic cleanup; releasing the input reference does not release the wrapper.</param>
     /// <returns>Returns <see langword="true"/> if the target COM Object Interface has been successfully obtained. Otherwise, <see langword="false"/>.</returns>
     public static unsafe bool TryCreateComObjectFromReference(
         nint comObjPpv,
 
         [NotNullWhen(true)] out  TComObject? comObjResult,
         [NotNullWhen(false)] out Exception?  exceptionIfFalse,
-        bool releaseReference = true)
+
+        bool releaseReference = true,
+        bool useUnique        = false)
     {
-        Unsafe.SkipInit(out comObjResult);
-        Unsafe.SkipInit(out exceptionIfFalse);
+        comObjResult     = null;
+        exceptionIfFalse = null;
 
         // Return null exception if comObjPpv is null
         if (comObjPpv == nint.Zero)
@@ -223,7 +255,9 @@ public static class ComMarshal<TComObject>
         try
         {
             // Get or Create Object
-            comObjResult = ComInterfaceMarshaller<TComObject>.ConvertToManaged((void*)comObjPpv);
+            comObjResult = useUnique
+                ? UniqueComInterfaceMarshaller<TComObject>.ConvertToManaged((void*)comObjPpv)
+                : ComInterfaceMarshaller<TComObject>.ConvertToManaged((void*)comObjPpv);
         }
         catch (Exception ex)
         {
