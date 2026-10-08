@@ -9,6 +9,16 @@ using System.Runtime.InteropServices.Marshalling;
 
 namespace Hi3Helper.Win32.ManagedTools;
 
+public static class ComMarshal
+{
+    /// <summary>
+    /// Final release the reference of the wrapped COM Object Interface.
+    /// </summary>
+    /// <param name="comObj">A COM Object Interface to be released.</param>
+    public static void FinalRelease<TComObject>(TComObject? comObj)
+        where TComObject : class => (comObj as ComObject)?.FinalRelease();
+}
+
 public static class ComMarshal<TComObject>
     where TComObject : class
 {
@@ -282,6 +292,12 @@ public static class ComMarshal<TComObject>
         // ReSharper disable once TailRecursiveCall
         return TryCreateComObjectFromReference(comObjPpv, out comObjResult, out exceptionIfFalse);
     }
+
+    /// <summary>
+    /// Final release the reference of the wrapped COM Object Interface.
+    /// </summary>
+    /// <param name="comObj">A COM Object Interface to be released.</param>
+    public static void FinalRelease(TComObject? comObj) => (comObj as ComObject)?.FinalRelease();
 
     private static InvalidCastException ThrowNoGuidDefined<TObjTarget>() => new($"Type of {typeof(TObjTarget).Name} has no Class Identifier ID (IID)");
 }
