@@ -1,12 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.Structs;
-using System;
+﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Structs;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable CommentTypo

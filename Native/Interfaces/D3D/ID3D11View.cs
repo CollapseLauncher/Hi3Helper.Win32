@@ -1,12 +1,11 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
-using Hi3Helper.Win32.Native.Interfaces.DXGI;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 
 [GeneratedComInterface]
 [Guid("839d1216-bb2e-412b-b7f4-a9dbebe08ed1")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID3D11View : ID3D11DeviceChild
 {
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11view-getresource

@@ -1,8 +1,8 @@
-﻿using Hi3Helper.Win32.Native.LibraryImport;
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Hi3Helper.Win32.Native.LibraryImport;
 
 // ReSharper disable CommentTypo
 

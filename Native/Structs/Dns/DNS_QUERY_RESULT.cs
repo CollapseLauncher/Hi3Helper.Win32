@@ -1,5 +1,5 @@
-﻿using Hi3Helper.Win32.Native.Enums.Dns;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums.Dns;
 // ReSharper disable NotAccessedField.Global
 // ReSharper disable UnassignedField.Global
 

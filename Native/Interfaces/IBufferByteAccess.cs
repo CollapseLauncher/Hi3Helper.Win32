@@ -1,6 +1,6 @@
-﻿using Hi3Helper.Win32.Native.ClassIds;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.ClassIds;
 
 namespace Hi3Helper.Win32.Native.Interfaces;
 

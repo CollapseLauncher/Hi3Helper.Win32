@@ -1,11 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.D2D;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
-[GeneratedComInterface, Guid("da20d8ef-812a-4c43-9802-62ec4abd7add")]
+[GeneratedComInterface]
+[Guid("da20d8ef-812a-4c43-9802-62ec4abd7add")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IDWriteFontFamily : IDWriteFontList
 {
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontfamily-getfamilynames

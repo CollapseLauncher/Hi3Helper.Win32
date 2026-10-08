@@ -1,8 +1,8 @@
-﻿using Hi3Helper.Win32.Native.LibraryImport;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Hi3Helper.Win32.Native.LibraryImport;
 
 #pragma warning disable IDE0130
 

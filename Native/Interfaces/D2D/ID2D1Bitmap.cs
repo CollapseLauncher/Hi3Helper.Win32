@@ -1,12 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Structs.D2D;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs.D2D;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface]
 [Guid("a2296057-ea42-4099-983b-539fb6505426")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID2D1Bitmap : ID2D1Image
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1bitmap-getsize

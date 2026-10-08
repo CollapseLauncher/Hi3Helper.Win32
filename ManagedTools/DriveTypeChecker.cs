@@ -1,9 +1,9 @@
-using Hi3Helper.Win32.Native.Structs;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Buffers;
 using System.IO;
 using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Structs;
+using Microsoft.Extensions.Logging;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ShiftExpressionZeroLeftOperand

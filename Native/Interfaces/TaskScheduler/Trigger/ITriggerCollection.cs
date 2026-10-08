@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.ManagedTools;
-using Hi3Helper.Win32.Native.Enums;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.ManagedTools;
+using Hi3Helper.Win32.Native.Enums;
 
 namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler.Trigger;
 

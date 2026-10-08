@@ -1,9 +1,9 @@
-using Hi3Helper.Win32.Native.Enums;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Hi3Helper.Win32.Native.Enums;
+using Microsoft.Extensions.Logging;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable AsyncVoidMethod
 // ReSharper disable UnusedMember.Global

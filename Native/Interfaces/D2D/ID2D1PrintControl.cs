@@ -1,12 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Structs.D2D;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs.D2D;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface]
 [Guid("2c1d867d-c290-41c8-ae7e-34a98702e9a5")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID2D1PrintControl
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1printcontrol-addpage

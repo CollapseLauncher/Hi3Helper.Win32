@@ -1,12 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Interfaces.DXGI;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Interfaces.DXGI;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 [Guid("94f81a73-9212-4376-9c58-b16a3a0d3992")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID2D1Factory2 : ID2D1Factory1
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_2/nf-d2d1_2-id2d1factory2-createdevice

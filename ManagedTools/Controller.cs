@@ -1,7 +1,7 @@
+using System;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace Hi3Helper.Win32.ManagedTools;
 

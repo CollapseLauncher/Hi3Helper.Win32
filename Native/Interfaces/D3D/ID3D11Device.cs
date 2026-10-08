@@ -8,6 +8,7 @@ using Hi3Helper.Win32.Native.Structs.D3D;
 namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 
 [GeneratedComInterface]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 [Guid("db6f6ddb-ac77-4e88-8253-819df9bbf140")]
 public partial interface ID3D11Device
 {
@@ -127,7 +128,7 @@ public partial interface ID3D11Device
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-getimmediatecontext
     [PreserveSig]
-    void GetImmediateContext([MarshalUsing(typeof(ComInterfaceMarshaller<ID3D11DeviceContext>))] out ID3D11DeviceContext ppImmediateContext);
+    void GetImmediateContext([MarshalUsing(typeof(UniqueComInterfaceMarshaller<ID3D11DeviceContext>))] out ID3D11DeviceContext ppImmediateContext);
 
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11device-setexceptionmode
     void SetExceptionMode(uint RaiseFlags);

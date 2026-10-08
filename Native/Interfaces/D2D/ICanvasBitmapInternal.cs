@@ -5,6 +5,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [Guid("4684FA78-C721-4531-8CCE-BEA927F95E5D")]
 [GeneratedComInterface]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ICanvasBitmapInternal
 {
     void GetD2DBitmap(out nint ppv);

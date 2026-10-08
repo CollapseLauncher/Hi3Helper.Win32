@@ -1,12 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 [Guid("08256209-099a-4b34-b86d-c22b110e7771")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IDWriteLocalizedStrings
 {
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritelocalizedstrings-getcount

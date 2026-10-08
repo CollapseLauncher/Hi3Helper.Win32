@@ -1,6 +1,3 @@
-using Hi3Helper.Win32.ManagedTools;
-using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -9,6 +6,10 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Threading;
 using System.Threading.Tasks;
+using Hi3Helper.Win32.ManagedTools;
+using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Interfaces;
+using Hi3Helper.Win32.Native.Structs;
 
 // ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable UnusedMember.Global

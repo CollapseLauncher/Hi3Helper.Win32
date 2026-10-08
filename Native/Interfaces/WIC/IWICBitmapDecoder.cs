@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 
@@ -9,6 +9,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.WIC;
 
 [Guid("9EDDE9E7-8DEE-47EA-99DF-E6FAF2ED44BF")]
 [GeneratedComInterface]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 // https://doxygen.reactos.org/de/d25/interfaceIWICBitmapDecoder.html
 public partial interface IWICBitmapDecoder
 {

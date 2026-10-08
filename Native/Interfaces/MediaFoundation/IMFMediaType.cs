@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 
@@ -9,6 +9,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.MediaFoundation;
 
 [Guid("44AE0FA8-EA31-4109-8D2E-4CAE4997C555")]
 [GeneratedComInterface]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 // https://doxygen.reactos.org/d1/d40/interfaceIMFMediaType.html
 public partial interface IMFMediaType : IMFAttributes
 {

@@ -1,11 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Enums.DXGI;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.DXGI;
 
 namespace Hi3Helper.Win32.Native.Interfaces.DXGI;
 
-[GeneratedComInterface, Guid("035f3ab4-482e-4e50-b41f-8a7f8bd8960b")]
+[GeneratedComInterface]
+[Guid("035f3ab4-482e-4e50-b41f-8a7f8bd8960b")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public unsafe partial interface IDXGIResource : IDXGIDeviceSubObject
 {
     // https://learn.microsoft.com/windows/win32/api/dxgi/nf-dxgi-idxgiresource-getsharedhandle

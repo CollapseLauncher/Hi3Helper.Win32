@@ -1,14 +1,15 @@
-﻿using Hi3Helper.Win32.ManagedTools;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using System.Runtime.Versioning;
+using Hi3Helper.Win32.ManagedTools;
 using Hi3Helper.Win32.Native.ClassIds;
 using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 // ReSharper disable IdentifierTypo
 // ReSharper disable CommentTypo
 
@@ -109,7 +110,11 @@ public class ShellLink
     [field: AllowNull, MaybeNull]
     public unsafe string IconPath
     {
-        get => field ??= GetStringFromIMethod(260, (ptr, len) => _linkW?.GetIconLocation(ptr, len, out _));
+        get
+        {
+            _linkW?.GetIconLocation(out field, 260, out _);
+            return field ?? "";
+        }
         set => _linkW?.SetIconLocation(field = value, IconIndex ?? 0);
     }
 
@@ -126,7 +131,7 @@ public class ShellLink
             }
 
             int iconIndex = 0;
-            _     = GetStringFromIMethod(260, (ptr, len) => _linkW?.GetIconLocation(ptr, len, out iconIndex));
+            _linkW?.GetIconLocation(out _, 260, out iconIndex);
             field = iconIndex;
             return field ?? 0;
         }
@@ -139,7 +144,11 @@ public class ShellLink
     [field: AllowNull, MaybeNull]
     public unsafe string Target
     {
-        get => field ??= GetStringFromIMethod(260, (ptr, len) => _linkW?.GetPath(ptr, len, nint.Zero, EShellLinkGP.SLGP_UNCPRIORITY));
+        get
+        {
+            _linkW?.GetPath(out field, 260, nint.Zero, EShellLinkGP.SLGP_UNCPRIORITY);
+            return field ?? "";
+        }
         set => _linkW?.SetPath(field = value);
     }
 
@@ -149,7 +158,11 @@ public class ShellLink
     [field: AllowNull, MaybeNull]
     public unsafe string WorkingDirectory
     {
-        get => field ??= GetStringFromIMethod(260, (ptr, len) => _linkW?.GetWorkingDirectory(ptr, len));
+        get
+        {
+            _linkW?.GetWorkingDirectory(out field, 260);
+            return field ?? "";
+        }
         set => _linkW?.SetWorkingDirectory(field = value);
     }
 
@@ -159,7 +172,11 @@ public class ShellLink
     [field: AllowNull, MaybeNull]
     public unsafe string Description
     {
-        get => field ??= GetStringFromIMethod(1024, (ptr, len) => _linkW?.GetDescription(ptr, len));
+        get
+        {
+            _linkW?.GetDescription(out field, 1 << 10);
+            return field ?? "";
+        }
         set => _linkW?.SetDescription(field = value);
     }
 
@@ -169,7 +186,11 @@ public class ShellLink
     [field: AllowNull, MaybeNull]
     public unsafe string Arguments
     {
-        get => field ??= GetStringFromIMethod(260, (ptr, len) => _linkW?.GetArguments(ptr, len));
+        get
+        {
+            _linkW?.GetArguments(out field, 260);
+            return field ?? "";
+        }
         set => _linkW?.SetArguments(field = value);
     }
 
@@ -241,11 +262,8 @@ public class ShellLink
         PropVariant varGuid = PropVariant.FromGuid(clsid);
         try
         {
-            int errCode = _propertyStoreW?.SetValue(ref pkey, ref varGuid) ?? unchecked((int)0x80004003);
-            Marshal.ThrowExceptionForHR(errCode);
-
-            errCode = _propertyStoreW?.Commit() ?? unchecked((int)0x80004003);
-            Marshal.ThrowExceptionForHR(errCode);
+            _propertyStoreW?.SetValue(ref pkey, ref varGuid);
+            _propertyStoreW?.Commit();
         }
         finally
         {

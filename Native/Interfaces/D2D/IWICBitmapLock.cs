@@ -6,6 +6,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface]
 [Guid("00000123-a8f2-4877-ba0a-fd2b6645fb94")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IWICBitmapLock
 {
     // https://learn.microsoft.com/windows/win32/api/wincodec/nf-wincodec-iwicbitmaplock-getsize

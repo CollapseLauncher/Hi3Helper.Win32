@@ -1,12 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.D2D;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface]
 [Guid("d21768e1-23a4-4823-a14b-7c3eba85d658")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID2D1Device1 : ID2D1Device
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_2/nf-d2d1_2-id2d1device1-getrenderingpriority

@@ -6,6 +6,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 
 [GeneratedComInterface]
 [Guid("1841e5c8-16b0-489b-bcc8-44cfb0d5deae")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID3D11DeviceChild
 {
     // https://learn.microsoft.com/windows/win32/api/d3d11/nf-d3d11-id3d11devicechild-getdevice

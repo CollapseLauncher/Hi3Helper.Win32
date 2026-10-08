@@ -1,14 +1,14 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
+﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.D2D;
 using Hi3Helper.Win32.Native.Interfaces.DXGI;
 using Hi3Helper.Win32.Native.Structs.D2D;
-using System;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface]
 [Guid("06152247-6f50-465a-9245-118bfd3b6007")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID2D1Factory
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1/nf-d2d1-id2d1factory-reloadsystemmetrics

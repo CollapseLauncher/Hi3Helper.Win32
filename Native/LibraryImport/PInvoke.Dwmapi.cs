@@ -1,5 +1,5 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Structs;
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMethodReturnValue.Global
 

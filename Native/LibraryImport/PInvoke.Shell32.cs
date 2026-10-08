@@ -1,6 +1,6 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Structs;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo

@@ -1,6 +1,6 @@
-﻿using Hi3Helper.Win32.Native.Enums;
+﻿using System;
+using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.ShellLinkCOM;
-using System;
 
 namespace Hi3Helper.Win32.Native.Structs;
 

@@ -1,5 +1,3 @@
-using Hi3Helper.Win32.Native.Enums;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -7,6 +5,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Threading.Tasks;
+using Hi3Helper.Win32.Native.Enums;
+using Microsoft.Extensions.Logging;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global

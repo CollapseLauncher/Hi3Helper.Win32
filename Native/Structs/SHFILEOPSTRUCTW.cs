@@ -1,5 +1,5 @@
-﻿using Hi3Helper.Win32.Native.Enums;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global

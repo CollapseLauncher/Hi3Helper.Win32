@@ -1,9 +1,8 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using Hi3Helper.Win32.Native.Enums.D3D;
+﻿using System;
+using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums.D2D;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.D2D;
-using System;
-using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 

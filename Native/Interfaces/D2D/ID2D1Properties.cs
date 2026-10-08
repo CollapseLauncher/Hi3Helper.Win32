@@ -1,12 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.D2D;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 [Guid("483473d7-cd46-4f9d-9d3a-3112aa80159d")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID2D1Properties
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1properties-getpropertycount

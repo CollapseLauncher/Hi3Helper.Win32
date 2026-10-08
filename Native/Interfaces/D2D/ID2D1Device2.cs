@@ -1,13 +1,13 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using Hi3Helper.Win32.Native.Interfaces.DXGI;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.D2D;
+using Hi3Helper.Win32.Native.Interfaces.DXGI;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface]
 [Guid("a44472e1-8dfb-4e60-8492-6e2861c9ca8b")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID2D1Device2 : ID2D1Device1
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_3/nf-d2d1_3-id2d1device2-createdevicecontext

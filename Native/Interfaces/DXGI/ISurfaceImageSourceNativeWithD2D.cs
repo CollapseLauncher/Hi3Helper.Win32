@@ -1,12 +1,13 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.Native.Interfaces.DXGI;
 
 [GeneratedComInterface]
 [Guid("cb833102-d5d1-448b-a31a-52a9509f24e6")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ISurfaceImageSourceNativeWithD2D
 {
     // https://learn.microsoft.com/windows/win32/api/windows.ui.xaml.media.dxinterop/nf-windows-ui-xaml-media-dxinterop-isurfaceimagesourcenativewithd2d-setdevice

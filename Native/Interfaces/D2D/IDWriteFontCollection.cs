@@ -1,12 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 [Guid("a84cee02-3eea-4eee-a827-87c1a02a0fcc")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IDWriteFontCollection
 {
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontcollection-getfontfamilycount

@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.Native.Enums;
+﻿using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Enums.Registry;
 using Microsoft.Win32.SafeHandles;
-using System.Runtime.InteropServices;
 // ReSharper disable StringLiteralTypo
 #pragma warning disable CA1401
 

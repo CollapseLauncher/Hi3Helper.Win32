@@ -1,7 +1,4 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using Hi3Helper.Win32.Native.LibraryImport;
-using Hi3Helper.Win32.Native.Structs.D2D;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -10,6 +7,9 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using Hi3Helper.Win32.Native.Enums.D2D;
+using Hi3Helper.Win32.Native.LibraryImport;
+using Hi3Helper.Win32.Native.Structs.D2D;
 
 namespace Hi3Helper.Win32.Native.Structs.D3D;
 

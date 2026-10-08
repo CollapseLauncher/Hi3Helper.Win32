@@ -1,11 +1,11 @@
-﻿using Hi3Helper.Win32.Native.LibraryImport;
-using Hi3Helper.Win32.Native.Structs;
-using System;
+﻿using System;
 using System.Buffers;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.LibraryImport;
+using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.ManagedTools;
 

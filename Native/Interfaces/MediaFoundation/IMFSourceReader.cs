@@ -1,6 +1,6 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 
@@ -8,6 +8,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.MediaFoundation;
 
 [Guid("70AE66F2-C809-4E4F-8915-BDCB406B7993")]
 [GeneratedComInterface]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 // https://www.winehq.org/pipermail/wine-patches/2017-February/158102.html
 public partial interface IMFSourceReader
 {

@@ -6,6 +6,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.DXGI;
 
 [GeneratedComInterface]
 [Guid("a8be2ac4-199f-4946-b331-79599fb98de7")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public unsafe partial interface IDXGISwapChain2 : IDXGISwapChain1
 {
     // https://learn.microsoft.com/windows/win32/api/dxgi1_3/nf-dxgi1_3-idxgiswapchain2-setsourcesize

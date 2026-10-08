@@ -1,6 +1,6 @@
-﻿using Hi3Helper.Win32.Native.Enums.Dns;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.Dns;
 // ReSharper disable InconsistentNaming
 
 namespace Hi3Helper.Win32.Native.Structs.Dns

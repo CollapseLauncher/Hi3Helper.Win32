@@ -1,13 +1,14 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs;
 // ReSharper disable InconsistentNaming
 
 namespace Hi3Helper.Win32.Native.Interfaces.MediaFoundation;
 
 [Guid("2CD2D921-C447-44A7-A13C-4ADABFC247E3")]
 [GeneratedComInterface]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 // https://doxygen.reactos.org/d3/d9f/interfaceIMFAttributes.html
 public partial interface IMFAttributes
 {

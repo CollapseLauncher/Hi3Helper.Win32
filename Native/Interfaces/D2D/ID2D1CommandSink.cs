@@ -1,13 +1,13 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using Hi3Helper.Win32.Native.Structs.D2D;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.D2D;
+using Hi3Helper.Win32.Native.Structs.D2D;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface]
 [Guid("54d7898a-a061-40a7-bec7-e465bcba2c4f")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID2D1CommandSink
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1commandsink-begindraw

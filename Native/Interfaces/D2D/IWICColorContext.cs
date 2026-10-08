@@ -1,12 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.D2D;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 [Guid("3c613a02-34b2-44ea-9a7c-45aea9c6fd6d")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IWICColorContext
 {
     // https://learn.microsoft.com/windows/win32/api/wincodec/nf-wincodec-iwiccolorcontext-initializefromfilename

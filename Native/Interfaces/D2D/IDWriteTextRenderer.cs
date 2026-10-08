@@ -1,14 +1,14 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
+﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.D2D;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.D2D;
-using System;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface]
 [Guid("ef8a8135-5cc6-45fe-8825-c5a0724eb819")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IDWriteTextRenderer : IDWritePixelSnapping
 {
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritetextrenderer-drawglyphrun

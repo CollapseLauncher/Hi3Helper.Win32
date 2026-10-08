@@ -1,12 +1,13 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.Native.Interfaces.DXGI;
 
 [GeneratedComInterface]
 [Guid("eb533d5d-2db6-40f8-97a9-494692014f07")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 // https://github.com/smourier/DirectNAot/blob/0f81689b5f52ae792ee8cc236570d3058b0a2bf0/DirectN/Generated/DirectN/IMFDXGIDeviceManager.cs#L7
 public partial interface IMFDXGIDeviceManager
 {

@@ -1,12 +1,12 @@
-﻿using Hi3Helper.Win32.Native.Enums.DXGI;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.DXGI;
 
 namespace Hi3Helper.Win32.Native.Interfaces.DXGI;
 
 [GeneratedComInterface]
 [Guid("05008617-fbfd-4051-a790-144884b4f6a9")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IDXGIDevice2 : IDXGIDevice1
 {
     // https://learn.microsoft.com/windows/win32/api/dxgi1_2/nf-dxgi1_2-idxgidevice2-offerresources

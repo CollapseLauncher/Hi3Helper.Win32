@@ -1,15 +1,15 @@
-﻿using Hi3Helper.Win32.Native.Enums.Dns;
-using Hi3Helper.Win32.Native.LibraryImport;
-using Hi3Helper.Win32.Native.Structs.Dns;
-using Hi3Helper.Win32.Native.Structs.Dns.RecordDataType;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Hi3Helper.Win32.Native.Enums.Dns;
+using Hi3Helper.Win32.Native.LibraryImport;
+using Hi3Helper.Win32.Native.Structs.Dns;
+using Hi3Helper.Win32.Native.Structs.Dns.RecordDataType;
+using Microsoft.Extensions.Logging;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 

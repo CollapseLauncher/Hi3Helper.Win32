@@ -6,6 +6,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 
 [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 [Guid("9d06dffa-d1e5-4d07-83a8-1bb123f2f841")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID3D11Device2 : ID3D11Device1
 {
     // https://learn.microsoft.com/windows/win32/api/d3d11_2/nf-d3d11_2-id3d11device2-getimmediatecontext2

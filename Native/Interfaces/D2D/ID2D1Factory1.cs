@@ -1,9 +1,9 @@
-﻿using Hi3Helper.Win32.Native.Interfaces.D3D;
-using Hi3Helper.Win32.Native.Interfaces.DXGI;
-using Hi3Helper.Win32.Native.Structs.D2D;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Interfaces.DXGI;
+using Hi3Helper.Win32.Native.Structs.D2D;
+// ReSharper disable InconsistentNaming
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
@@ -12,6 +12,7 @@ public delegate nint PD2D1_EFFECT_FACTORY(nint effectImpl);
 
 [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 [Guid("bb12d362-daee-4b9a-aa1d-14ba401cfa1f")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID2D1Factory1 : ID2D1Factory
 {
     // https://learn.microsoft.com/windows/win32/api/d2d1_1/nf-d2d1_1-id2d1factory1-createdevice

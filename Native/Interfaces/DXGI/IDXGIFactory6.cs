@@ -1,8 +1,8 @@
-﻿using Hi3Helper.Win32.Native.ClassIds.DXGI;
-using Hi3Helper.Win32.Native.Enums.DXGI;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.ClassIds.DXGI;
+using Hi3Helper.Win32.Native.Enums.DXGI;
 // ReSharper disable InconsistentNaming
 // ReSharper disable RedundantUnsafeContext
 // ReSharper disable CommentTypo

@@ -1,9 +1,9 @@
-﻿using Hi3Helper.Win32.Native.Enums;
+﻿using System;
+using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.ShellLinkCOM;
-using System;
-using System.Runtime.InteropServices;
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 

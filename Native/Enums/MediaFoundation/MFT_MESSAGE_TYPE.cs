@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Hi3Helper.Win32.Native.Enums.MediaFoundation;
+﻿namespace Hi3Helper.Win32.Native.Enums.MediaFoundation;
 
 public enum MFT_MESSAGE_TYPE : uint
 {

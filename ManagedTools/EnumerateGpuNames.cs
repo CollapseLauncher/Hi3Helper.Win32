@@ -1,12 +1,12 @@
-﻿using Hi3Helper.Win32.Native.ClassIds.DXGI;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.ClassIds.DXGI;
 using Hi3Helper.Win32.Native.Enums.DXGI;
 using Hi3Helper.Win32.Native.Interfaces.DXGI;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.DXGI;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.ManagedTools;
 

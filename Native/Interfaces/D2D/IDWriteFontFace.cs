@@ -1,15 +1,15 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using Hi3Helper.Win32.Native.Structs;
-using Hi3Helper.Win32.Native.Structs.D2D;
-using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.D2D;
+using Hi3Helper.Win32.Native.Structs;
+using Hi3Helper.Win32.Native.Structs.D2D;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface]
 [Guid("5f49804d-7024-4d43-bfa9-d25984f53849")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IDWriteFontFace
 {
     // https://learn.microsoft.com/windows/win32/api/dwrite/nf-dwrite-idwritefontface-gettype

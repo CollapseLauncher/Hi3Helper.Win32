@@ -1,9 +1,8 @@
-﻿using Hi3Helper.Win32.Native.Enums.DXGI;
+﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.DXGI;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.DXGI;
-using System;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace Hi3Helper.Win32.Native.Interfaces.DXGI;
 

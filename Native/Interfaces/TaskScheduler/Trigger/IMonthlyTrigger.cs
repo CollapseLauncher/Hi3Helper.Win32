@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.ManagedTools;
-using Hi3Helper.Win32.Native.Structs;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.ManagedTools;
+using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.Native.Interfaces.TaskScheduler.Trigger;
 

@@ -1,126 +1,126 @@
-﻿using Hi3Helper.Win32.Native.ClassIds;
-using Hi3Helper.Win32.ShellLinkCOM;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.ClassIds;
+using Hi3Helper.Win32.Native.Structs;
+using Hi3Helper.Win32.ShellLinkCOM;
 // ReSharper disable PartialTypeWithSinglePart
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-namespace Hi3Helper.Win32.Native.Interfaces
+namespace Hi3Helper.Win32.Native.Interfaces;
+
+
+[Guid(ShellLinkClsId.Id_ShellLinkIGuid)]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+[GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
+public partial interface IShellLinkW
 {
-    [Guid(ShellLinkClsId.Id_ShellLinkIGuid)]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
-    public partial interface IShellLinkW
-    {
-        /// <summary>
-        /// Retrieves the path and filename of a shell link object
-        /// </summary>
-        unsafe void GetPath(
-            char*        pszFile,
-            int          cchMaxPath,
-            nint         pfd,
-            EShellLinkGP fFlags);
+    /// <summary>
+    /// Retrieves the path and filename of a shell link object
+    /// </summary>
+    unsafe void GetPath(
+        [MarshalUsing(typeof(Utf16StringMarshaller), CountElementName = nameof(cchMaxPath))] out string? pszFile,
+        int                                                                                              cchMaxPath,
+        nint                                                                                             pfd,
+        EShellLinkGP                                                                                     fFlags);
 
-        /// <summary>
-        /// Retrieves the list of shell link item identifiers
-        /// </summary>
-        void GetIDList(out nint ppidl);
+    /// <summary>
+    /// Retrieves the list of shell link item identifiers
+    /// </summary>
+    void GetIDList(out ITEMIDLIST* ppidl);
 
-        /// <summary>
-        /// Sets the list of shell link item identifiers
-        /// </summary>
-        void SetIDList(nint pidl);
+    /// <summary>
+    /// Sets the list of shell link item identifiers
+    /// </summary>
+    void SetIDList(ITEMIDLIST* pidl);
 
-        /// <summary>
-        /// Retrieves the shell link description string
-        /// </summary>
-        unsafe void GetDescription(
-            char* pszFile,
-            int   cchMaxName);
+    /// <summary>
+    /// Retrieves the shell link description string
+    /// </summary>
+    unsafe void GetDescription(
+        [MarshalUsing(typeof(Utf16StringMarshaller), CountElementName = nameof(cchMaxName))] out string? pszFile,
+        int                                                                                              cchMaxName);
 
-        /// <summary>
-        /// Sets the shell link description string
-        /// </summary>
-        void SetDescription([MarshalAs(UnmanagedType.LPWStr)] string pszName);
+    /// <summary>
+    /// Sets the shell link description string
+    /// </summary>
+    void SetDescription(string? pszName);
 
-        /// <summary>
-        /// Retrieves the name of the shell link working directory
-        /// </summary>
-        unsafe void GetWorkingDirectory(
-            char* pszDir,
-            int   cchMaxPath);
+    /// <summary>
+    /// Retrieves the name of the shell link working directory
+    /// </summary>
+    unsafe void GetWorkingDirectory(
+        [MarshalUsing(typeof(Utf16StringMarshaller), CountElementName = nameof(cchMaxPath))] out string? pszDir,
+        int                                                                                              cchMaxPath);
 
-        /// <summary>
-        /// Sets the name of the shell link working directory
-        /// </summary>
-        void SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string pszDir);
+    /// <summary>
+    /// Sets the name of the shell link working directory
+    /// </summary>
+    void SetWorkingDirectory(string? pszDir);
 
-        /// <summary>
-        /// Retrieves the shell link command-line arguments
-        /// </summary>
-        unsafe void GetArguments(
-            char* pszArgs,
-            int   cchMaxPath);
+    /// <summary>
+    /// Retrieves the shell link command-line arguments
+    /// </summary>
+    unsafe void GetArguments(
+        out string? pszArgs,
+        int         cchMaxPath);
 
-        /// <summary>
-        /// Sets the shell link command-line arguments
-        /// </summary>
-        void SetArguments(
-            [MarshalAs(UnmanagedType.LPWStr)] string pszArgs);
+    /// <summary>
+    /// Sets the shell link command-line arguments
+    /// </summary>
+    void SetArguments(string? pszArgs);
 
-        /// <summary>
-        /// Retrieves or sets the shell link hot key
-        /// </summary>
-        void GetHotkey(out short pwHotkey);
+    /// <summary>
+    /// Retrieves or sets the shell link hot key
+    /// </summary>
+    void GetHotkey(out short pwHotkey);
 
-        /// <summary>
-        /// Retrieves or sets the shell link hot key
-        /// </summary>
-        void SetHotkey(short pwHotkey);
+    /// <summary>
+    /// Retrieves or sets the shell link hot key
+    /// </summary>
+    void SetHotkey(short pwHotkey);
 
-        /// <summary>
-        /// Retrieves or sets the shell link show command
-        /// </summary>
-        void GetShowCmd(out uint piShowCmd);
+    /// <summary>
+    /// Retrieves or sets the shell link show command
+    /// </summary>
+    void GetShowCmd(out uint piShowCmd);
 
-        /// <summary>
-        /// Retrieves or sets the shell link show command
-        /// </summary>
-        void SetShowCmd(uint piShowCmd);
+    /// <summary>
+    /// Retrieves or sets the shell link show command
+    /// </summary>
+    void SetShowCmd(uint piShowCmd);
 
-        /// <summary>
-        /// Retrieves the location (path and index) of the shell link icon
-        /// </summary>
-        unsafe void GetIconLocation(
-            char*   pszIconPath,
-            int     cchIconPath,
-            out int piIcon);
+    /// <summary>
+    /// Retrieves the location (path and index) of the shell link icon
+    /// </summary>
+    unsafe void GetIconLocation(
+        [MarshalUsing(typeof(Utf16StringMarshaller), CountElementName = nameof(cchIconPath))] out string? pszIconPath,
+        int                                                                                               cchIconPath,
+        out int                                                                                           piIcon);
 
-        /// <summary>
-        /// Sets the location (path and index) of the shell link icon
-        /// </summary>
-        void SetIconLocation(
-            [MarshalAs(UnmanagedType.LPWStr)] string pszIconPath,
-            int                                      iIcon);
+    /// <summary>
+    /// Sets the location (path and index) of the shell link icon
+    /// </summary>
+    void SetIconLocation(
+        string? pszIconPath,
+        int     iIcon);
 
-        /// <summary>
-        /// Sets the shell link relative path
-        /// </summary>
-        void SetRelativePath(
-            [MarshalAs(UnmanagedType.LPWStr)] string pszPathRel,
-            uint                                     dwReserved);
+    /// <summary>
+    /// Sets the shell link relative path
+    /// </summary>
+    void SetRelativePath(
+        string? pszPathRel,
+        uint    dwReserved);
 
-        /// <summary>
-        /// Resolves a shell link. The system searches for the shell link object and updates the shell link path and its list of identifiers (if necessary)
-        /// </summary>
-        void Resolve(
-            nint windowHandle,
-            uint fFlags);
+    /// <summary>
+    /// Resolves a shell link. The system searches for the shell link object and updates the shell link path and its list of identifiers (if necessary)
+    /// </summary>
+    void Resolve(
+        nint windowHandle,
+        uint fFlags);
 
-        /// <summary>
-        /// Sets the shell link path and filename
-        /// </summary>
-        void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
-    }
+    /// <summary>
+    /// Sets the shell link path and filename
+    /// </summary>
+    void SetPath(string? pszFile);
 }

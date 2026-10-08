@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.Native.ClassIds.DXGI;
-using Hi3Helper.Win32.Native.Structs.DXGI;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.ClassIds.DXGI;
+using Hi3Helper.Win32.Native.Structs.DXGI;
 // ReSharper disable InconsistentNaming
 // ReSharper disable CommentTypo
 

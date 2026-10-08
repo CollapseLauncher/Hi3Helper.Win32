@@ -1,13 +1,13 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using Hi3Helper.Win32.Native.Enums.DXGI;
-using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.D2D;
+using Hi3Helper.Win32.Native.Enums.DXGI;
 
 namespace Hi3Helper.Win32.Native.Interfaces.DXGI;
 
 [GeneratedComInterface]
 [Guid("94d99bdb-f1f8-4ab0-b236-7da0170edab1")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IDXGISwapChain3 : IDXGISwapChain2
 {
     // https://learn.microsoft.com/windows/win32/api/dxgi1_4/nf-dxgi1_4-idxgiswapchain3-getcurrentbackbufferindex

@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.Native.Enums.MediaFoundation;
-using Hi3Helper.Win32.Native.Structs;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.MediaFoundation;
+using Hi3Helper.Win32.Native.Structs;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable InconsistentNaming
 
@@ -9,6 +9,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.MediaFoundation;
 
 [Guid("BF94C121-5B05-4E6F-8000-BA598961414D")]
 [GeneratedComInterface]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 // https://doxygen.reactos.org/d6/d8c/interfaceIMFTransform.html
 public partial interface IMFTransform
 {

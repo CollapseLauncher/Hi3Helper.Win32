@@ -1,10 +1,11 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 
-[GeneratedComInterface, Guid("bb2c6faa-b5fb-4082-8e6b-388b8cfa90e1")]
+[GeneratedComInterface]
+[Guid("bb2c6faa-b5fb-4082-8e6b-388b8cfa90e1")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID3D11DeviceContext1 : ID3D11DeviceContext
 {
     // https://learn.microsoft.com/windows/win32/api/d3d11_1/nf-d3d11_1-id3d11devicecontext1-copysubresourceregion1

@@ -1,20 +1,18 @@
-﻿using Hi3Helper.Win32.Native.ClassIds;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.ClassIds;
 // ReSharper disable PartialTypeWithSinglePart
 
-namespace Hi3Helper.Win32.Native.Interfaces
+namespace Hi3Helper.Win32.Native.Interfaces;
+
+[Guid(ShellLinkClsId.Id_IPersistIGuid)]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+[GeneratedComInterface]
+public partial interface IPersist
 {
-    [Guid(ShellLinkClsId.Id_IPersistIGuid)]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    [GeneratedComInterface]
-    public partial interface IPersist
-    {
-        /// <summary>
-        /// Returns the class identifier for the component object
-        /// </summary>
-        [PreserveSig]
-        void GetClassID(out Guid pClassID);
-    }
+    /// <summary>
+    /// Returns the class identifier for the component object
+    /// </summary>
+    void GetClassID(out Guid pClassID);
 }

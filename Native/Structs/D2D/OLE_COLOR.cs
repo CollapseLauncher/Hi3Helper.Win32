@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using Hi3Helper.Win32.Native.LibraryImport;
-using System;
+﻿using System;
 using System.Runtime.Versioning;
+using Hi3Helper.Win32.Native.Enums.D2D;
+using Hi3Helper.Win32.Native.LibraryImport;
 
 namespace Hi3Helper.Win32.Native.Structs.D2D;
 

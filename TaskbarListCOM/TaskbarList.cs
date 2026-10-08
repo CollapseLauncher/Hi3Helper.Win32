@@ -1,6 +1,7 @@
+using System;
 using Hi3Helper.Win32.ManagedTools;
 using Hi3Helper.Win32.Native.Enums;
-using System;
+using Hi3Helper.Win32.Native.Interfaces;
 
 namespace Hi3Helper.Win32.TaskbarListCOM;
 

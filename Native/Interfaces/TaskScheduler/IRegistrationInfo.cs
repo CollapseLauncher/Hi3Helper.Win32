@@ -1,6 +1,6 @@
-﻿using Hi3Helper.Win32.ManagedTools;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.ManagedTools;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo

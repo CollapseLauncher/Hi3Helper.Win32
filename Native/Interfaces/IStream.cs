@@ -1,13 +1,13 @@
-﻿using Hi3Helper.Win32.Native.Structs;
-using System;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.Native.Interfaces;
 
 [GeneratedComInterface]
 [Guid("0000000c-0000-0000-c000-000000000046")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IStream : ISequentialStream
 {
     // https://learn.microsoft.com/windows/win32/api/objidl/nf-objidl-istream-seek

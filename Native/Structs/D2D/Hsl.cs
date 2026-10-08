@@ -1,5 +1,5 @@
-﻿using Hi3Helper.Win32.Native.Structs.D3D;
-using System;
+﻿using System;
+using Hi3Helper.Win32.Native.Structs.D3D;
 
 namespace Hi3Helper.Win32.Native.Structs.D2D;
 

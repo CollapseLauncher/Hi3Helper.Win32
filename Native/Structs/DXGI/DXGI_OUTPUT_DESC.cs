@@ -1,6 +1,5 @@
-﻿using Hi3Helper.Win32.Native.Enums.DXGI;
-using System.Runtime.InteropServices;
-using System.Threading;
+﻿using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums.DXGI;
 // ReSharper disable InconsistentNaming
 // ReSharper disable CommentTypo
 // ReSharper disable MemberCanBePrivate.Global

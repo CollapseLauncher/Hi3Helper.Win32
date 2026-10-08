@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.Native.Enums.Dns;
-using Hi3Helper.Win32.Native.Structs.Dns;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums.Dns;
+using Hi3Helper.Win32.Native.Structs.Dns;
 // ReSharper disable StringLiteralTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMethodReturnValue.Global

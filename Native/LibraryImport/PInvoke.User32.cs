@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.Native.Enums;
+﻿using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Enums.D2D;
 using Hi3Helper.Win32.Native.Structs;
-using System.Runtime.InteropServices;
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMethodReturnValue.Global

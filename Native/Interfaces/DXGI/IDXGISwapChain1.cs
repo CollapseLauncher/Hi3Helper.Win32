@@ -1,10 +1,10 @@
-﻿using Hi3Helper.Win32.Native.ClassIds.DXGI;
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.ClassIds.DXGI;
 using Hi3Helper.Win32.Native.Enums.DXGI;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.DXGI;
-using System;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable InconsistentNaming
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
@@ -14,6 +14,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.DXGI;
 
 [GeneratedComInterface]
 [Guid(DXGIClsId.IDXGISwapChain1)]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IDXGISwapChain1 : IDXGISwapChain
 {
     // https://learn.microsoft.com/windows/win32/api/dxgi1_2/nf-dxgi1_2-idxgiswapchain1-getdesc1

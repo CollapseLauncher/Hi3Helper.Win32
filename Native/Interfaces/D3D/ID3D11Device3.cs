@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using Hi3Helper.Win32.Native.Structs.D3D;
 
@@ -7,6 +6,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.D3D;
 
 [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 [Guid("a05c8c37-d2c6-4732-b3a0-9ce0b0dc9ae6")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID3D11Device3 : ID3D11Device2
 {
     // https://learn.microsoft.com/windows/win32/api/d3d11_3/nf-d3d11_3-id3d11device3-createtexture2d1

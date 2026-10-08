@@ -1,8 +1,8 @@
-﻿using Hi3Helper.Win32.Native.ClassIds;
-using Hi3Helper.Win32.Native.LibraryImport;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Hi3Helper.Win32.Native.ClassIds;
+using Hi3Helper.Win32.Native.LibraryImport;
 // ReSharper disable UnusedType.Global
 // ReSharper disable CommentTypo
 // ReSharper disable UnusedMember.Global

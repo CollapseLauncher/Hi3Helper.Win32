@@ -1,9 +1,9 @@
-﻿using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.LibraryImport;
-using Hi3Helper.Win32.Native.Structs;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.LibraryImport;
+using Hi3Helper.Win32.Native.Structs;
 // ReSharper disable CommentTypo
 // ReSharper disable GrammarMistakeInComment
 // ReSharper disable MemberCanBePrivate.Global

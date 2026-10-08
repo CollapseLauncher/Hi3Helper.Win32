@@ -1,5 +1,5 @@
-using Hi3Helper.Win32.Native.Structs;
 using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.Native.LibraryImport;
 

@@ -1,9 +1,9 @@
-﻿using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.LibraryImport;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.LibraryImport;
+using Microsoft.Extensions.Logging;
 // ReSharper disable UnusedMember.Global
 
 namespace Hi3Helper.Win32.ManagedTools

@@ -1,11 +1,11 @@
-﻿using Hi3Helper.Win32.Native.Enums.MediaFoundation;
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.MediaFoundation;
 using Hi3Helper.Win32.Native.Interfaces.DXGI;
 using Hi3Helper.Win32.Native.Interfaces.MediaFoundation;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.MediaFoundation;
-using System;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable StringLiteralTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo

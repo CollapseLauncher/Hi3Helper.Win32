@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.Native.Enums.WIC;
-using Hi3Helper.Win32.Native.Structs;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.WIC;
+using Hi3Helper.Win32.Native.Structs;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 
@@ -9,6 +9,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.WIC;
 
 [Guid("EC5EC8A9-C395-4314-9C77-54D7A935FF70")]
 [GeneratedComInterface]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 // https://doxygen.reactos.org/da/d19/interfaceIWICImagingFactory.html
 public partial interface IWICImagingFactory
 {

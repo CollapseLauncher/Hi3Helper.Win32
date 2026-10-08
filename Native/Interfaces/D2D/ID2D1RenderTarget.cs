@@ -1,16 +1,17 @@
-﻿using Hi3Helper.Win32.Native.Enums.D2D;
-using Hi3Helper.Win32.Native.Structs;
-using Hi3Helper.Win32.Native.Structs.D2D;
-using Hi3Helper.Win32.Native.Structs.D3D;
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums.D2D;
+using Hi3Helper.Win32.Native.Structs;
+using Hi3Helper.Win32.Native.Structs.D2D;
+using Hi3Helper.Win32.Native.Structs.D3D;
 
 namespace Hi3Helper.Win32.Native.Interfaces.D2D;
 
 [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 [Guid("2cd90694-12e2-11dc-9fed-001143a055f9")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ID2D1RenderTarget : ID2D1Resource
 {
     // https://learn.microsoft.com/windows/win32/Direct2D/id2d1rendertarget-createbitmap

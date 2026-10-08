@@ -6,6 +6,7 @@ namespace Hi3Helper.Win32.Native.Interfaces;
 
 [GeneratedComInterface]
 [Guid("1b8efec4-3019-4c27-964e-367202156906")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IPrintDocumentPackageTarget
 {
     // https://learn.microsoft.com/windows/win32/api/documenttarget/nf-documenttarget-iprintdocumentpackagetarget-getpackagetargettypes

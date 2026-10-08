@@ -1,7 +1,7 @@
-using Microsoft.Extensions.Logging;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 
 namespace Hi3Helper.Win32.ManagedTools

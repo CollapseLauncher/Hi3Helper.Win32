@@ -1,6 +1,6 @@
-﻿using Hi3Helper.Win32.Native.Enums.D3D;
+﻿using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums.D3D;
 using Hi3Helper.Win32.Native.Enums.DXGI;
-using System.Runtime.InteropServices;
 
 namespace Hi3Helper.Win32.Native.Structs.D3D;
 

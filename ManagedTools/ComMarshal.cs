@@ -1,11 +1,11 @@
-﻿using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.LibraryImport;
-using Hi3Helper.Win32.Native.Structs;
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.LibraryImport;
+using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.ManagedTools;
 
@@ -16,7 +16,7 @@ public static class ComMarshal
     /// </summary>
     /// <param name="comObj">A COM Object Interface to be released.</param>
     public static void FinalRelease<TComObject>(TComObject? comObj)
-        where TComObject : class => (comObj as ComObject)?.FinalRelease();
+        where TComObject : class => ComMarshal<TComObject>.FinalRelease(comObj);
 }
 
 public static class ComMarshal<TComObject>
@@ -297,7 +297,10 @@ public static class ComMarshal<TComObject>
     /// Final release the reference of the wrapped COM Object Interface.
     /// </summary>
     /// <param name="comObj">A COM Object Interface to be released.</param>
-    public static void FinalRelease(TComObject? comObj) => (comObj as ComObject)?.FinalRelease();
+    public static void FinalRelease(TComObject? comObj)
+    {
+        (comObj as ComObject)?.FinalRelease();
+    }
 
     private static InvalidCastException ThrowNoGuidDefined<TObjTarget>() => new($"Type of {typeof(TObjTarget).Name} has no Class Identifier ID (IID)");
 }

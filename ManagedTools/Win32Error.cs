@@ -1,7 +1,7 @@
-﻿using Hi3Helper.Win32.Native.Enums;
-using System;
+﻿using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
+using Hi3Helper.Win32.Native.Enums;
 using static Hi3Helper.Win32.Native.LibraryImport.PInvoke;
 // ReSharper disable MemberCanBePrivate.Global
 

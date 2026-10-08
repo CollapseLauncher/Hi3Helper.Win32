@@ -1,27 +1,25 @@
-﻿using Hi3Helper.Win32.Native.ClassIds;
+﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.ClassIds;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.ShellLinkCOM;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 // ReSharper disable PartialTypeWithSinglePart
 // ReSharper disable IdentifierTypo
 
-namespace Hi3Helper.Win32.Native.Interfaces
+namespace Hi3Helper.Win32.Native.Interfaces;
+
+[Guid(ShellLinkClsId.Id_IPropertyStoreIGuid)]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+[GeneratedComInterface]
+public partial interface IPropertyStore
 {
-    [Guid(ShellLinkClsId.Id_IPropertyStoreIGuid)]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    [GeneratedComInterface]
-    public partial interface IPropertyStore
-    {
-        [PreserveSig]
-        int GetCount(out uint cProps);
-        [PreserveSig]
-        int GetAt(in uint iProp, out PropertyKey pkey);
-        [PreserveSig]
-        int GetValue(ref PropertyKey key, out PropVariant pv);
-        [PreserveSig]
-        int SetValue(ref PropertyKey key, ref PropVariant pv);
-        [PreserveSig]
-        int Commit();
-    }
+    void GetCount(out uint cProps);
+
+    void GetAt(in uint iProp, out PropertyKey pkey);
+
+    void GetValue(ref PropertyKey key, out PropVariant pv);
+
+    void SetValue(ref PropertyKey key, ref PropVariant pv);
+
+    void Commit();
 }

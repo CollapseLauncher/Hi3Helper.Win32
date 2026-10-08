@@ -1,4 +1,9 @@
-﻿using Hi3Helper.Win32.ManagedTools;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using Hi3Helper.Win32.ManagedTools;
 using Hi3Helper.Win32.Native.ClassIds.DXGI;
 using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Enums.DXGI;
@@ -6,11 +11,6 @@ using Hi3Helper.Win32.Native.Interfaces.DXGI;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.DXGI;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.CompilerServices;
 // ReSharper disable InconsistentNaming
 
 namespace Hi3Helper.Win32.Screen;
