@@ -4,25 +4,77 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using Hi3Helper.Win32.Native.Enums;
+using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
+// ReSharper disable InconsistentNaming
 
 namespace Hi3Helper.Win32.ManagedTools;
 
+public enum DisposeResult
+{
+    NotDisposable,
+    IClosable
+}
+
 public static class ComMarshal
 {
+    private static readonly Guid IID_IClosable = typeof(IClosable).GUID;
+
     /// <summary>
     /// Final release the reference of the wrapped COM Object Interface.
     /// </summary>
     /// <param name="comObj">A COM Object Interface to be released.</param>
-    public static void FinalRelease<TComObject>(TComObject? comObj)
-        where TComObject : class => ComMarshal<TComObject>.FinalRelease(comObj);
+    public static unsafe void FinalRelease<TComObject>(TComObject? comObj)
+        => (comObj as ComObject)?.FinalRelease();
+
+    /// <summary>
+    /// Try to dispose a COM Object Interface if it's IClosable/IDisposable derived ones.
+    /// </summary>
+    /// <param name="comObj">A COM Object Interface to be released.</param>
+    /// <param name="disposeResult">The result of the disposing, showing the type whether it's disposable one or not.</param>
+    /// <param name="hResult">The HResult of the underlying <see cref="Marshal.QueryInterface"/> or the actual method of the Dispose()/Close().</param>
+    public static unsafe bool TryDispose<TComObject>(
+        TComObject?       comObj,
+        out DisposeResult disposeResult,
+        out int           hResult)
+    {
+        hResult       = 0;
+        disposeResult = DisposeResult.NotDisposable;
+
+        if (comObj == null)
+            return false;
+
+        // Try to query if object is an IClosable first
+        nint ppvIClosable = nint.Zero;
+        nint ppv          = (nint)ComInterfaceMarshaller<TComObject>.ConvertToUnmanaged(comObj);
+        if (ppv == nint.Zero)
+            return false;
+
+        try
+        {
+            // Try QI into IClosable
+            hResult = Marshal.QueryInterface(ppv, in IID_IClosable, out ppvIClosable);
+            if (hResult == unchecked((int)0x80004002)) // Not an IClosable? Skip it!
+                return false;
+            disposeResult = DisposeResult.IClosable;
+
+            // Perform IClosable::Close();
+            hResult = ((delegate* unmanaged[MemberFunction]<nint, int>)(*(*(void***)ppvIClosable + 6)))(ppvIClosable);
+            return hResult == 0;
+        }
+        finally
+        {
+            if (ppvIClosable != nint.Zero) Marshal.Release(ppvIClosable);
+            if (ppv != nint.Zero) Marshal.Release(ppv);
+        }
+    }
 }
 
 public static class ComMarshal<TComObject>
     where TComObject : class
 {
-    private static readonly Guid? ObjComIid = typeof(TComObject).GUID;
+    private static readonly Guid? IID = typeof(TComObject).GUID;
 
     /// <summary>
     /// Try to create COM Object based on its Class Factory ID and its Class Identifier ID (IID).
@@ -141,7 +193,7 @@ public static class ComMarshal<TComObject>
         bool useUnique = false)
         => TryCreateComObject(in classFactoryId,
                               classContext,
-                              in Nullable.GetValueRefOrDefaultRef(in ObjComIid),
+                              in Nullable.GetValueRefOrDefaultRef(in IID),
                               out comObjResult,
                               out exceptionIfFalse,
                               useUnique);
@@ -220,7 +272,7 @@ public static class ComMarshal<TComObject>
     {
         Unsafe.SkipInit(out comObjTarget);
 
-        ref readonly Guid comObjTargetIid = ref Nullable.GetValueRefOrDefaultRef(in ComMarshal<TComCastTo>.ObjComIid);
+        ref readonly Guid comObjTargetIid = ref Nullable.GetValueRefOrDefaultRef(in IID);
         if (!Unsafe.IsNullRef(in comObjTargetIid))
         {
             return TryCastComObjectAs(comObjSource,
@@ -298,9 +350,19 @@ public static class ComMarshal<TComObject>
     /// </summary>
     /// <param name="comObj">A COM Object Interface to be released.</param>
     public static void FinalRelease(TComObject? comObj)
-    {
-        (comObj as ComObject)?.FinalRelease();
-    }
+        => ComMarshal.FinalRelease(comObj);
+
+    /// <summary>
+    /// Try to dispose a COM Object Interface if it's IClosable/IDisposable derived ones.
+    /// </summary>
+    /// <param name="comObj">A COM Object Interface to be released.</param>
+    /// <param name="disposeResult">The result of the disposing, showing the type whether it's disposable one or not.</param>
+    /// <param name="hResult">The HResult of the underlying <see cref="Marshal.QueryInterface"/> or the actual method of the Dispose()/Close().</param>
+    public static unsafe bool TryDispose(
+        TComObject?       comObj,
+        out DisposeResult disposeResult,
+        out int           hResult)
+        => ComMarshal.TryDispose(comObj, out disposeResult, out hResult);
 
     private static InvalidCastException ThrowNoGuidDefined<TObjTarget>() => new($"Type of {typeof(TObjTarget).Name} has no Class Identifier ID (IID)");
 }
