@@ -8,7 +8,7 @@ namespace Hi3Helper.Win32.Native.Interfaces;
 [GeneratedComInterface]
 [Guid("30d5a829-7fa4-4026-83bb-d75bae4ea99e")]
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-public partial interface IClosable
+public partial interface IClosable : IInspectable
 {
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
