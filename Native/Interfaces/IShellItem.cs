@@ -8,14 +8,14 @@ namespace Hi3Helper.Win32.Native.Interfaces;
 
 [Guid(IIDGuid.IShellItem)]
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-[GeneratedComInterface]
+[GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 public partial interface IShellItem
 {
     void BindToHandler(nint pbc, in Guid bhid, in Guid riid, out nint ppv);
 
     void GetParent(out IShellItem ppsi);
 
-    void GetDisplayName(SIGDN sigdnName, out nint ppszName);
+    void GetDisplayName(SIGDN sigdnName, out string? ppszName);
 
     void GetAttributes(SFGAOF sfgaoMask, out SFGAOF psfgaoAttribs);
 

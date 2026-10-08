@@ -121,48 +121,36 @@ namespace Hi3Helper.Win32.FileDialogCOM
                     throw exception;
                 }
 
-                ref COMDLG_FILTERSPEC filterArray = ref SetFileTypeFilter(fileTypeFilter, out uint filterCount);
-                try
+                SetFileTypeFilter(dialog, fileTypeFilter);
+
+                if (!string.IsNullOrEmpty(title))
+                    dialog.SetTitle(title);
+
+                FILEOPENDIALOGOPTIONS mode = isMultiple
+                    ? FILEOPENDIALOGOPTIONS.FOS_NOREADONLYRETURN | FILEOPENDIALOGOPTIONS.FOS_DONTADDTORECENT | FILEOPENDIALOGOPTIONS.FOS_ALLOWMULTISELECT
+                    : FILEOPENDIALOGOPTIONS.FOS_NOREADONLYRETURN | FILEOPENDIALOGOPTIONS.FOS_DONTADDTORECENT;
+
+                if (isFolder)
                 {
-                    if (!string.IsNullOrEmpty(title))
-                        dialog.SetTitle(title);
-
-                    if (filterCount > 0)
-                        dialog.SetFileTypes(filterCount, ref filterArray);
-
-                    FILEOPENDIALOGOPTIONS mode = isMultiple
-                        ? FILEOPENDIALOGOPTIONS.FOS_NOREADONLYRETURN | FILEOPENDIALOGOPTIONS.FOS_DONTADDTORECENT | FILEOPENDIALOGOPTIONS.FOS_ALLOWMULTISELECT
-                        : FILEOPENDIALOGOPTIONS.FOS_NOREADONLYRETURN | FILEOPENDIALOGOPTIONS.FOS_DONTADDTORECENT;
-
-                    if (isFolder)
-                    {
-                        mode |= FILEOPENDIALOGOPTIONS.FOS_PICKFOLDERS;
-                    }
-
-                    dialog.SetOptions(mode);
-                    if (ShowIsCancelledByUser(dialog))
-                    {
-                        return null;
-                    }
-
-                    if (isMultiple)
-                    {
-                        dialog.GetResults(out IShellItemArray resShell);
-                        return GetIShellItemArray(resShell);
-                    }
-                    else
-                    {
-                        dialog.GetResult(out IShellItem resShell);
-                        resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
-
-                        string? result = Marshal.PtrToStringUni(resultPtr);
-                        Marshal.FreeCoTaskMem(resultPtr);
-                        return result ?? defaultValue;
-                    }
+                    mode |= FILEOPENDIALOGOPTIONS.FOS_PICKFOLDERS;
                 }
-                finally
+
+                dialog.SetOptions(mode);
+                if (ShowIsCancelledByUser(dialog))
                 {
-                    FreeRefCoTaskMem(ref filterArray);
+                    return null;
+                }
+
+                if (isMultiple)
+                {
+                    dialog.GetResults(out IShellItemArray resShell);
+                    return GetIShellItemArray(resShell);
+                }
+                else
+                {
+                    dialog.GetResult(out IShellItem resShell);
+                    resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out string? result);
+                    return result ?? defaultValue;
                 }
             }
         }
@@ -189,34 +177,22 @@ namespace Hi3Helper.Win32.FileDialogCOM
                     throw exception;
                 }
 
-                ref COMDLG_FILTERSPEC filterArray = ref SetFileTypeFilter(fileTypeFilter, out uint filterCount);
-                try
+                SetFileTypeFilter(dialog, fileTypeFilter);
+
+                if (!string.IsNullOrEmpty(title))
+                    dialog.SetTitle(title);
+
+                const FILEOPENDIALOGOPTIONS mode = FILEOPENDIALOGOPTIONS.FOS_NOREADONLYRETURN | FILEOPENDIALOGOPTIONS.FOS_DONTADDTORECENT;
+
+                dialog.SetOptions(mode);
+                if (ShowIsCancelledByUser(dialog))
                 {
-                    if (!string.IsNullOrEmpty(title))
-                        dialog.SetTitle(title);
-
-                    if (filterCount > 0)
-                        dialog.SetFileTypes(filterCount, ref filterArray);
-
-                    const FILEOPENDIALOGOPTIONS mode = FILEOPENDIALOGOPTIONS.FOS_NOREADONLYRETURN | FILEOPENDIALOGOPTIONS.FOS_DONTADDTORECENT;
-
-                    dialog.SetOptions(mode);
-                    if (ShowIsCancelledByUser(dialog))
-                    {
-                        return defaultValue;
-                    }
-
-                    dialog.GetResult(out IShellItem resShell);
-                    resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out nint resultPtr);
-
-                    string? result = Marshal.PtrToStringUni(resultPtr);
-                    Marshal.FreeCoTaskMem(resultPtr);
-                    return result ?? defaultValue;
+                    return defaultValue;
                 }
-                finally
-                {
-                    FreeRefCoTaskMem(ref filterArray);
-                }
+
+                dialog.GetResult(out IShellItem resShell);
+                resShell.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out string? result);
+                return result ?? defaultValue;
             }
         }
 
@@ -236,55 +212,34 @@ namespace Hi3Helper.Win32.FileDialogCOM
             }
         }
 
-        private static unsafe void FreeRefCoTaskMem<T>(ref T source)
-            where T : unmanaged
+        [SkipLocalsInit]
+        private static unsafe void SetFileTypeFilter(IFileDialog                 dialog,
+                                                     Dictionary<string, string>? fileTypeFilter)
         {
-            if (Unsafe.IsNullRef(ref source))
-            {
+            if (fileTypeFilter == null || fileTypeFilter.Count == 0)
                 return;
-            }
 
-            nint ptr = (nint)Unsafe.AsPointer(ref source);
-            Marshal.FreeCoTaskMem(ptr);
-        }
+            Span<COMDLG_FILTERSPEC> filterBuffer = fileTypeFilter.Count == 0
+                ? Span<COMDLG_FILTERSPEC>.Empty
+                : stackalloc COMDLG_FILTERSPEC[fileTypeFilter.Count];
 
-        private static unsafe ref COMDLG_FILTERSPEC SetFileTypeFilter(Dictionary<string, string>? fileTypeFilter, out uint count)
-        {
-            if (fileTypeFilter == null)
+            int i = 0;
+            foreach ((string key, string value) in fileTypeFilter)
             {
-                count    = 0;
-                return ref Unsafe.NullRef<COMDLG_FILTERSPEC>();
+                ref COMDLG_FILTERSPEC current = ref filterBuffer[i++];
+                current.pszName = GetStringPointer(key);
+                current.pszSpec = GetStringPointer(value);
             }
 
-            int len = fileTypeFilter.Count;
-            int i   = 0;
-
-            nint ptrAlloc = Marshal.AllocCoTaskMem(len * sizeof(COMDLG_FILTERSPEC));
-            COMDLG_FILTERSPEC* array = (COMDLG_FILTERSPEC*)ptrAlloc;
-
-            foreach (KeyValuePair<string, string> entry in fileTypeFilter)
-            {
-                array[i].pszName   = GetStringPointer(entry.Key);
-                array[i++].pszSpec = GetStringPointer(entry.Value);
-            }
-
-            count = (uint)len;
-            return ref Unsafe.AsRef<COMDLG_FILTERSPEC>(array);
+            dialog.SetFileTypes((uint)fileTypeFilter.Count, ref MemoryMarshal.GetReference(filterBuffer));
         }
 
         private static unsafe nint GetStringPointer(string str)
-        {
-            fixed (void* ptr = &Utf16StringMarshaller.GetPinnableReference(str))
-            {
-                return (nint)ptr;
-            }
-        }
+            => (nint)Unsafe.AsPointer(in Utf16StringMarshaller.GetPinnableReference(str));
 
         private static string[]? GetIShellItemArray(IShellItemArray itemArray)
         {
             IShellItem? item = null;
-            nint resPtr = nint.Zero;
-
             itemArray.GetCount(out uint fileCount);
             if (fileCount == 0)
             {
@@ -295,13 +250,11 @@ namespace Hi3Helper.Win32.FileDialogCOM
             for (uint i = 0; i < fileCount; i++)
             {
                 itemArray?.GetItemAt(i, out item);
-                item?.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out resPtr);
 
-                results[i] = Marshal.PtrToStringUni(resPtr) ?? "";
-                if (resPtr != nint.Zero)
-                {
-                    Marshal.FreeCoTaskMem(resPtr);
-                }
+                string? res = null;
+                item?.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, out res);
+
+                results[i] = res ?? "";
             }
 
             return results;
