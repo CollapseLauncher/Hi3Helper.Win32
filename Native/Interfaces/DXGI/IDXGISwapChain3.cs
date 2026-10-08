@@ -15,7 +15,7 @@ public partial interface IDXGISwapChain3 : IDXGISwapChain2
     uint GetCurrentBackBufferIndex();
 
     // https://learn.microsoft.com/windows/win32/api/dxgi1_4/nf-dxgi1_4-idxgiswapchain3-checkcolorspacesupport
-    void CheckColorSpaceSupport(DXGI_COLOR_SPACE_TYPE ColorSpace, out uint pColorSpaceSupport);
+    void CheckColorSpaceSupport(DXGI_COLOR_SPACE_TYPE ColorSpace, out DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG pColorSpaceSupport);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi1_4/nf-dxgi1_4-idxgiswapchain3-setcolorspace1
     void SetColorSpace1(DXGI_COLOR_SPACE_TYPE ColorSpace);

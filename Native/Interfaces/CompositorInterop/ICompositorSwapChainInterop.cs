@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Win32.Native.Interfaces.DXGI;
 
 namespace Hi3Helper.Win32.Native.Interfaces.CompositorInterop;
 
@@ -8,13 +9,11 @@ namespace Hi3Helper.Win32.Native.Interfaces.CompositorInterop;
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ICompositorSwapChainInterop : ICompositorInterop
 {
-    [PreserveSig]
-    int CreateCompositionSurfaceForHandle(
+    void CreateCompositionSurfaceForHandle(
         nint     swapChainHandle,
         out nint compositionSurfaceResult);
 
-    [PreserveSig]
-    int CreateCompositionSurfaceForSwapChain(
-        nint     swapChain,
-        out nint compositionSurfaceResult);
+    void CreateCompositionSurfaceForSwapChain(
+        [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGISwapChain>))] IDXGISwapChain swapChain,
+        out                                                                  nint           compositionSurfaceResult);
 }

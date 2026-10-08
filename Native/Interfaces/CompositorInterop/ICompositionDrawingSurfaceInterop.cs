@@ -11,20 +11,26 @@ namespace Hi3Helper.Win32.Native.Interfaces.CompositorInterop;
 public partial interface ICompositionDrawingSurfaceInterop
 {
     [PreserveSig]
-    int BeginDraw(nint updateRect, in Guid iid, out nint updateObject, out POINTL updateOffset);
+    [return: MarshalAs(UnmanagedType.Error)]
+    HResult BeginDraw(nint updateRect, in Guid iid, out nint updateObject, out POINTL updateOffset);
 
     [PreserveSig]
-    int EndDraw();
+    [return: MarshalAs(UnmanagedType.Error)]
+    HResult EndDraw();
 
     [PreserveSig]
-    int Resize(SIZEL sizePixels);
+    [return: MarshalAs(UnmanagedType.Error)]
+    HResult Resize(SIZEL sizePixels);
 
     [PreserveSig]
-    int Scroll(nint scrollRect, nint clipRect, int offsetX, int offsetY);
+    [return: MarshalAs(UnmanagedType.Error)]
+    HResult Scroll(nint scrollRect, nint clipRect, int offsetX, int offsetY);
 
     [PreserveSig]
-    int ResumeDraw();
+    [return: MarshalAs(UnmanagedType.Error)]
+    HResult ResumeDraw();
 
     [PreserveSig]
-    int SuspendDraw();
+    [return: MarshalAs(UnmanagedType.Error)]
+    HResult SuspendDraw();
 }

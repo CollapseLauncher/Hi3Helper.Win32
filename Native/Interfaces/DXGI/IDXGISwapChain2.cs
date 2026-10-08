@@ -1,5 +1,4 @@
-﻿using Hi3Helper.Win32.Native.Structs.DXGI;
-using System;
+﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
@@ -26,8 +25,8 @@ public unsafe partial interface IDXGISwapChain2 : IDXGISwapChain1
     nint GetFrameLatencyWaitableObject();
 
     // https://learn.microsoft.com/windows/win32/api/dxgi1_3/nf-dxgi1_3-idxgiswapchain2-setmatrixtransform
-    void SetMatrixTransform(in DXGI_MATRIX_3X2_F pMatrix);
+    void SetMatrixTransform(in Matrix3x2 pMatrix);
 
     // https://learn.microsoft.com/windows/win32/api/dxgi1_3/nf-dxgi1_3-idxgiswapchain2-getmatrixtransform
-    void GetMatrixTransform(out DXGI_MATRIX_3X2_F pMatrix);
+    void GetMatrixTransform(out Matrix3x2 pMatrix);
 }

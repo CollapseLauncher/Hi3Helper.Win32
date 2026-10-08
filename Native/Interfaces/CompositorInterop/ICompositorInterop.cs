@@ -8,8 +8,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.CompositorInterop;
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface ICompositorInterop
 {
-    [PreserveSig]
-    int CreateGraphicsDevice(
+    void CreateGraphicsDevice(
         nint     renderingDevice,
         out nint compositionGraphicsDeviceResult);
 }
