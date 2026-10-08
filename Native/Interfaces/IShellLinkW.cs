@@ -19,10 +19,10 @@ public partial interface IShellLinkW
     /// Retrieves the path and filename of a shell link object
     /// </summary>
     unsafe void GetPath(
-        [MarshalUsing(typeof(Utf16StringMarshaller), CountElementName = nameof(cchMaxPath))] out string? pszFile,
-        int                                                                                              cchMaxPath,
-        nint                                                                                             pfd,
-        EShellLinkGP                                                                                     fFlags);
+        ref char     pszFile,
+        int          cchMaxPath,
+        nint         pfd,
+        EShellLinkGP fFlags);
 
     /// <summary>
     /// Retrieves the list of shell link item identifiers
@@ -38,8 +38,8 @@ public partial interface IShellLinkW
     /// Retrieves the shell link description string
     /// </summary>
     unsafe void GetDescription(
-        [MarshalUsing(typeof(Utf16StringMarshaller), CountElementName = nameof(cchMaxName))] out string? pszFile,
-        int                                                                                              cchMaxName);
+        ref char pszFile,
+        int      cchMaxName);
 
     /// <summary>
     /// Sets the shell link description string
@@ -50,8 +50,8 @@ public partial interface IShellLinkW
     /// Retrieves the name of the shell link working directory
     /// </summary>
     unsafe void GetWorkingDirectory(
-        [MarshalUsing(typeof(Utf16StringMarshaller), CountElementName = nameof(cchMaxPath))] out string? pszDir,
-        int                                                                                              cchMaxPath);
+        ref char pszDir,
+        int      cchMaxPath);
 
     /// <summary>
     /// Sets the name of the shell link working directory
@@ -62,8 +62,8 @@ public partial interface IShellLinkW
     /// Retrieves the shell link command-line arguments
     /// </summary>
     unsafe void GetArguments(
-        out string? pszArgs,
-        int         cchMaxPath);
+        ref char pszArgs,
+        int      cchMaxPath);
 
     /// <summary>
     /// Sets the shell link command-line arguments
@@ -94,9 +94,9 @@ public partial interface IShellLinkW
     /// Retrieves the location (path and index) of the shell link icon
     /// </summary>
     unsafe void GetIconLocation(
-        [MarshalUsing(typeof(Utf16StringMarshaller), CountElementName = nameof(cchIconPath))] out string? pszIconPath,
-        int                                                                                               cchIconPath,
-        out int                                                                                           piIcon);
+        ref char pszIconPath,
+        int      cchIconPath,
+        out int  piIcon);
 
     /// <summary>
     /// Sets the location (path and index) of the shell link icon

@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.Versioning;
 using Hi3Helper.Win32.ManagedTools;
 using Hi3Helper.Win32.Native.ClassIds;
@@ -15,11 +14,10 @@ using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.ShellLinkCOM;
 
-internal unsafe delegate void ToDelegateInvoke(char* buffer, int length);
+internal unsafe delegate void ToDelegateInvoke(ref char buffer, int length);
 
 public class ShellLink
 {
-    // Use Unicode (W) under NT, otherwise use ANSI      
     private readonly IShellLinkW?    _linkW;
     private readonly IPropertyStore? _propertyStoreW;
     private readonly IPersistFile?   _persistFileW;
@@ -58,11 +56,12 @@ public class ShellLink
     /// This pointer must be destroyed with DestroyIcon when you are done with it.
     /// </summary>
     /// <param name="large">Whether to return the small or large icon</param>
-    public nint GetIcon(bool large)
+    [SupportedOSPlatform("windows")]
+    public unsafe nint GetIcon(bool large)
     {
         // Get icon index and path:
-        string iconFile = IconPath;
-        int iconIndex = IconIndex ?? 0;
+        string iconFile  = IconPath;
+        int    iconIndex = IconIndex;
 
         // If there are no details set for the icon, then we must use
         // the shell to get the icon for the target:
@@ -75,17 +74,16 @@ public class ShellLink
 
             flags |= large ? SHGetFileInfoConstants.SHGFI_LARGEICON : SHGetFileInfoConstants.SHGFI_SMALLICON;
 
-            FileIcon fileIcon = new FileIcon(Target, flags);
+            FileIcon fileIcon = new(Target, flags);
             return fileIcon.ShellIcon;
         }
 
         // Use ExtractIconEx to get the icon:
-        nint[] hIconEx  = [nint.Zero];
-        nint   hIconExP = Marshal.UnsafeAddrOfPinnedArrayElement(hIconEx, 0);
+        Span<nint> hIconEx  = [nint.Zero];
+        nint       hIconExP = (nint)Unsafe.AsPointer(ref MemoryMarshal.GetReference(hIconEx));
         if (large)
         {
-            PInvoke.ExtractIconEx(
-                                  iconFile,
+            PInvoke.ExtractIconEx(iconFile,
                                   iconIndex,
                                   hIconExP,
                                   nint.Zero,
@@ -93,8 +91,7 @@ public class ShellLink
         }
         else
         {
-            PInvoke.ExtractIconEx(
-                                  iconFile,
+            PInvoke.ExtractIconEx(iconFile,
                                   iconIndex,
                                   nint.Zero,
                                   hIconExP,
@@ -110,32 +107,26 @@ public class ShellLink
     [field: AllowNull, MaybeNull]
     public unsafe string IconPath
     {
-        get
+        get => field ??= GetStringFromIMethod((ref buffer, len) => _linkW?.GetIconLocation(ref buffer, len, out _)) ?? "";
+        set
         {
-            _linkW?.GetIconLocation(out field, 260, out _);
-            return field ?? "";
+            int iconIndex = Math.Max(IconIndex, 0);
+            _linkW?.SetIconLocation(field = value, iconIndex);
         }
-        set => _linkW?.SetIconLocation(field = value, IconIndex ?? 0);
     }
 
     /// <summary>
     /// Gets the index of this icon within the icon path's resources
     /// </summary>
-    public unsafe int? IconIndex
+    public unsafe int IconIndex
     {
         get
         {
-            if (field != null)
-            {
-                return field ?? 0;
-            }
-
-            int iconIndex = 0;
-            _linkW?.GetIconLocation(out _, 260, out iconIndex);
-            field = iconIndex;
-            return field ?? 0;
+            int iconIndex = -1;
+            _ = GetStringFromIMethod((ref buffer, len) => _linkW?.GetIconLocation(ref buffer, len, out iconIndex));
+            return iconIndex;
         }
-        set => _linkW?.SetIconLocation(IconPath, (field = value) ?? 0);
+        set => _linkW?.SetIconLocation(IconPath, value);
     }
 
     /// <summary>
@@ -144,11 +135,7 @@ public class ShellLink
     [field: AllowNull, MaybeNull]
     public unsafe string Target
     {
-        get
-        {
-            _linkW?.GetPath(out field, 260, nint.Zero, EShellLinkGP.SLGP_UNCPRIORITY);
-            return field ?? "";
-        }
+        get => field ??= GetStringFromIMethod((ref buffer, len) => _linkW?.GetPath(ref buffer, len, nint.Zero, EShellLinkGP.SLGP_UNCPRIORITY)) ?? "";
         set => _linkW?.SetPath(field = value);
     }
 
@@ -158,11 +145,7 @@ public class ShellLink
     [field: AllowNull, MaybeNull]
     public unsafe string WorkingDirectory
     {
-        get
-        {
-            _linkW?.GetWorkingDirectory(out field, 260);
-            return field ?? "";
-        }
+        get => field ??= GetStringFromIMethod((ref buffer, len) => _linkW?.GetWorkingDirectory(ref buffer, len)) ?? "";
         set => _linkW?.SetWorkingDirectory(field = value);
     }
 
@@ -172,11 +155,7 @@ public class ShellLink
     [field: AllowNull, MaybeNull]
     public unsafe string Description
     {
-        get
-        {
-            _linkW?.GetDescription(out field, 1 << 10);
-            return field ?? "";
-        }
+        get => field ??= GetStringFromIMethod((ref buffer, len) => _linkW?.GetDescription(ref buffer, len)) ?? "";
         set => _linkW?.SetDescription(field = value);
     }
 
@@ -186,11 +165,7 @@ public class ShellLink
     [field: AllowNull, MaybeNull]
     public unsafe string Arguments
     {
-        get
-        {
-            _linkW?.GetArguments(out field, 260);
-            return field ?? "";
-        }
+        get => field ??= GetStringFromIMethod((ref buffer, len) => _linkW?.GetArguments(ref buffer, len)) ?? "";
         set => _linkW?.SetArguments(field = value);
     }
 
@@ -223,15 +198,19 @@ public class ShellLink
         set => _linkW?.SetHotkey(value);
     }
 
-    private static unsafe string GetStringFromIMethod(int length, ToDelegateInvoke toInvokeDelegate)
+    [SkipLocalsInit]
+    private static unsafe string? GetStringFromIMethod(ToDelegateInvoke toInvokeDelegate, int length = 1 << 10)
     {
         Span<char> buffer = stackalloc char[length];
-        fixed (char* bufferP = &MemoryMarshal.GetReference(buffer))
+        toInvokeDelegate(ref MemoryMarshal.GetReference(buffer), length);
+
+        int indexOfNull = buffer.IndexOf('\0');
+        return indexOfNull switch
         {
-            toInvokeDelegate(bufferP, length);
-            ReadOnlySpan<char> bufferSliced = MemoryMarshal.CreateReadOnlySpanFromNullTerminated(bufferP);
-            return bufferSliced.IsEmpty ? string.Empty : new string(bufferSliced);
-        }
+            < 0 => null,
+            0   => "",
+            _   => new string(buffer[..indexOfNull])
+        };
     }
 
     /// <summary>
