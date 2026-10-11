@@ -74,7 +74,7 @@ public static class ComMarshal
 public static class ComMarshal<TComObject>
     where TComObject : class
 {
-    private static readonly Guid? IID = typeof(TComObject).GUID;
+    public static readonly Guid? IID = typeof(TComObject).GUID;
 
     /// <summary>
     /// Try to create COM Object based on its Class Factory ID and its Class Identifier ID (IID).
