@@ -2,24 +2,39 @@
 using System.Runtime.InteropServices.Marshalling;
 using Hi3Helper.Win32.Native.Enums.WIC;
 using Hi3Helper.Win32.Native.Structs;
+using System;
+
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 
 namespace Hi3Helper.Win32.Native.Interfaces.WIC;
 
 [Guid("EC5EC8A9-C395-4314-9C77-54D7A935FF70")]
-[GeneratedComInterface]
+[GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 // https://doxygen.reactos.org/da/d19/interfaceIWICImagingFactory.html
 public partial interface IWICImagingFactory
 {
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult CreateDecoderFromFilename([MarshalUsing(typeof(Utf16StringMarshaller))] string? wzFilename, nint pguidVendor, uint dwDesiredAccess, WICDecodeOptions metadataOptions, [MarshalUsing(typeof(ComInterfaceMarshaller<IWICBitmapDecoder>))] out IWICBitmapDecoder? ppIDecoder);
+    HResult CreateDecoderFromFilename(
+        string?           wzFilename,
+        ref readonly Guid pguidVendor,
+        uint              dwDesiredAccess,
+        WICDecodeOptions  metadataOptions,
+
+        [MarshalUsing(typeof(ComInterfaceMarshaller<IWICBitmapDecoder>))]
+        out IWICBitmapDecoder? ppIDecoder);
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult CreateDecoderFromStream(); // Dummy
+    HResult CreateDecoderFromStream(
+        IStream           pIStream,
+        ref readonly Guid pguidVendor,
+        WICDecodeOptions  metadataOptions,
+
+        [MarshalUsing(typeof(ComInterfaceMarshaller<IWICBitmapDecoder>))]
+        out IWICBitmapDecoder? ppIDecoder);
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
