@@ -2,16 +2,20 @@
 using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Enums.MediaFoundation;
 using Hi3Helper.Win32.Native.Enums.WIC;
+using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.Interfaces.MediaFoundation;
 using Hi3Helper.Win32.Native.Interfaces.WIC;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.MediaFoundation;
+using Hi3Helper.Win32.WinRT.WindowsStream;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Windows.Storage.Streams;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
@@ -161,6 +165,44 @@ public static class WindowsCodecHelper
     /// <summary>
     /// Determines whether the specified file is a natively supported image format by Windows Imaging Component (WIC).
     /// </summary>
+    /// <param name="stream">The <see cref="Stream"/> of the file to check.</param>
+    /// <returns><see langword="true"/> if whether the file is supported as an image file. Otherwise, <see langword="false"/>.</returns>
+    public static bool IsFileSupportedImage(Stream stream)
+    {
+        if (!ComMarshal<IWICImagingFactory>.TryCreateComObject(in CLSID_WICImagingFactory,
+                                                               CLSCTX.CLSCTX_INPROC_SERVER,
+                                                               out IWICImagingFactory? factory,
+                                                               out _))
+        {
+            return false;
+        }
+
+        using IRandomAccessStream randomStream = stream.AsRandomAccessStream(true, true);
+        if (!ComMarshal<IRandomAccessStream>.TryCastComObjectAs(randomStream,
+                                                                out IStream? streamWrapper,
+                                                                out _))
+        {
+            return false;
+        }
+
+        HResult hr = factory.CreateDecoderFromStream(streamWrapper,
+                                                     in Unsafe.NullRef<Guid>(),
+                                                     WICDecodeOptions.WICDecodeMetadataCacheOnDemand,
+                                                     out IWICBitmapDecoder? decoder);
+
+        if (!hr || decoder == null)
+        {
+            return false;
+        }
+
+        Unsafe.SkipInit(out Guid guidContainerFormat);
+        decoder.GetContainerFormat(out guidContainerFormat);
+        return guidContainerFormat != Guid.Empty;
+    }
+
+    /// <summary>
+    /// Determines whether the specified file is a natively supported image format by Windows Imaging Component (WIC).
+    /// </summary>
     /// <param name="filePath">The URL or Local File Path of the file to check.</param>
     /// <returns><see langword="true"/> if whether the file is supported as an image file. Otherwise, <see langword="false"/>.</returns>
     public static bool IsFileSupportedImage(string filePath)
@@ -174,7 +216,7 @@ public static class WindowsCodecHelper
         }
 
         HResult hr = factory.CreateDecoderFromFilename(filePath,
-                                                       nint.Zero,
+                                                       in Unsafe.NullRef<Guid>(),
                                                        GENERIC_READ,
                                                        WICDecodeOptions.WICDecodeMetadataCacheOnDemand,
                                                        out IWICBitmapDecoder? decoder);
