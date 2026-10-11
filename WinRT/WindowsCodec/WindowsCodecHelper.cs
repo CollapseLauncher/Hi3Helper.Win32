@@ -8,12 +8,15 @@ using Hi3Helper.Win32.Native.Interfaces.WIC;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.MediaFoundation;
+using Hi3Helper.Win32.WinRT.NativeImport;
 using Hi3Helper.Win32.WinRT.WindowsStream;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using Windows.Storage.Streams;
 
@@ -178,26 +181,58 @@ public static class WindowsCodecHelper
         }
 
         using IRandomAccessStream randomStream = stream.AsRandomAccessStream(true, true);
-        if (!ComMarshal<IRandomAccessStream>.TryCastComObjectAs(randomStream,
-                                                                out IStream? streamWrapper,
-                                                                out _))
+        return IsFileSupportedImage(randomStream);
+    }
+
+    /// <summary>
+    /// Determines whether the specified file is a natively supported image format by Windows Imaging Component (WIC).
+    /// </summary>
+    /// <param name="randomStream">The <see cref="IRandomAccessStream"/> of the file to check.</param>
+    /// <returns><see langword="true"/> if whether the file is supported as an image file. Otherwise, <see langword="false"/>.</returns>
+    public static unsafe bool IsFileSupportedImage(IRandomAccessStream randomStream)
+    {
+        if (!ComMarshal<IWICImagingFactory>.TryCreateComObject(in CLSID_WICImagingFactory,
+                                                               CLSCTX.CLSCTX_INPROC_SERVER,
+                                                               out IWICImagingFactory? factory,
+                                                               out _))
         {
             return false;
         }
 
-        HResult hr = factory.CreateDecoderFromStream(streamWrapper,
-                                                     in Unsafe.NullRef<Guid>(),
-                                                     WICDecodeOptions.WICDecodeMetadataCacheOnDemand,
-                                                     out IWICBitmapDecoder? decoder);
+        nint randomStreamAbi = nint.Zero;
+        nint streamAbi       = nint.Zero;
+        try
+        {
+            ref readonly Guid iid = ref Nullable.GetValueRefOrDefaultRef(in ComMarshal<IStream>.IID);
 
-        if (!hr || decoder == null)
+            randomStreamAbi = (nint)ComInterfaceMarshaller<IRandomAccessStream>.ConvertToUnmanaged(randomStream);
+            WinRTPInvoke.CreateStreamOverRandomAccessStream(randomStreamAbi,
+                                                            in iid,
+                                                            out streamAbi);
+
+            HResult hr = factory.CreateDecoderFromStream(streamAbi,
+                                                         in Unsafe.NullRef<Guid>(),
+                                                         WICDecodeOptions.WICDecodeMetadataCacheOnDemand,
+                                                         out IWICBitmapDecoder? decoder);
+
+            if (!hr || decoder == null)
+            {
+                return false;
+            }
+
+            Unsafe.SkipInit(out Guid guidContainerFormat);
+            decoder.GetContainerFormat(out guidContainerFormat);
+            return guidContainerFormat != Guid.Empty;
+        }
+        catch
         {
             return false;
         }
-
-        Unsafe.SkipInit(out Guid guidContainerFormat);
-        decoder.GetContainerFormat(out guidContainerFormat);
-        return guidContainerFormat != Guid.Empty;
+        finally
+        {
+            if (streamAbi != nint.Zero) Marshal.Release(streamAbi);
+            if (randomStreamAbi != nint.Zero) Marshal.Release(randomStreamAbi);
+        }
     }
 
     /// <summary>

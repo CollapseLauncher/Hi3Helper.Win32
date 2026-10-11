@@ -29,7 +29,7 @@ public partial interface IWICImagingFactory
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
     HResult CreateDecoderFromStream(
-        IStream           pIStream,
+        nint              pIStream,
         ref readonly Guid pguidVendor,
         WICDecodeOptions  metadataOptions,
 
