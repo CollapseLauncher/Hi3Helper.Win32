@@ -20,7 +20,7 @@ public static class RandomStreamExtension
     extension(Stream stream)
     {
         [OverloadResolutionPriority(1)]
-        public IRandomAccessStream AsRandomAccessStream(bool bypassChecks)
+        public IRandomAccessStream AsRandomAccessStream(bool bypassChecks, bool leaveOpen = false)
         {
             if (!bypassChecks)
             {
@@ -28,14 +28,12 @@ public static class RandomStreamExtension
             }
 
             StreamReadOperationOptimization opt = stream.GetOptimization();
-
-            NetFxToWinRtStreamAdapter.RandomAccessStream streamAdapter = new(stream, opt);
-            streamAdapter.SetWonInitializationRace();
+            NetFxToWinRtStreamAdapter.RandomAccessStream streamAdapter = new(stream, opt, leaveOpen);
             return streamAdapter;
         }
 
         [OverloadResolutionPriority(1)]
-        public IInputStream AsInputStream(bool bypassChecks)
+        public IInputStream AsInputStream(bool bypassChecks, bool leaveOpen = false)
         {
             if (!bypassChecks)
             {
@@ -46,18 +44,16 @@ public static class RandomStreamExtension
 
             if (stream.CanWrite)
             {
-                InputOutputStream stream1Adapter = new(stream, opt);
-                stream1Adapter.SetWonInitializationRace();
+                InputOutputStream stream1Adapter = new(stream, opt, leaveOpen);
                 return stream1Adapter;
             }
 
-            InputStream streamAdapter = new(stream, opt);
-            streamAdapter.SetWonInitializationRace();
+            InputStream streamAdapter = new(stream, opt, leaveOpen);
             return streamAdapter;
         }
 
         [OverloadResolutionPriority(1)]
-        public IOutputStream AsOutputStream(bool bypassChecks)
+        public IOutputStream AsOutputStream(bool bypassChecks, bool leaveOpen = false)
         {
             if (!bypassChecks)
             {
@@ -70,9 +66,7 @@ public static class RandomStreamExtension
             }
 
             StreamReadOperationOptimization opt = stream.GetOptimization();
-
-            OutputStream streamAdapter = new(stream, opt);
-            streamAdapter.SetWonInitializationRace();
+            OutputStream streamAdapter = new(stream, opt, leaveOpen);
             return streamAdapter;
         }
 
@@ -87,23 +81,23 @@ public abstract class NetFxToWinRtStreamAdapter : IDisposable
 {
     [WinRTRuntimeClassName("Windows.Storage.Streams.IInputStream")]
     [WinRTExposedType(typeof(InputStreamWinRTTypeDetails))]
-    public sealed class InputStream(Stream stream, StreamReadOperationOptimization readOptimization)
-        : NetFxToWinRtStreamAdapter(stream, readOptimization), IInputStream;
+    public sealed class InputStream(Stream stream, StreamReadOperationOptimization readOptimization, bool leaveOpen = false)
+        : NetFxToWinRtStreamAdapter(stream, readOptimization, leaveOpen), IInputStream;
 
     [WinRTRuntimeClassName("Windows.Storage.Streams.IOutputStream")]
     [WinRTExposedType(typeof(OutputStreamWinRTTypeDetails))]
-    public sealed class OutputStream(Stream stream, StreamReadOperationOptimization readOptimization)
-        : NetFxToWinRtStreamAdapter(stream, readOptimization), IOutputStream;
+    public sealed class OutputStream(Stream stream, StreamReadOperationOptimization readOptimization, bool leaveOpen = false)
+        : NetFxToWinRtStreamAdapter(stream, readOptimization, leaveOpen), IOutputStream;
 
     [WinRTRuntimeClassName("Windows.Storage.Streams.IRandomAccessStream")]
     [WinRTExposedType(typeof(RandomAccessStreamWinRTTypeDetails))]
-    public sealed class RandomAccessStream(Stream stream, StreamReadOperationOptimization readOptimization)
-        : NetFxToWinRtStreamAdapter(stream, readOptimization), IRandomAccessStream;
+    public sealed class RandomAccessStream(Stream stream, StreamReadOperationOptimization readOptimization, bool leaveOpen = false)
+        : NetFxToWinRtStreamAdapter(stream, readOptimization, leaveOpen), IRandomAccessStream;
 
     [WinRTRuntimeClassName("Windows.Storage.Streams.IInputStream")]
     [WinRTExposedType(typeof(InputOutputStreamWinRTTypeDetails))]
-    public sealed class InputOutputStream(Stream stream, StreamReadOperationOptimization readOptimization)
-        : NetFxToWinRtStreamAdapter(stream, readOptimization), IInputStream, IOutputStream;
+    public sealed class InputOutputStream(Stream stream, StreamReadOperationOptimization readOptimization, bool leaveOpen = false)
+        : NetFxToWinRtStreamAdapter(stream, readOptimization, leaveOpen), IInputStream, IOutputStream;
 
     public enum StreamReadOperationOptimization
     {
@@ -113,7 +107,7 @@ public abstract class NetFxToWinRtStreamAdapter : IDisposable
 
     private Stream? _managedStream;
 
-    private bool _leaveUnderlyingStreamOpen = true;
+    private readonly bool _leaveOpen;
 
     private readonly StreamReadOperationOptimization _readOptimization;
 
@@ -172,15 +166,11 @@ public abstract class NetFxToWinRtStreamAdapter : IDisposable
         }
     }
 
-    private NetFxToWinRtStreamAdapter(Stream stream, StreamReadOperationOptimization readOptimization)
+    private NetFxToWinRtStreamAdapter(Stream stream, StreamReadOperationOptimization readOptimization, bool leaveOpen)
     {
         _readOptimization = readOptimization;
-        _managedStream = stream;
-    }
-
-    internal void SetWonInitializationRace()
-    {
-        _leaveUnderlyingStreamOpen = false;
+        _managedStream    = stream;
+        _leaveOpen        = leaveOpen;
     }
 
     private Stream EnsureNotDisposed()
@@ -200,7 +190,7 @@ public abstract class NetFxToWinRtStreamAdapter : IDisposable
         if (_managedStream is { } managedStream)
         {
             _managedStream = null;
-            if (!_leaveUnderlyingStreamOpen)
+            if (!_leaveOpen)
             {
                 managedStream.Dispose();
             }
