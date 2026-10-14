@@ -9,16 +9,15 @@ using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.MediaFoundation;
 using Hi3Helper.Win32.WinRT.NativeImport;
-using Hi3Helper.Win32.WinRT.WindowsStream;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using Windows.Storage.Streams;
+using WinRT;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
@@ -180,7 +179,7 @@ public static class WindowsCodecHelper
             return false;
         }
 
-        using IRandomAccessStream randomStream = stream.AsRandomAccessStream(true, true);
+        using IRandomAccessStream randomStream = stream.AsRandomAccessStream();
         return IsFileSupportedImage(randomStream);
     }
 
@@ -205,15 +204,20 @@ public static class WindowsCodecHelper
         {
             ref readonly Guid iid = ref Nullable.GetValueRefOrDefaultRef(in ComMarshal<IStream>.IID);
 
-            randomStreamAbi = (nint)ComInterfaceMarshaller<IRandomAccessStream>.ConvertToUnmanaged(randomStream);
-            WinRTPInvoke.CreateStreamOverRandomAccessStream(randomStreamAbi,
-                                                            in iid,
-                                                            out streamAbi);
+            randomStreamAbi = MarshalInterface<IRandomAccessStream>.FromManaged(randomStream);
+            HResult hr = WinRTPInvoke.CreateStreamOverRandomAccessStream(randomStreamAbi,
+                                                                         in iid,
+                                                                         out streamAbi);
 
-            HResult hr = factory.CreateDecoderFromStream(streamAbi,
-                                                         in Unsafe.NullRef<Guid>(),
-                                                         WICDecodeOptions.WICDecodeMetadataCacheOnDemand,
-                                                         out IWICBitmapDecoder? decoder);
+            if (!hr)
+            {
+                return false;
+            }
+
+            hr = factory.CreateDecoderFromStream(streamAbi,
+                                                 in Unsafe.NullRef<Guid>(),
+                                                 WICDecodeOptions.WICDecodeMetadataCacheOnDemand,
+                                                 out IWICBitmapDecoder? decoder);
 
             if (!hr || decoder == null)
             {
@@ -231,7 +235,7 @@ public static class WindowsCodecHelper
         finally
         {
             if (streamAbi != nint.Zero) Marshal.Release(streamAbi);
-            if (randomStreamAbi != nint.Zero) Marshal.Release(randomStreamAbi);
+            if (randomStreamAbi != nint.Zero) MarshalInterface<IRandomAccessStream>.DisposeAbi(randomStreamAbi);
         }
     }
 

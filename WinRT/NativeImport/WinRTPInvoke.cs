@@ -8,7 +8,7 @@ internal static partial class WinRTPInvoke
     [LibraryImport("Shcore.dll", EntryPoint = "CreateStreamOverRandomAccessStream")]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     public static partial int CreateStreamOverRandomAccessStream(
-        nint randomAccessStreamPpv,
+        nint              randomAccessStreamPpv,
         ref readonly Guid riid,
-        out nint ppv);
+        out          nint ppv);
 }

@@ -6,7 +6,7 @@ using Hi3Helper.Win32.Native.Structs;
 namespace Hi3Helper.Win32.Native.Interfaces;
 
 [GeneratedComInterface]
-[Guid("0000000c-0000-0000-c000-000000000046")]
+[Guid("0000000C-0000-0000-C000-000000000046")]
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public partial interface IStream : ISequentialStream
 {
