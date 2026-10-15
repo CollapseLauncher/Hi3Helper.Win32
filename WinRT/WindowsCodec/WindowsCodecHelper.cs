@@ -9,6 +9,7 @@ using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.Native.Structs.MediaFoundation;
 using Hi3Helper.Win32.WinRT.NativeImport;
+using Hi3Helper.Win32.WinRT.WindowsStream;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -171,15 +172,7 @@ public static class WindowsCodecHelper
     /// <returns><see langword="true"/> if whether the file is supported as an image file. Otherwise, <see langword="false"/>.</returns>
     public static bool IsFileSupportedImage(Stream stream)
     {
-        if (!ComMarshal<IWICImagingFactory>.TryCreateComObject(in CLSID_WICImagingFactory,
-                                                               CLSCTX.CLSCTX_INPROC_SERVER,
-                                                               out IWICImagingFactory? factory,
-                                                               out _))
-        {
-            return false;
-        }
-
-        using IRandomAccessStream randomStream = stream.AsRandomAccessStream();
+        using IRandomAccessStream randomStream = stream.AsRandomAccessStream(false, true);
         return IsFileSupportedImage(randomStream);
     }
 

@@ -22,11 +22,6 @@ public static class RandomStreamExtension
         [OverloadResolutionPriority(1)]
         public IRandomAccessStream AsRandomAccessStream(bool bypassChecks, bool leaveOpen = false)
         {
-            if (!bypassChecks)
-            {
-                return stream.AsRandomAccessStream();
-            }
-
             StreamReadOperationOptimization opt = stream.GetOptimization();
             NetFxToWinRtStreamAdapter.RandomAccessStream streamAdapter = new(stream, opt, leaveOpen);
             return streamAdapter;
@@ -35,36 +30,14 @@ public static class RandomStreamExtension
         [OverloadResolutionPriority(1)]
         public IInputStream AsInputStream(bool bypassChecks, bool leaveOpen = false)
         {
-            if (!bypassChecks)
-            {
-                return stream.AsInputStream();
-            }
-
             StreamReadOperationOptimization opt = stream.GetOptimization();
-
-            if (stream.CanWrite)
-            {
-                InputOutputStream stream1Adapter = new(stream, opt, leaveOpen);
-                return stream1Adapter;
-            }
-
-            InputStream streamAdapter = new(stream, opt, leaveOpen);
+            InputOutputStream streamAdapter = new(stream, opt, leaveOpen);
             return streamAdapter;
         }
 
         [OverloadResolutionPriority(1)]
         public IOutputStream AsOutputStream(bool bypassChecks, bool leaveOpen = false)
         {
-            if (!bypassChecks)
-            {
-                return stream.AsOutputStream();
-            }
-
-            if (stream.CanRead)
-            {
-                return (IOutputStream)stream.AsInputStream(bypassChecks);
-            }
-
             StreamReadOperationOptimization opt = stream.GetOptimization();
             OutputStream streamAdapter = new(stream, opt, leaveOpen);
             return streamAdapter;
