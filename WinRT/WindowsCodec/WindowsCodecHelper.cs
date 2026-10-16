@@ -186,13 +186,15 @@ public static class WindowsCodecHelper
         if (!ComMarshal<IWICImagingFactory>.TryCreateComObject(in CLSID_WICImagingFactory,
                                                                CLSCTX.CLSCTX_INPROC_SERVER,
                                                                out IWICImagingFactory? factory,
-                                                               out _))
+                                                               out _,
+                                                               useUnique: true))
         {
             return false;
         }
 
         nint randomStreamAbi = nint.Zero;
         nint streamAbi       = nint.Zero;
+        IWICBitmapDecoder? decoder = null;
         try
         {
             ref readonly Guid iid = ref Nullable.GetValueRefOrDefaultRef(in ComMarshal<IStream>.IID);
@@ -208,9 +210,9 @@ public static class WindowsCodecHelper
             }
 
             hr = factory.CreateDecoderFromStream(streamAbi,
-                                                 in Unsafe.NullRef<Guid>(),
+                                                 ref Unsafe.NullRef<Guid>(),
                                                  WICDecodeOptions.WICDecodeMetadataCacheOnDemand,
-                                                 out IWICBitmapDecoder? decoder);
+                                                 out decoder);
 
             if (!hr || decoder == null)
             {
@@ -227,8 +229,10 @@ public static class WindowsCodecHelper
         }
         finally
         {
+            ComMarshal<IWICBitmapDecoder>.FinalRelease(decoder);
             if (streamAbi != nint.Zero) Marshal.Release(streamAbi);
             if (randomStreamAbi != nint.Zero) MarshalInterface<IRandomAccessStream>.DisposeAbi(randomStreamAbi);
+            ComMarshal<IWICImagingFactory>.FinalRelease(factory);
         }
     }
 
@@ -242,25 +246,35 @@ public static class WindowsCodecHelper
         if (!ComMarshal<IWICImagingFactory>.TryCreateComObject(in CLSID_WICImagingFactory,
                                                                 CLSCTX.CLSCTX_INPROC_SERVER,
                                                                 out IWICImagingFactory? factory,
-                                                                out _))
+                                                                out _,
+                                                                useUnique: true))
         {
             return false;
         }
 
-        HResult hr = factory.CreateDecoderFromFilename(filePath,
-                                                       in Unsafe.NullRef<Guid>(),
-                                                       GENERIC_READ,
-                                                       WICDecodeOptions.WICDecodeMetadataCacheOnDemand,
-                                                       out IWICBitmapDecoder? decoder);
-
-        if (!hr || decoder == null)
+        IWICBitmapDecoder? decoder = null;
+        try
         {
-            return false;
-        }
+            HResult hr = factory.CreateDecoderFromFilename(filePath,
+                                                           ref Unsafe.NullRef<Guid>(),
+                                                           GENERIC_READ,
+                                                           WICDecodeOptions.WICDecodeMetadataCacheOnDemand,
+                                                           out decoder);
 
-        Unsafe.SkipInit(out Guid guidContainerFormat);
-        decoder.GetContainerFormat(out guidContainerFormat);
-        return guidContainerFormat != Guid.Empty;
+            if (!hr || decoder == null)
+            {
+                return false;
+            }
+
+            Unsafe.SkipInit(out Guid guidContainerFormat);
+            decoder.GetContainerFormat(out guidContainerFormat);
+            return guidContainerFormat != Guid.Empty;
+        }
+        finally
+        {
+            ComMarshal<IWICBitmapDecoder>.FinalRelease(decoder);
+            ComMarshal<IWICImagingFactory>.FinalRelease(factory);
+        }
     }
 
     /// <summary>
