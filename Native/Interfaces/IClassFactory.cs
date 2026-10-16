@@ -2,6 +2,8 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using Hi3Helper.Win32.Native.ClassIds;
+using Hi3Helper.Win32.Native.Structs;
+
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable PartialTypeWithSinglePart
@@ -15,10 +17,12 @@ public partial interface IClassFactory
 {
     // For HRESULTs use
     [PreserveSig]
-    int CreateInstance(nint     pUnkOuter,
-                       in  Guid riid,
-                       out nint ppvObject);
+    [return: MarshalAs(UnmanagedType.Error)]
+    HResult CreateInstance(nint     pUnkOuter,
+                           in  Guid riid,
+                           out nint ppvObject);
 
     [PreserveSig]
-    int LockServer([MarshalAs(UnmanagedType.VariantBool)] in bool fLock);
+    [return: MarshalAs(UnmanagedType.Error)]
+    HResult LockServer([MarshalAs(UnmanagedType.Bool)] bool fLock);
 }
