@@ -140,11 +140,11 @@ public partial interface IWICImagingFactory
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
     HResult CreateBitmapFromMemory(
-        uint    uiWidth,
-        uint    uiHeight,
-        in Guid pixelFormat,
-        uint    cbStride,
-        uint    cbBufferSize,
+        uint              uiWidth,
+        uint              uiHeight,
+        in Guid           pixelFormat,
+        uint              cbStride,
+        uint              cbBufferSize,
         ref readonly byte pbBuffer,
 
         [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IWICBitmap>))]
@@ -187,7 +187,7 @@ public partial interface IWICImagingFactory
     HResult CreateFastMetadataEncoderFromFrameDecode(
         [MarshalUsing(typeof(ComInterfaceMarshaller<IWICBitmapFrameDecode>))]
         IWICBitmapFrameDecode? pIFrameDecoder,
-        out nint                ppIFastEncoder);
+        out nint ppIFastEncoder);
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
