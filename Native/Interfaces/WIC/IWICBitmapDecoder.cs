@@ -12,7 +12,7 @@ namespace Hi3Helper.Win32.Native.Interfaces.WIC;
 [Guid("9EDDE9E7-8DEE-47EA-99DF-E6FAF2ED44BF")]
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 // https://doxygen.reactos.org/de/d25/interfaceIWICBitmapDecoder.html
-public partial interface IWICBitmapDecoder
+public unsafe partial interface IWICBitmapDecoder
 {
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
