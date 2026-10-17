@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.Structs;
@@ -12,6 +13,14 @@ namespace Hi3Helper.Win32.Native.LibraryImport
 {
     public static partial class PInvoke
     {
+        [LibraryImport("ole32.dll", EntryPoint = "CoInitializeEx")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial HResult CoInitializeEx(nint pvReserved, COINIT dwCoInit);
+
+        [LibraryImport("ole32.dll", EntryPoint = "CoUninitialize")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial void CoUninitialize();
+
         [LibraryImport("ole32.dll", EntryPoint = "CoCreateInstance")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static unsafe partial HResult CoCreateInstance(in Guid rclsid, nint pUnkOuter, CLSCTX dwClsContext, in Guid riid, out nint ppObj);
@@ -26,11 +35,14 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("ole32.dll", EntryPoint = "CoRegisterClassObject")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial HResult CoRegisterClassObject(
-            in                                   Guid          rclsid,
-            [MarshalAs(UnmanagedType.Interface)] IClassFactory pUnk,
-            CLSCTX                                             dwClsContext,
-            TagREGCLS                                          flags,
-            out uint                                           dwRegister);
+            in Guid rclsid,
+
+            [MarshalUsing(typeof(ComInterfaceMarshaller<IClassFactory>))]
+            IClassFactory pUnk,
+
+            CLSCTX    dwClsContext,
+            TagREGCLS flags,
+            out uint  dwRegister);
 
         [LibraryImport("ole32.dll", EntryPoint = "CoRevokeClassObject")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]

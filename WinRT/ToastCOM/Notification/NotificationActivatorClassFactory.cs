@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 #endif
 using Hi3Helper.Win32.Native.ClassIds;
 using Hi3Helper.Win32.Native.Interfaces;
+using Hi3Helper.Win32.Native.Structs;
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
@@ -26,7 +27,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             _instance = instance;
         }
 
-        public unsafe int CreateInstance(nint pUnkOuter, in Guid riid, out nint ppvObject)
+        public unsafe HResult CreateInstance(nint pUnkOuter, in Guid riid, out nint ppvObject)
         {
             ppvObject = nint.Zero;
 
@@ -57,7 +58,7 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
             }
         }
 
-        public int LockServer([MarshalAs(UnmanagedType.VariantBool)] in bool fLock)
+        public HResult LockServer(bool fLock)
         {
             return 0;
         }
