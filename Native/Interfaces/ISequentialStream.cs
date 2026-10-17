@@ -9,8 +9,8 @@ namespace Hi3Helper.Win32.Native.Interfaces;
 public partial interface ISequentialStream
 {
     // https://learn.microsoft.com/windows/win32/api/objidl/nf-objidl-isequentialstream-read
-    void Read(nint pv, uint cb, nint /* optional uint* */ pcbRead);
+    void Read(nint pv, uint cb, out uint pcbRead);
 
     // https://learn.microsoft.com/windows/win32/api/objidl/nf-objidl-isequentialstream-write
-    void Write(nint pv, uint cb, nint /* optional uint* */ pcbWritten);
+    void Write(nint pv, uint cb, out uint pcbWritten);
 }

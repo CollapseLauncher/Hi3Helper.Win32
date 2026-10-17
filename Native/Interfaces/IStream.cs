@@ -11,7 +11,7 @@ namespace Hi3Helper.Win32.Native.Interfaces;
 public partial interface IStream : ISequentialStream
 {
     // https://learn.microsoft.com/windows/win32/api/objidl/nf-objidl-istream-seek
-    void Seek(long dlibMove, SeekOrigin dwOrigin, nint /* optional ulong* */ plibNewPosition);
+    void Seek(long dlibMove, SeekOrigin dwOrigin, out ulong plibNewPosition);
 
     // https://learn.microsoft.com/windows/win32/api/objidl/nf-objidl-istream-setsize
     void SetSize(ulong libNewSize);
