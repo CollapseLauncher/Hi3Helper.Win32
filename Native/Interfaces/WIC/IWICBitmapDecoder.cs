@@ -16,7 +16,7 @@ public unsafe partial interface IWICBitmapDecoder
 {
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
-    HResult QueryCapability(nint stream, out uint capabilities);
+    HResult QueryCapability(nint stream, out WICBitmapDecoderCapabilities capabilities);
 
     [PreserveSig]
     [return: MarshalAs(UnmanagedType.Error)]
