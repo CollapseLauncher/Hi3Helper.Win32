@@ -48,6 +48,24 @@ public static class RandomStreamExtension
                 ? StreamReadOperationOptimization.MemoryStream
                 : StreamReadOperationOptimization.AbstractStream;
     }
+
+    extension(IRandomAccessStream stream)
+    {
+        public Stream AsStream(bool leaveOpen = false)
+            => WinRtToNetFxStreamAdapter.Create(stream, leaveOpen);
+    }
+
+    extension(IInputStream stream)
+    {
+        public Stream AsStreamForRead(bool leaveOpen = false)
+            => WinRtToNetFxStreamAdapter.Create(stream, leaveOpen);
+    }
+
+    extension(IOutputStream stream)
+    {
+        public Stream AsStreamForWrite(bool leaveOpen = false)
+            => WinRtToNetFxStreamAdapter.Create(stream, leaveOpen);
+    }
 }
 
 public abstract class NetFxToWinRtStreamAdapter : IDisposable
