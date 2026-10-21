@@ -9,6 +9,7 @@ using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Interfaces;
 using Hi3Helper.Win32.Native.LibraryImport;
 using Hi3Helper.Win32.Native.Structs;
+
 // ReSharper disable IdentifierTypo
 // ReSharper disable CommentTypo
 
@@ -218,9 +219,11 @@ public class ShellLink
     /// </summary>
     public void SetAppUserModelId(string appId)
     {
-        PropertyKey pkey = PropertyKey.PkeyAppUserModelID;
-        PropVariant str = PropVariant.FromString(appId);
-        _propertyStoreW?.SetValue(ref pkey, ref str);
+        PropertyKey       pkey = PropertyKey.PkeyAppUserModelID;
+        using PropVariant str  = PropVariant.Create(appId);
+
+        _propertyStoreW?.SetValue(in pkey, in str);
+        _propertyStoreW?.Commit();
     }
 
     /// <summary>
@@ -237,17 +240,11 @@ public class ShellLink
     /// </summary>
     public void SetToastActivatorClsid(Guid clsid)
     {
-        PropertyKey pkey = PropertyKey.PkeyAppUserModelToastActivatorClsid;
-        PropVariant varGuid = PropVariant.FromGuid(clsid);
-        try
-        {
-            _propertyStoreW?.SetValue(ref pkey, ref varGuid);
-            _propertyStoreW?.Commit();
-        }
-        finally
-        {
-            varGuid.Clear();
-        }
+        PropertyKey       pkey    = PropertyKey.PkeyAppUserModelToastActivatorClsid;
+        using PropVariant varGuid = PropVariant.Create(clsid);
+
+        _propertyStoreW?.SetValue(ref pkey, in varGuid);
+        _propertyStoreW?.Commit();
     }
 
     /// <summary>

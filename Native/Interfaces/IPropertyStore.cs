@@ -15,11 +15,11 @@ public partial interface IPropertyStore
 {
     void GetCount(out uint cProps);
 
-    void GetAt(in uint iProp, out PropertyKey pkey);
+    void GetAt(ref readonly uint iProp, out PropertyKey pkey);
 
-    void GetValue(ref PropertyKey key, out PropVariant pv);
+    void GetValue(ref readonly PropertyKey key, out PropVariant pv);
 
-    void SetValue(ref PropertyKey key, ref PropVariant pv);
+    void SetValue(ref readonly PropertyKey key, ref readonly PropVariant pv);
 
     void Commit();
 }

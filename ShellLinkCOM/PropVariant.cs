@@ -15,21 +15,21 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         public short Reserved1, Reserved2, Reserved3;
         public nint  pointerValue;
 
-        public static PropVariant FromString(string str)
+        public static PropVariant Create(string str)
         {
-            PropVariant pv = new PropVariant
+            PropVariant pv = new()
             {
-                variantType = 31,  // VT_LPWSTR
+                variantType  = 31,  // VT_LPWSTR
                 pointerValue = Marshal.StringToCoTaskMemUni(str)
             };
 
             return pv;
         }
 
-        public static PropVariant FromGuid(Guid guid)
+        public static PropVariant Create(Guid guid)
         {
             byte[] bytes = guid.ToByteArray();
-            PropVariant pv = new PropVariant
+            PropVariant pv = new()
             {
                 variantType = 72,  // VT_CLSID
                 pointerValue = Marshal.AllocCoTaskMem(bytes.Length)
@@ -56,7 +56,7 @@ namespace Hi3Helper.Win32.ShellLinkCOM
         public unsafe void Clear()
         {
             PInvoke.PropVariantClear((PropVariant*)Unsafe.AsPointer(ref this))
-                .ThrowOnFailure();
+                   .ThrowOnFailure();
         }
     }
 }

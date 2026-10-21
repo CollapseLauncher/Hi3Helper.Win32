@@ -7,8 +7,8 @@ namespace Hi3Helper.Win32.Native.Structs
     [StructLayout(LayoutKind.Sequential)]
     public struct PropertyKey
     {
-        public Guid  formatId;
-        public nuint pid;
+        public Guid formatId;
+        public int  pid;
 
         public static PropertyKey PkeyAppUserModelID
         {
@@ -17,7 +17,7 @@ namespace Hi3Helper.Win32.Native.Structs
                 return new PropertyKey
                 {
                     formatId = Guid.ParseExact("{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}", "B"),
-                    pid = new nuint(5)
+                    pid      = 5
                 };
             }
         }
@@ -29,7 +29,7 @@ namespace Hi3Helper.Win32.Native.Structs
                 return new PropertyKey
                 {
                     formatId = Guid.ParseExact("{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}", "B"),
-                    pid = new nuint(26)
+                    pid      = 26
                 };
             }
         }

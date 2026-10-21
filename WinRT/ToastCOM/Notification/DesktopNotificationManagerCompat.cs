@@ -1,9 +1,5 @@
-﻿using Hi3Helper.Win32.ManagedTools;
-using Hi3Helper.Win32.Native.ClassIds;
-using Hi3Helper.Win32.Native.Enums;
-using Hi3Helper.Win32.Native.Interfaces;
+﻿using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.LibraryImport;
-using Hi3Helper.Win32.Native.Structs;
 using Hi3Helper.Win32.ShellLinkCOM;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -90,72 +86,19 @@ namespace Hi3Helper.Win32.WinRT.ToastCOM.Notification
                 shortcutPath += ".lnk";
             }
 
-            if (!ComMarshal<IShellLinkW>.TryCreateComObject(ShellLinkClsId.ClsId_ShellLink,
-                                                             CLSCTX.CLSCTX_INPROC_SERVER,
-                                                             out IShellLinkW? shellLink,
-                                                             out Exception? exception))
+            ShellLink shellLink = new()
             {
-                currentInstance.Logger?.LogError(exception, $"An error has occurred while trying to create COM Instance of {nameof(IShellLinkW)}");
-                return;
-            }
-
-            PropVariant aumId = PropVariant.FromString(aumid);
-            PropertyKey aumIdPropkey = new()
-            {
-                formatId = ToastG,
-                pid = 5
-            };
-            PropVariant toastId = PropVariant.FromGuid(applicationId);
-            PropertyKey toastIdPropkey = new()
-            {
-                formatId = ToastG,
-                pid = 26
+                Target           = executablePath,
+                WorkingDirectory = executableDirPath
             };
 
-            bool isShortcutExist = File.Exists(shortcutPath);
+            shellLink.SetAppUserModelId(aumid);
+            shellLink.SetToastActivatorClsid(applicationId);
 
-            try
-            {
-                if (!ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
-                                                                 in ShellLinkClsId.IGuid_IPersistFile,
-                                                                 out IPersistFile? persistFileW,
-                                                                 out exception) ||
-                    !ComMarshal<IShellLinkW>.TryCastComObjectAs(shellLink,
-                                                                 in ShellLinkClsId.IGuid_IPropertyStore,
-                                                                 out IPropertyStore? propertyStoreW,
-                                                                 out exception))
-                {
-                    currentInstance.Logger?.LogError(exception, $"An error has occurred while trying to cast COM Instance from {nameof(IShellLinkW)} to {nameof(IPersistFile)} or {nameof(IPropertyStore)}");
-                    return;
-                }
+            if (!string.IsNullOrEmpty(temporaryDirectoryPath) && !Directory.Exists(temporaryDirectoryPath))
+                Directory.CreateDirectory(temporaryDirectoryPath);
 
-                try
-                {
-                    if (isShortcutExist)
-                        persistFileW.Load(shortcutPath, 0);
-                }
-                catch (Exception ex)
-                {
-                    currentInstance.Logger?.LogError(ex, "[DesktopNotificationManagerCompat::CreateAumidShortcut] An error has occured while loading existing shortcut: {shortcutPath}\r\n{ex}", shortcutPath, ex);
-                }
-
-                shellLink.SetPath(executablePath);
-                shellLink.SetWorkingDirectory(executableDirPath);
-
-                propertyStoreW.SetValue(ref aumIdPropkey, ref aumId);
-                propertyStoreW.SetValue(ref toastIdPropkey, ref toastId);
-                propertyStoreW.Commit();
-
-                if (!string.IsNullOrEmpty(temporaryDirectoryPath) && !Directory.Exists(temporaryDirectoryPath))
-                    Directory.CreateDirectory(temporaryDirectoryPath);
-
-                persistFileW.Save(shortcutPath, true);
-            }
-            finally
-            {
-                aumId.Clear();
-                toastId.Clear();
-            }
+            shellLink.Save(shortcutPath);
         }
 
         private static void RegisterAumid(string? iconPath, Guid applicationId)
