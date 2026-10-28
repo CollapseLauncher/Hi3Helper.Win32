@@ -22,12 +22,24 @@ public unsafe struct BITMAPHEADER
     {
         var thisSpan = new Span<BITMAPHEADER>(ref this);
         thisSpan.Clear();
-        ref BITMAPV5HEADER v5Header = ref TryReadAs<BITMAPV5HEADER>();
+        ref BITMAPV5HEADER v5Header = ref MemoryMarshal.AsRef<BITMAPV5HEADER>(DibHeaderData);
 
         v5Header.V5Size      = (uint)sizeof(BITMAPV5HEADER);
         File.PixelDataOffset = v5Header.V5Size;
 
         MemoryMarshal.AsRef<ushort>(MemoryMarshal.AsBytes(thisSpan)) = TypeSig;
+    }
+
+    public int DibHeaderSize
+    {
+        get
+        {
+            ref BITMAPV5HEADER v5Header = ref MemoryMarshal.AsRef<BITMAPV5HEADER>(DibHeaderData);
+            if (Unsafe.IsNullRef(ref v5Header))
+                return 0;
+
+            return (int)v5Header.V5Size;
+        }
     }
 
     public bool IsNull => Unsafe.AsPointer(ref this) == null;
@@ -36,7 +48,7 @@ public unsafe struct BITMAPHEADER
     {
         get
         {
-            int structSize = MemoryMarshal.Read<int>(DibHeaderData);
+            int structSize = DibHeaderSize;
             return !IsNull &&
                    MemoryMarshal.Read<ushort>(File.Type) == TypeSig &&
                    (sizeof(BITMAPV1HEADER) >= structSize ||
