@@ -4,7 +4,7 @@
 
 namespace Hi3Helper.Win32.Native.Structs;
 
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct CIEXYZTRIPLE
 {
     public CIEXYZ ciexyzRed;

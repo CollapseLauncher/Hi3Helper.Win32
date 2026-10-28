@@ -1,32 +1,35 @@
-﻿namespace Hi3Helper.Win32.Native.Structs;
+﻿using System.Runtime.InteropServices;
+
+namespace Hi3Helper.Win32.Native.Structs;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct BITMAPV5HEADER
 {
-    public uint         bV5Size;
-    public int          bV5Width;
-    public int          bV5Height;
-    public ushort       bV5Planes;
-    public ushort       bV5BitCount;
-    public uint         bV5Compression;
-    public uint         bV5SizeImage;
-    public int          bV5XPelsPerMeter;
-    public int          bV5YPelsPerMeter;
-    public uint         bV5ClrUsed;
-    public uint         bV5ClrImportant;
-    public uint         bV5RedMask;
-    public uint         bV5GreenMask;
-    public uint         bV5BlueMask;
-    public uint         bV5AlphaMask;
-    public uint         bV5CSType;
-    public CIEXYZTRIPLE bV5Endpoints;
-    public uint         bV5GammaRed;
-    public uint         bV5GammaGreen;
-    public uint         bV5GammaBlue;
-    public uint         bV5Intent;
-    public uint         bV5ProfileData;
-    public uint         bV5ProfileSize;
-    public uint         bV5Reserved;
+    public uint         V5Size;
+    public int          V5Width;
+    public int          V5Height;
+    public ushort       V5Planes;
+    public ushort       V5BitCount;
+    public uint         V5Compression;
+    public uint         V5SizeImage;
+    public int          V5XPelsPerMeter;
+    public int          V5YPelsPerMeter;
+    public uint         V5ClrUsed;
+    public uint         V5ClrImportant;
+    public uint         V5RedMask;
+    public uint         V5GreenMask;
+    public uint         V5BlueMask;
+    public uint         V5AlphaMask;
+    public uint         V5CSType;
+    public CIEXYZTRIPLE V5Endpoints;
+    public uint         V5GammaRed;
+    public uint         V5GammaGreen;
+    public uint         V5GammaBlue;
+    public uint         V5Intent;
+    public uint         V5ProfileData;
+    public uint         V5ProfileSize;
+    public uint         V5Reserved;
 }
