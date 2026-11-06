@@ -74,7 +74,7 @@ public static class ComMarshal
 public static class ComMarshal<TComObject>
     where TComObject : class
 {
-    public static readonly Guid? IID = typeof(TComObject).GUID;
+    public static readonly Guid IID = typeof(TComObject).GUID;
 
     /// <summary>
     /// Try to create COM Object based on its Class Factory ID and its Class Identifier ID (IID).
@@ -193,7 +193,7 @@ public static class ComMarshal<TComObject>
         bool useUnique = false)
         => TryCreateComObject(in classFactoryId,
                               classContext,
-                              in Nullable.GetValueRefOrDefaultRef(in IID),
+                              in IID,
                               out comObjResult,
                               out exceptionIfFalse,
                               useUnique);
@@ -271,19 +271,11 @@ public static class ComMarshal<TComObject>
         where TComCastTo : class
     {
         Unsafe.SkipInit(out comObjTarget);
-
-        ref readonly Guid comObjTargetIid = ref Nullable.GetValueRefOrDefaultRef(in IID);
-        if (!Unsafe.IsNullRef(in comObjTargetIid))
-        {
-            return TryCastComObjectAs(comObjSource,
-                                      in comObjTargetIid,
-                                      out comObjTarget,
-                                      out exceptionIfFalse,
-                                      useUnique);
-        }
-
-        exceptionIfFalse = ThrowNoGuidDefined<TComCastTo>();
-        return false;
+        return TryCastComObjectAs(comObjSource,
+                                  IID,
+                                  out comObjTarget,
+                                  out exceptionIfFalse,
+                                  useUnique);
     }
 
     /// <summary>
@@ -363,6 +355,4 @@ public static class ComMarshal<TComObject>
         out DisposeResult disposeResult,
         out int           hResult)
         => ComMarshal.TryDispose(comObj, out disposeResult, out hResult);
-
-    private static InvalidCastException ThrowNoGuidDefined<TObjTarget>() => new($"Type of {typeof(TObjTarget).Name} has no Class Identifier ID (IID)");
 }

@@ -197,11 +197,9 @@ public static class WindowsCodecHelper
         IWICBitmapDecoder? decoder = null;
         try
         {
-            ref readonly Guid iid = ref Nullable.GetValueRefOrDefaultRef(in ComMarshal<IStream>.IID);
-
             randomStreamAbi = MarshalInterface<IRandomAccessStream>.FromManaged(randomStream);
             HResult hr = WinRTPInvoke.CreateStreamOverRandomAccessStream(randomStreamAbi,
-                                                                         in iid,
+                                                                         in ComMarshal<IStream>.IID,
                                                                          out streamAbi);
 
             if (!hr)
