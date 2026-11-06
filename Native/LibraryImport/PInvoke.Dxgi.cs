@@ -14,5 +14,9 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("Dxgi.dll", EntryPoint = "CreateDXGIFactory2")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial HResult CreateDXGIFactory2(uint flags, in Guid riid, [MarshalUsing(typeof(UniqueComInterfaceMarshaller<IDXGIFactory2>))] out IDXGIFactory2? ppFactory);
+
+        [LibraryImport("Dxgi.dll", EntryPoint = "CreateDXGIFactory2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial HResult CreateDXGIFactory2(uint flags, in Guid riid, out nint ppFactory);
     }
 }
