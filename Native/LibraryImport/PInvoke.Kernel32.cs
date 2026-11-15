@@ -10,7 +10,7 @@ using Hi3Helper.Win32.Native.Structs;
 
 namespace Hi3Helper.Win32.Native.LibraryImport
 {
-    public delegate bool ConsoleControlHandler(uint handle);
+    public delegate BOOL ConsoleControlHandler(uint handle);
     public static partial class PInvoke
     {
         public const uint FormatMessageFromHmodule    = 0x800;

@@ -21,9 +21,9 @@ namespace Hi3Helper.Win32.Native.Structs
             return instance._bestHandle;
         }
 
-        private static unsafe bool EnumWindowsCallback(nint handle, nint extraParameter)
+        private static unsafe BOOL EnumWindowsCallback(nint handle, nint extraParameter)
         {
-            MainWindowFinder* instance = (MainWindowFinder*)extraParameter;
+            var instance = (MainWindowFinder*)extraParameter;
 
             int processId = 0; // Avoid uninitialized variable if the window got closed in the meantime
             PInvoke.GetWindowThreadProcessId(handle, &processId);

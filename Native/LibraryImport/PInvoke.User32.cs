@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace Hi3Helper.Win32.Native.LibraryImport
 {
-    public delegate bool EnumWindowsProc(nint windowHandle, nint lParam);
+    public delegate BOOL EnumWindowsProc(nint windowHandle, nint lParam);
 
     public delegate void WinEventDelegate(nint hWinEventHook,
                                           uint eventType,
@@ -117,7 +117,7 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("user32.dll", EntryPoint = "GetWindowLongW", SetLastError = true)]
         public static partial uint GetWindowLong(nint windowHandle, GWL_INDEX nIndex);
 
-        [SkipLocalsInit, MethodImpl(MethodImplOptions.AggressiveInlining), SuppressGCTransition]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe void GetWindowLong<T>(nint windowHandle, GWL_INDEX nIndex, out T value)
             where T : unmanaged, allows ref struct
         {
@@ -136,7 +136,7 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("user32.dll", EntryPoint = "SetWindowLongW", SetLastError = true)]
         public static partial int SetWindowLong(nint windowHandle, GWL_INDEX nIndex, uint dwNewLong);
 
-        [SkipLocalsInit, MethodImpl(MethodImplOptions.AggressiveInlining), SuppressGCTransition]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe int SetWindowLong<T>(nint windowHandle, GWL_INDEX nIndex, T dwNewLong)
             where T : unmanaged, allows ref struct
         {
