@@ -51,5 +51,9 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         [LibraryImport("shell32.dll")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial void DragFinish(nint dropHandle);
+
+        [LibraryImport("shell32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static unsafe partial HResult Shell_NotifyIconGetRect(ref readonly NOTIFYICONIDENTIFIER identifier, out Rect rect);
     }
 }
