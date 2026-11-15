@@ -2,6 +2,9 @@
 using Hi3Helper.Win32.Native.Enums;
 using Hi3Helper.Win32.Native.Enums.D2D;
 using Hi3Helper.Win32.Native.Structs;
+using System;
+using System.Runtime.CompilerServices;
+
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMethodReturnValue.Global
@@ -112,14 +115,41 @@ namespace Hi3Helper.Win32.Native.LibraryImport
         public static partial bool DestroyIcon(nint hIcon);
 
         [LibraryImport("user32.dll", EntryPoint = "GetWindowLongW", SetLastError = true)]
-        public static partial WS_STYLE GetWindowLong(nint windowHandle, GWL_INDEX nIndex);
+        public static partial uint GetWindowLong(nint windowHandle, GWL_INDEX nIndex);
+
+        [SkipLocalsInit, MethodImpl(MethodImplOptions.AggressiveInlining), SuppressGCTransition]
+        public static unsafe void GetWindowLong<T>(nint windowHandle, GWL_INDEX nIndex, out T value)
+            where T : unmanaged, allows ref struct
+        {
+            Unsafe.SkipInit(out value);
+
+            if (sizeof(T) != sizeof(uint))
+                throw new InvalidOperationException($"Size of T must be {sizeof(uint)}!");
+
+            uint val = GetWindowLong(windowHandle, nIndex);
+            if (val == 0)
+                return;
+
+            value = Unsafe.BitCast<uint, T>(val);
+        }
 
         [LibraryImport("user32.dll", EntryPoint = "SetWindowLongW", SetLastError = true)]
-        public static partial int SetWindowLong(nint windowHandle, GWL_INDEX nIndex, WS_STYLE dwNewLong);
+        public static partial int SetWindowLong(nint windowHandle, GWL_INDEX nIndex, uint dwNewLong);
+
+        [SkipLocalsInit, MethodImpl(MethodImplOptions.AggressiveInlining), SuppressGCTransition]
+        public static unsafe int SetWindowLong<T>(nint windowHandle, GWL_INDEX nIndex, T dwNewLong)
+            where T : unmanaged, allows ref struct
+        {
+            if (sizeof(T) != sizeof(uint))
+                throw new InvalidOperationException($"Size of T must be {sizeof(uint)}!");
+
+            uint val = Unsafe.BitCast<T, uint>(dwNewLong);
+            return SetWindowLong(windowHandle, nIndex, val);
+        }
 
         [LibraryImport("user32.dll", EntryPoint = "GetWindowRect", SetLastError = true)]
-        [return : MarshalAs(UnmanagedType.Bool)]
-        public static unsafe partial bool GetWindowRect(nint windowHandle, WindowRect* rectangle);
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static unsafe partial bool GetWindowRect(nint windowHandle, out Rect rectangle);
 
         [LibraryImport("user32.dll", EntryPoint = "SetWindowPos", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
